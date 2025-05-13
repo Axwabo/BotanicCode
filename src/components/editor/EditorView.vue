@@ -1,16 +1,23 @@
 <script setup lang="ts">
-import { ref, watch } from "vue";
+import { defineAsyncComponent, ref, watch } from "vue";
 import useFileStore from "../../fileStore.ts";
 import { storeToRefs } from "pinia";
+import Loading from "./Loading.vue";
 
-const { currentFile } = storeToRefs(useFileStore());
+const { currentFile, fileContents, requestEditorText } = storeToRefs(useFileStore());
 const { files } = useFileStore();
 
 let controller = new AbortController();
 
-const script = ref("");
-
 const saving = ref(false);
+
+const loadedFile = ref("");
+
+const monaco = defineAsyncComponent({
+    delay: 0,
+    loadingComponent: Loading,
+    loader: () => import("./MonacoEditor.vue")
+});
 
 async function saveChanges() {
     saving.value = true;
@@ -18,7 +25,7 @@ async function saveChanges() {
         const path = currentFile.value;
         const response = await fetch(path, {
             method: "POST",
-            body: script.value
+            body: requestEditorText.value()
         });
         if (response.status !== 201) {
             alert("Failed to save file");
@@ -35,18 +42,20 @@ watch(currentFile, async value => {
     if (!value)
         return;
     if (files.get(value) === "created") {
-        script.value = "";
+        fileContents.value = "";
+        loadedFile.value = value;
         return;
     }
     controller?.abort("Navigating file");
     controller = new AbortController();
     const response = await fetch(value, { signal: controller.signal });
-    script.value = response.ok ? await response.text() : "";
+    fileContents.value = response.ok ? await response.text() : "";
+    loadedFile.value = value;
 });
 </script>
 
 <template>
-    <textarea v-model="script"></textarea>
+    <monaco :key="loadedFile"/>
     <button v-on:click="saveChanges();" v-bind:disabled="saving">Save Changes</button>
 </template>
 

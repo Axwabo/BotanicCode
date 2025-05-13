@@ -6,10 +6,12 @@ export type FileStatus = "created" | "modified" | "saved";
 interface State {
     files: Map<string, FileStatus>
     currentFile: string
+    fileContents: string
+    requestEditorText: () => string
 }
 
 const useFileStore = defineStore("projectFiles", {
-    state: (): State => ({ files: reactive(new Map<string, FileStatus>()), currentFile: "" }),
+    state: (): State => ({ files: reactive(new Map<string, FileStatus>()), currentFile: "", fileContents: "", requestEditorText: () => "" }),
     actions: {
         navigate(path: string, status?: FileStatus) {
             if (status)

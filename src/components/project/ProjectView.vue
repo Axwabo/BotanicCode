@@ -25,7 +25,7 @@ function createFile() {
     <input type="text" v-model="newFile">
     <button v-on:click="createFile()">+</button>
     <ul>
-        <li v-for="[file, status] in files">
+        <li v-for="[file, status] in files" :key="file">
             <File :filename="file" :status="status"/>
         </li>
     </ul>
