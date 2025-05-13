@@ -22,7 +22,7 @@ const monaco = defineAsyncComponent({
 async function saveChanges() {
     saving.value = true;
     try {
-        const path = currentFile.value;
+        const path = loadedFile.value;
         const response = await fetch(path, {
             method: "POST",
             body: requestEditorText.value()
@@ -34,6 +34,13 @@ async function saveChanges() {
     } finally {
         saving.value = false;
     }
+}
+
+function handleSave(event: KeyboardEvent) {
+    if (!event.ctrlKey || event.key !== "s")
+        return;
+    saveChanges();
+    event.preventDefault();
 }
 
 watch(currentFile, async value => {
@@ -49,7 +56,7 @@ watch(currentFile, async value => {
     const response = await fetch(value, { signal: controller.signal });
     fileContents.value = response.ok ? await response.text() : "";
     loadedFile.value = value;
-});
+}, { immediate: true });
 </script>
 
 <template>
@@ -57,7 +64,7 @@ watch(currentFile, async value => {
         <span class="view-label">{{ loadedFile || "Editor" }}</span>
         <button v-on:click="saveChanges();" v-bind:disabled="saving">Save Changes</button>
     </div>
-    <div id="editorContainer" v-if="loadedFile">
+    <div id="editorContainer" v-if="loadedFile" v-on:keydown="handleSave">
         <monaco :key="loadedFile"/>
     </div>
     <p v-else>Click on a file to open it, or create a new one</p>
