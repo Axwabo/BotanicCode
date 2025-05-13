@@ -33,5 +33,8 @@ export default defineConfig({
             suppressWarnings: true,
             type: "module"
         }
-    }) ]
+    }) ],
+    server: {
+        port: 8000
+    }
 })
