@@ -4,9 +4,13 @@ import { NavigationRoute, registerRoute } from "workbox-routing";
 
 declare let self: ServiceWorkerGlobalScope;
 
-const base = self.location.origin + import.meta.env.BASE_URL;
+const base = self.location.origin;
 
 let fileCache: Cache | undefined;
+
+async function getCache() {
+    return fileCache ??= await caches.open("Files");
+}
 
 self.addEventListener("activate", async () => {
     fileCache = await caches.open("Files");
@@ -26,17 +30,17 @@ self.addEventListener("fetch", event => {
     if (!path.startsWith("bot/"))
         return;
     const url = new URL(path, base);
-    event.respondWith(fileCache.put(url, new Response(event.request.body, {
+    event.respondWith(getCache().then(cache => cache.put(url, new Response(event.request.body, {
         status: 200,
         headers: {
             "Content-Type": "text/javascript",
             "Content-Security-Policy": "script-src 'strict-dynamic'"
         }
-    })).then(() => new Response(path, { status: 201 })));
+    }))).then(() => new Response(path, { status: 201 })));
 });
 
 registerRoute("/file-list/bot", async () => {
-    const keys = fileCache ? await fileCache.keys() : [];
+    const keys = await (await getCache()).keys();
     const response = new Response(keys.map(f => f.url.substring(base.length)).join("\n"));
     response.headers.set("Content-Type", "text/plain");
     return response;
