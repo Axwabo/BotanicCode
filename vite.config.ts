@@ -28,7 +28,7 @@ export default defineConfig({
         },
 
         devOptions: {
-            enabled: false,
+            enabled: true,
             navigateFallback: "index.html",
             suppressWarnings: true,
             type: "module"
@@ -36,6 +36,5 @@ export default defineConfig({
     }) ],
     server: {
         port: 8000
-    },
-    base: "BotanicCode"
+    }
 })

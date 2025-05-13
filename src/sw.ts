@@ -1,6 +1,6 @@
 /// <reference lib="webworker" />
 import { cleanupOutdatedCaches, createHandlerBoundToURL, precacheAndRoute } from "workbox-precaching"
-import { NavigationRoute, registerRoute } from "workbox-routing"
+import { NavigationRoute, registerRoute } from "workbox-routing";
 
 declare let self: ServiceWorkerGlobalScope;
 
@@ -8,7 +8,11 @@ const base = self.location.origin + import.meta.env.BASE_URL;
 
 let fileCache: Cache | undefined;
 
-self.addEventListener("activate", async () => fileCache = await caches.open("Files"));
+self.addEventListener("activate", async () => {
+    fileCache = await caches.open("Files");
+    await self.clients.claim();
+    await self.skipWaiting();
+});
 
 self.addEventListener("message", async event => {
     if (!event.data)
@@ -39,12 +43,19 @@ self.addEventListener("fetch", event => {
     if (!fileCache)
         return;
     const path = event.request.url.substring(base.length).replace(/^\//, "");
-    if(!path.startsWith("bot/"))
+    if (!path.startsWith("bot/"))
         return;
     event.respondWith(fileCache.match(new URL(event.request.url)).then(e => e ?? new Response(null, {
         status: 404,
         statusText: "File Not Found"
     })));
+});
+
+registerRoute("/file-list/bot", async () => {
+    const keys = await fileCache!.keys();
+    const response = new Response(keys.map(f => f.url).join("\n"));
+    response.headers.set("Content-Type", "text/plain");
+    return response;
 });
 
 // self.__WB_MANIFEST is the default injection point
