@@ -16,10 +16,10 @@ const useFileStore = defineStore("projectFiles", {
         navigate(path: string, status?: FileStatus) {
             if (this.currentFile === path)
                 return;
+            if (this.files.get(this.currentFile) === "created")
+                this.files.delete(this.currentFile);
             if (status)
                 this.files.set(path, status);
-            else if (this.files.get(this.currentFile) === "created")
-                this.files.delete(this.currentFile);
             this.currentFile = path;
         }
     }
