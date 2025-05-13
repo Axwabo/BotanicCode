@@ -10,3 +10,18 @@
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
 }
+
+#app {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    grid-template-rows: auto 1fr;
+    grid-auto-flow: column;
+    gap: 0.5rem;
+}
+
+.view-label {
+    background-color: black;
+    flex: 1;
+    font-family: monospace;
+    padding: 0.25em;
+}

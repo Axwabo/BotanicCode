@@ -27,12 +27,10 @@ async function saveChanges() {
             method: "POST",
             body: requestEditorText.value()
         });
-        if (response.status !== 201) {
+        if (response.status !== 201)
             alert("Failed to save file");
-            return;
-        }
-        files.set(path, "saved");
-        alert("Saved");
+        else
+            files.set(path, "saved");
     } finally {
         saving.value = false;
     }
@@ -55,10 +53,24 @@ watch(currentFile, async value => {
 </script>
 
 <template>
-    <monaco :key="loadedFile"/>
-    <button v-on:click="saveChanges();" v-bind:disabled="saving">Save Changes</button>
+    <div class="editor-buttons">
+        <span class="view-label">{{ loadedFile || "Editor" }}</span>
+        <button v-on:click="saveChanges();" v-bind:disabled="saving">Save Changes</button>
+    </div>
+    <div id="editorContainer" v-if="loadedFile">
+        <monaco :key="loadedFile"/>
+    </div>
+    <p v-else>Click on a file to open it, or create a new one</p>
 </template>
 
 <style scoped>
+.editor-buttons {
+    display: flex;
+    align-items: center;
+    gap: 0.5em;
+}
 
+#editorContainer {
+    width: 100%;
+}
 </style>

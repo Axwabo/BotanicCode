@@ -14,6 +14,8 @@ const useFileStore = defineStore("projectFiles", {
     state: (): State => ({ files: reactive(new Map<string, FileStatus>()), currentFile: "", fileContents: "", requestEditorText: () => "" }),
     actions: {
         navigate(path: string, status?: FileStatus) {
+            if (this.currentFile === path)
+                return;
             if (status)
                 this.files.set(path, status);
             else if (this.files.get(this.currentFile) === "created")

@@ -5,9 +5,7 @@ import EditorView from "./components/editor/EditorView.vue";
 </script>
 
 <template>
-    <Suspense>
-        <ProjectView/>
-    </Suspense>
+    <ProjectView/>
     <EditorView/>
     <PWABadge/>
 </template>

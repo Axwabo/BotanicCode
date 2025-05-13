@@ -40,7 +40,6 @@ onUnmounted(() => {
 
 <style scoped>
 #monacoEditor {
-    width: 1000px; /* TODO*/
-    height: 500px;
+    min-height: 500px;
 }
 </style>

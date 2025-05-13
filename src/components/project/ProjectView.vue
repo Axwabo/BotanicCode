@@ -1,36 +1,29 @@
 <script setup lang="ts">
 import { ref } from "vue";
-import File from "./File.vue";
 import useFileStore from "../../fileStore.ts";
+import FileList from "./FileList.vue";
 
-const { files, navigate } = useFileStore();
-
-const response = await fetch("file-list/bot");
-if (response.ok) {
-    const text = await response.text();
-    const lines = text.split("\n");
-    for (const line of lines)
-        if (line)
-            files.set(line, "saved");
-}
+const { navigate } = useFileStore();
 
 const newFile = ref("");
 
 function createFile() {
     navigate(`bot/${newFile.value}`, "created");
+    newFile.value = "";
 }
 </script>
 
 <template>
-    <input type="text" v-model="newFile">
-    <button v-on:click="createFile()">+</button>
-    <ul>
-        <li v-for="[file, status] in files" :key="file">
-            <File :filename="file" :status="status"/>
-        </li>
-    </ul>
+    <span class="view-label">Project</span>
+    <div id="projectContainer">
+        <input type="text" v-model="newFile" placeholder="Create file">
+        <button v-on:click="createFile()">+</button>
+        <hr>
+        <Suspense>
+            <FileList/>
+            <template #fallback>
+                <p>Loading...</p>
+            </template>
+        </Suspense>
+    </div>
 </template>
-
-<style scoped>
-
-</style>
