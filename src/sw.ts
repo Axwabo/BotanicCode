@@ -36,7 +36,7 @@ self.addEventListener("fetch", event => {
 });
 
 registerRoute("/file-list/bot", async () => {
-    const keys = await fileCache!.keys();
+    const keys = fileCache ? await fileCache.keys() : [];
     const response = new Response(keys.map(f => f.url.substring(base.length)).join("\n"));
     response.headers.set("Content-Type", "text/plain");
     return response;

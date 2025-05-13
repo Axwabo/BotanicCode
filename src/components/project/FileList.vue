@@ -7,7 +7,7 @@ const { files } = useFileStore();
 await navigator.serviceWorker.ready;
 
 const response = await fetch("file-list/bot");
-if (response.ok) {
+if (response.ok && response.headers.get("Content-Type") === "text/plain") {
     const text = await response.text();
     const lines = text.split("\n");
     for (const line of lines)
