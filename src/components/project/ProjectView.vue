@@ -1,17 +1,23 @@
 <script setup lang="ts">
 import { ref } from "vue";
 import File from "./File.vue";
-import { activeEditorFileName } from "../../activeEditor.ts";
+import useFileStore from "../../fileStore.ts";
+
+const { files, navigate } = useFileStore();
 
 const response = await fetch("file-list/bot");
-const text = response.ok ? await response.text() : "";
-
-const files = ref<string[]>(text.split("\n").filter(e => e));
+if (response.ok) {
+    const text = await response.text();
+    const lines = text.split("\n");
+    for (const line of lines)
+        if (line)
+            files.set(line, "saved");
+}
 
 const newFile = ref("");
 
 function createFile() {
-    activeEditorFileName.value = `bot/${newFile.value}`;
+    navigate(`bot/${newFile.value}`, "created");
 }
 </script>
 
@@ -19,8 +25,8 @@ function createFile() {
     <input type="text" v-model="newFile">
     <button v-on:click="createFile()">+</button>
     <ul>
-        <li v-for="file in files">
-            <File :filename="file"/>
+        <li v-for="[file, status] in files">
+            <File :filename="file" :status="status"/>
         </li>
     </ul>
 </template>

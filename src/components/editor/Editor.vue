@@ -1,6 +1,12 @@
 <script setup lang="ts">
 import { ref, watch } from "vue";
-import { activeEditorFileName } from "../../activeEditor.ts";
+import useFileStore from "../../fileStore.ts";
+import { storeToRefs } from "pinia";
+
+const { currentFile } = storeToRefs(useFileStore());
+const { files } = useFileStore();
+
+let controller = new AbortController();
 
 const script = ref("");
 
@@ -9,18 +15,32 @@ const saving = ref(false);
 async function saveChanges() {
     saving.value = true;
     try {
-        const response = await fetch(activeEditorFileName.value, {
+        const path = currentFile.value;
+        const response = await fetch(path, {
             method: "POST",
             body: script.value
         });
-        alert(response.status === 201 ? "Saved" : "Failed to save file");
+        if (response.status !== 201) {
+            alert("Failed to save file");
+            return;
+        }
+        files.set(path, "saved");
+        alert("Saved");
     } finally {
         saving.value = false;
     }
 }
 
-watch(activeEditorFileName, async value => {
-    const response = await fetch(value);
+watch(currentFile, async value => {
+    if (!value)
+        return;
+    if (files.get(value) === "created") {
+        script.value = "";
+        return;
+    }
+    controller?.abort("Navigating file");
+    controller = new AbortController();
+    const response = await fetch(value, { signal: controller.signal });
     script.value = response.ok ? await response.text() : "";
 });
 </script>
