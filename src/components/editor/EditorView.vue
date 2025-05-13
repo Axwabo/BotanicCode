@@ -64,10 +64,10 @@ watch(currentFile, async value => {
         <span class="view-label">{{ loadedFile || "Editor" }}</span>
         <button v-on:click="saveChanges();" v-bind:disabled="saving">Save Changes</button>
     </div>
-    <div id="editorContainer" v-if="loadedFile" v-on:keydown="handleSave">
-        <monaco :key="loadedFile"/>
+    <div id="editorContainer" v-on:keydown="handleSave">
+        <monaco v-if="loadedFile" :key="loadedFile"/>
+        <p v-else>Click on a file to open it, or create a new one</p>
     </div>
-    <p v-else>Click on a file to open it, or create a new one</p>
 </template>
 
 <style scoped>
@@ -78,6 +78,12 @@ watch(currentFile, async value => {
 }
 
 #editorContainer {
-    width: 100%;
+    min-height: 20rem;
+}
+
+#editorContainer:has(> p) {
+    display: grid;
+    place-items: center;
+    background-color: #1e1e1e;
 }
 </style>

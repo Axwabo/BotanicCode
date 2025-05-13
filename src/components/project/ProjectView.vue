@@ -16,8 +16,10 @@ function createFile() {
 <template>
     <span class="view-label">Project</span>
     <div id="projectContainer">
-        <input type="text" v-model="newFile" placeholder="Create file">
-        <button v-on:click="createFile()">+</button>
+        <div class="create-container">
+            <input type="text" v-model="newFile" placeholder="Create file">
+            <button v-on:click="createFile()">+</button>
+        </div>
         <hr>
         <Suspense>
             <FileList/>
@@ -27,3 +29,10 @@ function createFile() {
         </Suspense>
     </div>
 </template>
+
+<style scoped>
+.create-container {
+    display: flex;
+    gap: 0.25rem;
+}
+</style>
