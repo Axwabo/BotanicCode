@@ -14,48 +14,44 @@ self.addEventListener("activate", async () => {
     await self.skipWaiting();
 });
 
-self.addEventListener("message", async event => {
-    if (!event.data)
-        return;
-    switch (event.data.type) {
-        case "SKIP_WAITING":
-            void self.skipWaiting();
-            break;
-        case "SAVE":
-            if (!fileCache) {
-                event.source?.postMessage("Cache not yet set up");
-                break;
-            }
-            // TODO: path validation
-            await fileCache.put(new URL(event.data.path, base), new Response(event.data.script, {
-                status: 200,
-                headers: {
-                    "Content-Type": "text/javascript",
-                    "Content-Security-Policy": "script-src 'strict-dynamic'"
-                }
-            }));
-            event.source?.postMessage("Saved");
-            break;
-    }
+self.addEventListener("message", event => {
+    if (event.data && event.data.type === "SKIP_WAITING")
+        void self.skipWaiting();
 });
 
 self.addEventListener("fetch", event => {
-    if (!fileCache)
+    if (!fileCache || event.request.method !== "POST")
         return;
     const path = event.request.url.substring(base.length).replace(/^\//, "");
     if (!path.startsWith("bot/"))
         return;
-    event.respondWith(fileCache.match(new URL(event.request.url)).then(e => e ?? new Response(null, {
-        status: 404,
-        statusText: "File Not Found"
-    })));
+    const url = new URL(path, base);
+    event.respondWith(fileCache.put(url, new Response(event.request.body, {
+        status: 200,
+        headers: {
+            "Content-Type": "text/javascript",
+            "Content-Security-Policy": "script-src 'strict-dynamic'"
+        }
+    })).then(() => new Response(path, { status: 201 })));
 });
 
 registerRoute("/file-list/bot", async () => {
     const keys = await fileCache!.keys();
-    const response = new Response(keys.map(f => f.url).join("\n"));
+    const response = new Response(keys.map(f => f.url.substring(base.length)).join("\n"));
     response.headers.set("Content-Type", "text/plain");
     return response;
+});
+
+registerRoute(/\/bot\/*/i, async options => {
+    if (!fileCache)
+        return new Response(null, { status: 503 });
+    const cached = await fileCache.match(options.url);
+    if (cached)
+        return cached;
+    return new Response(null, {
+        status: 404,
+        statusText: "File Not Found"
+    });
 });
 
 // self.__WB_MANIFEST is the default injection point
