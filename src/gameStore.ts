@@ -16,7 +16,22 @@ const useGameStore = defineStore("game", {
         renderer: undefined,
         game: {
             board: {
-                chunks: []
+                chunks: [ {
+                    x: 0,
+                    y: 0,
+                    rows: [ {
+                        chunkY: 0,
+                        tiles: [ {
+                            worldX: 0,
+                            worldY: 0,
+                            type: "grass"
+                        }, {
+                            worldX: 1,
+                            worldY: 0,
+                            type: "dirt"
+                        } ]
+                    } ]
+                } ]
             },
             position: {
                 x: 0,
