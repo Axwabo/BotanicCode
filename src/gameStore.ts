@@ -10,6 +10,8 @@ interface Renderer {
 interface State {
     renderer: Renderer | undefined;
     game: GameState;
+    dragging: boolean;
+    uiEventsRegistered: boolean;
 }
 
 function createBoard() {
@@ -32,8 +34,19 @@ const useGameStore = defineStore("game", {
                 x: 0,
                 y: 0
             }
+        },
+        dragging: false,
+        uiEventsRegistered: false
+    }),
+    actions: {
+        resetPosition() {
+            this.game.position.x = 0;
+            this.game.position.y = 0;
+        },
+        resetBoard() {
+            this.game.board = createBoard();
         }
-    })
+    }
 });
 
 export default useGameStore;

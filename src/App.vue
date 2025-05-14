@@ -4,7 +4,7 @@ import ProjectView from "./components/project/ProjectView.vue";
 import EditorView from "./components/editor/EditorView.vue";
 import { defineAsyncComponent } from "vue";
 
-const game = defineAsyncComponent(() => import("./components/GameView.vue"));
+const game = defineAsyncComponent(() => import("./components/game/GameView.vue"));
 </script>
 
 <template>
