@@ -4,6 +4,8 @@ import { storeToRefs } from "pinia";
 import useGameStore from "../gameStore.ts";
 import loop from "../game/main.ts";
 import { tileSize, type TileType } from "../game/tileConstants.ts";
+import type { Facing } from "../game/tileData.ts";
+import type { Tile } from "../game/tile.ts";
 
 const gameCanvas = ref<HTMLCanvasElement>();
 
@@ -31,6 +33,8 @@ const dragging = ref(false);
 
 const tileToPlace = ref<TileType>("gravel");
 
+const facings: Facing[][] = [ [], [ "north" ], [ "east" ], [ "south" ], [ "west" ] ];
+
 function onMouseDown(event: MouseEvent) {
     if (event.button === 1) {
         dragging.value = true;
@@ -40,8 +44,13 @@ function onMouseDown(event: MouseEvent) {
     const pos = game.value.position;
     const x = event.offsetX - canvas.width * 0.5 + pos.x;
     const y = event.offsetY - canvas.height * 0.5 + pos.y;
-    const tile = game.value.board.getTile(Math.floor(x / tileSize), Math.floor(y / tileSize));
+    const tile: Tile = game.value.board.getTile(Math.floor(x / tileSize), Math.floor(y / tileSize));
+    if (event.button === 2) {
+        tile.data = { type: "fence", posts: facings[event.detail % facings.length] };
+        return;
+    }
     tile.type = tileToPlace.value;
+    tile.data = undefined;
 }
 
 function onMouseMove(event: MouseEvent) {
@@ -77,7 +86,7 @@ function reset() {
         <button v-on:click="reset">Reset</button>
     </div>
     <canvas ref="gameCanvas" id="gameCanvas" :class="{ dragging }"
-            v-on:mousedown="onMouseDown" v-on:mouseup="dragging = false" v-on:mousemove="onMouseMove"></canvas>
+            v-on:mousedown="onMouseDown" v-on:mouseup="dragging = false" v-on:mousemove="onMouseMove" @contextmenu.prevent></canvas>
 </template>
 
 <style scoped>

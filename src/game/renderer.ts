@@ -1,5 +1,7 @@
 import getContext from "./ctx.ts";
 import { tileSize, worldToChunk } from "./tileConstants.ts";
+import type { Tile } from "./tile.ts";
+import type { Facing } from "./tileData.ts";
 
 export function render() {
     const { ctx, width, height, game } = getContext();
@@ -9,22 +11,11 @@ export function render() {
     const { x, y } = game.position;
     ctx.translate(-x, -y);
     const { startX, startY, endX, endY } = viewportChunks(x, y, width, height);
-    for (let x = startX; x <= endX; x++) {
-        for (let y = startY; y <= endY; y++) {
-            const chunk = game.board.getChunk(x, y);
-            for (const row of chunk.rows)
-                for (const tile of row.tiles) {
-                    if (tile.type === "air")
-                        continue;
-                    ctx.fillStyle = tile.type === "dirt"
-                        ? "brown"
-                        : tile.type === "gravel"
-                            ? "gray"
-                            : "green"; // TODO: images
-                    ctx.fillRect(tile.worldX * tileSize, tile.worldY * tileSize, tileSize, tileSize);
-                }
-        }
-    }
+    for (let x = startX; x <= endX; x++)
+        for (let y = startY; y <= endY; y++)
+            for (const row of game.board.getChunk(x, y).rows)
+                for (const tile of row.tiles)
+                    drawTile(ctx, tile);
     ctx.resetTransform();
     ctx.textBaseline = "top";
     ctx.fillStyle = "white";
@@ -41,4 +32,38 @@ function viewportChunks(x: number, y: number, width: number, height: number) {
     const endX = chunkX + Math.ceil(worldToChunk(width * 0.5));
     const endY = chunkY + Math.ceil(worldToChunk(height * 0.5));
     return { startX, startY, endX, endY };
+}
+
+function drawTile(ctx: CanvasRenderingContext2D, tile: Tile) {
+    const x = tile.worldX * tileSize;
+    const y = tile.worldY * tileSize;
+    if (tile.type !== "air") {
+        ctx.fillStyle = tile.type === "dirt"
+            ? "brown"
+            : tile.type === "gravel"
+                ? "gray"
+                : "green";
+        ctx.fillRect(x, y, tileSize, tileSize);
+    }
+    const data = tile.data;
+    if (!data)
+        return;
+    switch (data.type) {
+        case "fence":
+            ctx.fillStyle = "orange";
+            ctx.fillRect(x + tileSize * 0.5 - 3, y + 5, 6, tileSize - 10);
+            drawFencePosts(ctx, x, y, data.posts);
+            break;
+    }
+}
+
+function drawFencePosts(ctx: CanvasRenderingContext2D, x: number, y: number, posts: Facing[]) {
+    if (posts.includes("north"))
+        ctx.fillRect(x + tileSize * 0.5 - 2, y, 4, 5);
+    if (posts.includes("south"))
+        ctx.fillRect(x + tileSize * 0.5 - 2, y + tileSize, 4, -5);
+    if (posts.includes("west"))
+        ctx.fillRect(x, y + tileSize * 0.5, tileSize * 0.5, 4);
+    if (posts.includes("east"))
+        ctx.fillRect(x + tileSize, y + tileSize * 0.5, -tileSize * 0.5, 4);
 }

@@ -1,4 +1,5 @@
 import { chunkSize, type TileType } from "./tileConstants.ts";
+import type { TileData } from "./tileData.ts";
 
 const defaultTileType: TileType = "grass";
 
@@ -8,6 +9,7 @@ export interface Tile {
     worldX: number;
     worldY: number;
     type: TileType;
+    data?: TileData
 }
 
 export class Row {
