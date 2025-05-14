@@ -79,6 +79,7 @@ watch(currentFile, async value => {
 
 #editorContainer {
     min-height: 20rem;
+    height: calc(100% - 0.5rem);
 }
 
 #editorContainer:has(> p) {
