@@ -12,8 +12,8 @@ export class Board {
         return this.chunkStore.get(x, y);
     }
 
-    getChunkAt(worldX: number, worldY: number) {
-        return this.getChunk(Math.floor(worldX / chunkSize), Math.floor(worldY / chunkSize));
+    getChunkAt(tileX: number, tileY: number) {
+        return this.getChunk(Math.floor(tileX / chunkSize), Math.floor(tileY / chunkSize));
     }
 
     getTile(x: number, y: number) {
