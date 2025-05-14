@@ -26,13 +26,12 @@ export class Board {
         return newChunk;
     }
 
-    getTile(x: number, y: number) {
-        return this.getChunk(Math.floor(x / chunkSize), Math.floor(y / chunkSize))
-        .getTile(getChunkRemainder(x), getChunkRemainder(y));
+    getChunkAt(worldX: number, worldY: number) {
+        return this.getChunk(Math.floor(worldX / chunkSize), Math.floor(worldY / chunkSize));
     }
 
-    get chunks(): MapIterator<Chunk> {
-        return this.chunkMap.values();
+    getTile(x: number, y: number) {
+        return this.getChunkAt(x, y).getTile(getChunkRemainder(x), getChunkRemainder(y));
     }
 }
 
