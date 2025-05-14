@@ -1,8 +1,13 @@
 import { render } from "./renderer.ts";
 import { storeToRefs } from "pinia";
 import useGameStore from "../gameStore.ts";
+import { canvasToWorld } from "./ctx.ts";
+import TileClickEvent from "./editor/tileClickEvent.ts";
+import { tileSize } from "./tileConstants.ts";
 
-const { game, dragging, uiEventsRegistered } = storeToRefs(useGameStore());
+const { game, dragging, uiEventsRegistered, pointer } = storeToRefs(useGameStore());
+
+export const editorHandler = new EventTarget();
 
 export default function beginLoop() {
     if (uiEventsRegistered.value)
@@ -21,6 +26,7 @@ export default function beginLoop() {
 function loop() {
     render();
     requestAnimationFrame(loop);
+    editorHandler.dispatchEvent(new Event("render"));
 }
 
 function handleKey(event: KeyboardEvent) {
@@ -56,6 +62,14 @@ function handleMouseDown(event: MouseEvent) {
         return;
     if (event.button === 1)
         dragging.value = true;
+    if (event.button !== 0)
+        return;
+    const { x, y } = canvasToWorld(event.offsetX, event.offsetY);
+    editorHandler.dispatchEvent(new TileClickEvent(
+        game.value.board,
+        Math.floor(x / tileSize),
+        Math.floor(y / tileSize)
+    ));
 }
 
 function handleMouseUp(event: MouseEvent) {
@@ -64,6 +78,12 @@ function handleMouseUp(event: MouseEvent) {
 }
 
 function handleMouseMove(event: MouseEvent) {
+    if (notCanvas(event))
+        pointer.value.x = pointer.value.y = NaN;
+    else {
+        pointer.value.x = event.offsetX;
+        pointer.value.y = event.offsetY;
+    }
     if (!dragging.value)
         return;
     game.value.position.x -= event.movementX;

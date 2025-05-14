@@ -1,5 +1,11 @@
 <script setup lang="ts">
 import FacingCheckbox from "./FacingCheckbox.vue";
+import useEditorStore from "../../../../editorStore.ts";
+import useTileClickHandler from "../../../../game/editor/useTileClickHandler.ts";
+
+const { facings } = useEditorStore();
+
+useTileClickHandler(tile => tile.data = { type: "fence", posts: Array.from(facings) });
 </script>
 
 <template>

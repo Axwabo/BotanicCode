@@ -1,10 +1,10 @@
-import getContext from "./ctx.ts";
+import getContext, { canvasToWorld } from "./ctx.ts";
 import { tileSize, worldToChunk } from "./tileConstants.ts";
 import type { Tile } from "./tile.ts";
 import type { Facing } from "./tileData.ts";
 
 export function render() {
-    const { ctx, width, height, game } = getContext();
+    const { ctx, width, height, game, pointerX, pointerY } = getContext();
     ctx.resetTransform();
     ctx.clearRect(0, 0, width, height);
     ctx.translate(Math.floor(width * 0.5), Math.floor(height * 0.5));
@@ -16,6 +16,11 @@ export function render() {
             for (const row of game.board.getChunk(x, y).rows)
                 for (const tile of row.tiles)
                     drawTile(ctx, tile);
+    if (!isNaN(pointerX) && !isNaN(pointerY)) {
+        const { x: tileX, y: tileY } = canvasToWorld(pointerX, pointerY);
+        ctx.fillStyle = "rgba(255, 255, 0, 0.3)";
+        ctx.fillRect(Math.floor(tileX / tileSize) * tileSize, Math.floor(tileY / tileSize) * tileSize, tileSize, tileSize);
+    }
     ctx.resetTransform();
     ctx.textBaseline = "top";
     ctx.fillStyle = "white";

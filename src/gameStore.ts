@@ -12,6 +12,10 @@ interface State {
     game: GameState;
     dragging: boolean;
     uiEventsRegistered: boolean;
+    pointer: {
+        x: number,
+        y: number
+    }
 }
 
 function createBoard() {
@@ -36,7 +40,11 @@ const useGameStore = defineStore("game", {
             }
         },
         dragging: false,
-        uiEventsRegistered: false
+        uiEventsRegistered: false,
+        pointer: {
+            x: 0,
+            y: 0
+        }
     }),
     actions: {
         resetPosition() {

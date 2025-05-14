@@ -3,6 +3,7 @@ import ToolButton from "./ToolButton.vue";
 import ToolView from "./ToolView.vue";
 import TilePlacer from "./tools/TilePlacer.vue";
 import FencePlacer from "./tools/FencePlacer.vue";
+import ClearTile from "./tools/ClearTile.vue";
 </script>
 
 <template>
@@ -17,6 +18,9 @@ import FencePlacer from "./tools/FencePlacer.vue";
         </ToolView>
         <ToolView tool="Fence Placer">
             <FencePlacer/>
+        </ToolView>
+        <ToolView tool="Clear Tile">
+            <ClearTile/>
         </ToolView>
     </div>
 </template>
