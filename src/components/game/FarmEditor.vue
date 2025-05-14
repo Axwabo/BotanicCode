@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import FarmCanvas from "./FarmCanvas.vue";
-import FarmToolbar from "./FarmToolbar.vue";
+import FarmToolbar from "./editor/FarmToolbar.vue";
 </script>
 
 <template>
