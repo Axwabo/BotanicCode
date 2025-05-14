@@ -14,8 +14,14 @@ interface State {
 
 function createBoard() {
     const board = new Board();
+    board.getTile(-1, 1).type = "grass";
+    board.getTile(0, 1).type = "grass";
     board.getTile(1, 1).type = "grass";
+    board.getTile(-1, 2).type = "dirt";
+    board.getTile(-2, 2).type = "dirt";
+    board.getTile(0, 2).type = "dirt";
     board.getTile(1, 2).type = "dirt";
+    board.getTile(2, 2).type = "dirt";
     return board;
 }
 
