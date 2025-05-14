@@ -25,6 +25,12 @@ export function render() {
                 }
         }
     }
+    ctx.resetTransform();
+    ctx.textBaseline = "top";
+    ctx.fillStyle = "white";
+    ctx.font = "20px monospace";
+    ctx.fillText(`X: ${x} (chunk: ${Math.floor(worldToChunk(x))})`, 5, 5);
+    ctx.fillText(`Y: ${y} (chunk: ${Math.floor(worldToChunk(y))})`, 5, 25);
 }
 
 function viewportChunks(x: number, y: number, width: number, height: number) {
