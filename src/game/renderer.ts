@@ -1,5 +1,5 @@
 import getContext from "./ctx.ts";
-import { chunkSize } from "./board.ts";
+import { chunkSize } from "./tileConstants.ts";
 
 export function render() {
     const { ctx, width, height, game } = getContext();
@@ -9,13 +9,13 @@ export function render() {
     for (const chunk of game.board.chunks) {
         ctx.save();
         ctx.translate(chunk.x * chunkSize, chunk.y * chunkSize);
-        for (const row of chunk.rows) {
-            for (let x = 0; x < row.tiles.length; x++) {
-                const tile = row.tiles[x];
+        for (const row of chunk.rows)
+            for (const tile of row.tiles) {
+                if (tile.type === "air")
+                    continue;
                 ctx.fillStyle = tile.type === "dirt" ? "brown" : "green"; // TODO: images
-                ctx.fillRect(x * chunkSize, row.chunkY * chunkSize, chunkSize, chunkSize);
+                ctx.fillRect(tile.rowX * chunkSize, row.chunkY * chunkSize, chunkSize, chunkSize);
             }
-        }
         ctx.restore();
     }
 }

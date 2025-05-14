@@ -1,5 +1,6 @@
 import { defineStore } from "pinia";
 import type { GameState } from "./game/gameState.ts";
+import { Board } from "./game/board.ts";
 
 interface Renderer {
     canvas: HTMLCanvasElement;
@@ -11,28 +12,18 @@ interface State {
     game: GameState;
 }
 
+function createBoard() {
+    const board = new Board();
+    board.getTile(1, 1).type = "grass";
+    board.getTile(1, 2).type = "dirt";
+    return board;
+}
+
 const useGameStore = defineStore("game", {
     state: (): State => ({
         renderer: undefined,
         game: {
-            board: {
-                chunks: [ {
-                    x: 0,
-                    y: 0,
-                    rows: [ {
-                        chunkY: 0,
-                        tiles: [ {
-                            worldX: 0,
-                            worldY: 0,
-                            type: "grass"
-                        }, {
-                            worldX: 1,
-                            worldY: 0,
-                            type: "dirt"
-                        } ]
-                    } ]
-                } ]
-            },
+            board: createBoard(),
             position: {
                 x: 0,
                 y: 0
