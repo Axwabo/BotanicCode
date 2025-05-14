@@ -1,11 +1,12 @@
 <script setup lang="ts">
 import FarmCanvas from "./FarmCanvas.vue";
+import FarmToolbar from "./FarmToolbar.vue";
 </script>
 
 <template>
     <div class="farm-editor-container">
         <FarmCanvas/>
-        <!--        TODO: toolbar-->
+        <FarmToolbar/>
     </div>
 </template>
 
@@ -15,5 +16,6 @@ import FarmCanvas from "./FarmCanvas.vue";
     height: 100%;
     display: grid;
     grid-template-rows: 1fr auto;
+    gap: 0.5rem;
 }
 </style>
