@@ -1,5 +1,7 @@
 import { chunkSize, type TileType } from "./tileConstants.ts";
 
+const defaultTileType: TileType = "grass";
+
 export interface Tile {
     row: Row;
     rowX: number;
@@ -17,7 +19,7 @@ export class Row {
         this.chunk = chunk;
         this.chunkY = y;
         for (let x = 0; x < chunkSize; x++)
-            this.tiles.push({ row: this, rowX: x, worldX: this.chunk.worldX + x, worldY: this.worldY, type: "air" })
+            this.tiles.push({ row: this, rowX: x, worldX: this.chunk.worldX + x, worldY: this.worldY, type: defaultTileType });
     }
 
     get worldY() {

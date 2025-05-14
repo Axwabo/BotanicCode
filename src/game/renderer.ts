@@ -16,7 +16,11 @@ export function render() {
                 for (const tile of row.tiles) {
                     if (tile.type === "air")
                         continue;
-                    ctx.fillStyle = tile.type === "dirt" ? "brown" : "green"; // TODO: images
+                    ctx.fillStyle = tile.type === "dirt"
+                        ? "brown"
+                        : tile.type === "gravel"
+                            ? "gray"
+                            : "green"; // TODO: images
                     ctx.fillRect(tile.worldX * tileSize, tile.worldY * tileSize, tileSize, tileSize);
                 }
         }
