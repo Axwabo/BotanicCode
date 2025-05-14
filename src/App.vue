@@ -2,13 +2,15 @@
 import PWABadge from "./components/PWABadge.vue"
 import ProjectView from "./components/project/ProjectView.vue";
 import EditorView from "./components/editor/EditorView.vue";
-import GameView from "./components/GameView.vue";
+import { defineAsyncComponent } from "vue";
+
+const game = defineAsyncComponent(() => import("./components/GameView.vue"));
 </script>
 
 <template>
     <ProjectView/>
     <EditorView/>
-    <GameView/>
+    <game/>
     <PWABadge/>
 </template>
 

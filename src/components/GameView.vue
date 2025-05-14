@@ -2,6 +2,7 @@
 import { onMounted, ref } from "vue";
 import { storeToRefs } from "pinia";
 import useGameStore from "../gameStore.ts";
+import loop from "../game/main.ts";
 
 const gameCanvas = ref<HTMLCanvasElement>();
 
@@ -14,10 +15,11 @@ onMounted(() => {
     canvas.height = rect.height;
     canvas.style.width = `${canvas.width}px`;
     canvas.style.height = `${canvas.height}px`;
-    return renderer.value = {
+    renderer.value = {
         canvas,
         context: canvas.getContext("2d")!
     };
+    requestAnimationFrame(loop);
 });
 </script>
 
