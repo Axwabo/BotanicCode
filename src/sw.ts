@@ -56,7 +56,10 @@ registerRoute(/\/bot\/sdk\/run*/, async options => {
         return new Response(null, { status: 401 });
     // TODO: sanitize input
     lastRun = Date.now();
-    return new Response(`import registerEvents from "./events.js";registerEvents();void import("${entry}?t=${lastRun}");`, {
+    return new Response(`import { signalReady, signalError } from "./ready.js";
+import registerEvents from "./events.js";
+registerEvents();
+import("${entry}?t=${lastRun}").then(signalReady).catch(signalError);`, {
         status: 200,
         headers
     });

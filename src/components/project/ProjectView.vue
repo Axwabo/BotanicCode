@@ -17,7 +17,8 @@ function createFile() {
 function run() {
     const { currentFile } = useFileStore();
     const { game } = useGameStore();
-    game.bots.set(Date.now().toString(32), new Bot(currentFile));
+    const name = Date.now().toString(32);
+    game.bots.set(name, new Bot(name, currentFile));
 }
 </script>
 
