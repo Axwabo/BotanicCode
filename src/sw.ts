@@ -78,16 +78,16 @@ registerRoute(/\/bot\/(?!sdk\/)/i, async ({ url }) => {
     const text = await cached.text();
     // TODO: prevent importing from parent directory
     return new Response(
-        text.replace(/(?:^|\w)import([\s\S]+?)from\s*["'](.+?)["']/g, (_, members, file) => `import ${members} from "${transformFile(file)}?t=${lastRun}"`)
+        text.replace(/(?:^|\w)import([\s\S]+?)from\s*["'](.+?)["']/g, (_, members, file) => `import ${members} from "${transformFile(file)}"`)
         .replace(/(?:^|\w)import\s["'](.+?)["']*/, (_, file) => `import "/bot/${file}?t=${lastRun}"`),
         { status: 200, headers }
     );
 });
 
-const staticAssets = /^(?:\.\/util|\/util\/|\.sdk\/|sdk\/|\/bot\/sdk\/)/;
+const staticAssets = /^(?:\/util\/|\.\/sdk\/|sdk\/|\/bot\/sdk\/)/;
 
 function transformFile(file: string) {
-    return file.match(staticAssets) ? file : `/bot/${file}`;
+    return file.match(staticAssets) ? file : `/bot/${file}?t=${lastRun}`;
 }
 
 // self.__WB_MANIFEST is the default injection point
