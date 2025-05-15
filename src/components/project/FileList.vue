@@ -28,29 +28,35 @@ const sorted = computed(() => {
     const flatStatuses = Array.from(files).map(([ path, status ]) => ({ path, status }));
     flatStatuses.sort((a, b) => a.path.localeCompare(b.path));
     const listing: ListItem[] = [];
-    let pointerDepth = 0;
-    let pointerLength = 0;
-    let pointer = 0;
-    let length = 0;
-    while (pointer < flatStatuses.length) {
-        const { path, status } = flatStatuses[pointer];
-        const split = path.split("/");
-        pointerDepth = split.length;
-        while (pointer + ++length < flatStatuses.length) {
-            console.log(pointer, length)
-            const { path: endPath, status: endStatus } = flatStatuses[pointer + length];
-            const endSplit = endPath.split("/");
-            const depth = endSplit.length;
-            listing.push({ path: endPath, status: endStatus, start: split.slice(0, pointerDepth - 1).join("/").length, length: endPath.length });
-            if (depth < pointerDepth)
-                break;
-        }
-        pointer += length;
-        length = 0;
-    }
+    process(flatStatuses, "/", listing);
     return listing;
 });
 
+function process(statuses: { path: string, status: FileStatus }[], root: string, list: ListItem[]) {
+    // TODO: SLIDING WINDOW OMG
+    const subdirectories = new Map<string, Record<string, FileStatus>>();
+    for (const { path, status } of statuses) {
+        const descendant = path.substring(root.length);
+        if (!descendant)
+            continue;
+        const slash = descendant.indexOf("/", 1);
+        if (slash === -1) {
+            list.push({ path, status, start: root.length, length: path.length });
+            continue;
+        }
+        const directory = root + descendant.substring(0, slash);
+        if (directory.indexOf("/", 1) !== -1) {
+
+            break;
+        }
+        let subdirectory = subdirectories.get(directory);
+        if (!subdirectory) {
+            list.push({ path: directory, start: root.length, length: slash + 1 });
+            subdirectories.set(directory, subdirectory = {});
+        }
+        subdirectory[path] = status;
+    }
+}
 </script>
 
 <template>
