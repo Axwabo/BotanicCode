@@ -1,13 +1,13 @@
 <script setup lang="ts">
 import useFileStore, { type FileStatus } from "../../fileStore.ts";
 
-const { filename, status } = defineProps<{ filename: string; status: FileStatus; }>();
+const { name, status } = defineProps<{ path: string; name: string; status: FileStatus; }>();
 
 const { navigate } = useFileStore();
 </script>
 
 <template>
-    <button v-on:click="navigate(filename)" :class="status">{{ filename }}</button>
+    <button v-on:click="navigate(path)" :class="status">{{ name }}</button>
 </template>
 
 <style scoped>
