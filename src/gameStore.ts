@@ -1,7 +1,7 @@
 import { defineStore } from "pinia";
 import type { GameState } from "./game/gameState.ts";
 import { Board } from "./game/board.ts";
-import type Bot from "./game/bot/bot.ts";
+import type Bot from "./game/bot.ts";
 
 interface Renderer {
     canvas: HTMLCanvasElement;
@@ -39,7 +39,7 @@ const useGameStore = defineStore("game", {
                 x: 0,
                 y: 0
             },
-            agents: new Map<string, Bot>()
+            bots: new Map<string, Bot>()
         },
         dragging: false,
         uiEventsRegistered: false,
@@ -54,9 +54,9 @@ const useGameStore = defineStore("game", {
             this.game.position.y = 0;
         },
         resetBoard() {
-            for (const agent of this.game.agents.values())
+            for (const agent of this.game.bots.values())
                 agent.terminate();
-            this.game.agents.clear();
+            this.game.bots.clear();
             this.game.board = createBoard();
         }
     }

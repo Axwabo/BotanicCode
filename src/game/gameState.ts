@@ -1,5 +1,5 @@
 import type { Board } from "./board.ts";
-import type Bot from "./bot/bot.ts";
+import type Bot from "./bot.ts";
 
 export interface GameState {
     board: Board;
@@ -7,5 +7,5 @@ export interface GameState {
         x: number
         y: number
     };
-    agents: Map<string, Bot>;
+    bots: Map<string, Bot>;
 }

@@ -46,10 +46,25 @@ registerRoute("/file-list/bot", async () => {
     return response;
 });
 
-registerRoute(/\/bot\/*/i, async options => {
+registerRoute(/\/bot\/sdk\/run*/, async options => {
+    const entry = options.url.searchParams.get("entryPoint");
+    if (!entry)
+        return new Response(null, { status: 401 });
+    // TODO: sanitize input
+    return new Response(`import "${entry}"`, {
+        status: 200,
+        headers: {
+            "Content-Type": "text/javascript",
+            "Content-Security-Policy": "script-src 'strict-dynamic'"
+        }
+    });
+});
+
+registerRoute(/\/bot\/.*/i, async ({ url }) => {
     if (!fileCache)
         return new Response(null, { status: 503 });
-    const cached = await fileCache.match(options.url);
+    url.searchParams.delete("t");
+    const cached = await fileCache.match(url);
     if (cached)
         return cached;
     return new Response(null, {

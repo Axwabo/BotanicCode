@@ -1,14 +1,14 @@
 <script setup lang="ts">
 import PWABadge from "./components/PWABadge.vue"
-import ProjectView from "./components/project/ProjectView.vue";
 import EditorView from "./components/editor/EditorView.vue";
 import { defineAsyncComponent } from "vue";
 
+const project = defineAsyncComponent(() => import("./components/project/ProjectView.vue"));
 const game = defineAsyncComponent(() => import("./components/game/GameView.vue"));
 </script>
 
 <template>
-    <ProjectView/>
+    <project/>
     <EditorView/>
     <game/>
     <PWABadge/>

@@ -2,6 +2,8 @@
 import { ref } from "vue";
 import useFileStore from "../../fileStore.ts";
 import FileList from "./FileList.vue";
+import useGameStore from "../../gameStore.ts";
+import Bot from "../../game/bot.ts";
 
 const { navigate } = useFileStore();
 
@@ -11,11 +13,18 @@ function createFile() {
     navigate(`bot/${newFile.value}`, "created");
     newFile.value = "";
 }
+
+function run() {
+    const { currentFile } = useFileStore();
+    const { game } = useGameStore();
+    game.bots.set(Date.now().toString(32), new Bot(currentFile));
+}
 </script>
 
 <template>
     <div class="view-title-bar">
         <span class="view-label">Project</span>
+        <button v-on:click="run()">Run</button>
     </div>
     <div id="projectContainer">
         <div class="create-container">

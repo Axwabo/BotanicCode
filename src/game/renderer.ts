@@ -18,7 +18,8 @@ export function render() {
                     drawTile(ctx, tile);
     ctx.font = "20px monospace";
     ctx.textBaseline = "bottom";
-    for (const [ name, bot ] of game.agents) {
+    ctx.textAlign = "center";
+    for (const [ name, bot ] of game.bots) {
         ctx.fillStyle = "white";
         ctx.beginPath();
         ctx.arc(bot.position.x, bot.position.y, tileSize * 0.4, 0, Math.PI * 2);
@@ -33,6 +34,7 @@ export function render() {
     }
     ctx.resetTransform();
     ctx.textBaseline = "top";
+    ctx.textAlign = "left";
     ctx.fillStyle = "white";
     ctx.fillText(`X: ${x} (chunk: ${Math.floor(worldToChunk(x))})`, 5, 5);
     ctx.fillText(`Y: ${y} (chunk: ${Math.floor(worldToChunk(y))})`, 5, 25);
