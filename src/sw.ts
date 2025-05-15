@@ -62,9 +62,7 @@ registerRoute(/\/bot\/sdk\/run*/, async options => {
     });
 });
 
-registerRoute(/\/bot\/sdk\/*/, async ({ url }) => fetch(url));
-
-registerRoute(/\/bot\/.*/i, async ({ url }) => {
+registerRoute(/\/bot\/(?!sdk\/)/i, async ({ url }) => {
     if (!fileCache)
         return new Response(null, { status: 503 });
     const isTimed = url.searchParams.has("t");
@@ -86,10 +84,10 @@ registerRoute(/\/bot\/.*/i, async ({ url }) => {
     );
 });
 
+const staticAssets = /^(?:\.\/util|\/util\/|\.sdk\/|sdk\/|\/bot\/sdk\/)/;
+
 function transformFile(file: string) {
-    return file.startsWith("./util/") || file.startsWith("/util/") || file.startsWith("util/")
-        ? file
-        : `/bot/${file}`;
+    return file.match(staticAssets) ? file : `/bot/${file}`;
 }
 
 // self.__WB_MANIFEST is the default injection point
