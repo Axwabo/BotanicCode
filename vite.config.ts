@@ -1,6 +1,7 @@
 import { VitePWA } from "vite-plugin-pwa";
 import { defineConfig } from "vite"
 import vue from "@vitejs/plugin-vue"
+import { viteStaticCopy } from "vite-plugin-static-copy";
 
 // https://vitejs.dev/config/
 export default defineConfig({
@@ -24,7 +25,8 @@ export default defineConfig({
         },
 
         injectManifest: {
-            globPatterns: [ "**/*.{js,css,html,svg,png,ico,ttf}" ]
+            globPatterns: [ "**/*.{js,css,html,svg,png,ico,ttf}" ],
+            maximumFileSizeToCacheInBytes: 10 * 1000 * 1000
         },
 
         devOptions: {
@@ -33,6 +35,13 @@ export default defineConfig({
             suppressWarnings: true,
             type: "module"
         }
+    }), viteStaticCopy({
+        targets: [
+            {
+                src: "src/bot/sdk",
+                dest: "bot"
+            }
+        ]
     }) ],
     server: {
         port: 8000

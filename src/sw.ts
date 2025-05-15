@@ -62,6 +62,8 @@ registerRoute(/\/bot\/sdk\/run*/, async options => {
     });
 });
 
+registerRoute(/\/bot\/sdk\/*/, async ({ url }) => fetch(url));
+
 registerRoute(/\/bot\/.*/i, async ({ url }) => {
     if (!fileCache)
         return new Response(null, { status: 503 });

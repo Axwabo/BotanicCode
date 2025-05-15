@@ -20,6 +20,7 @@
         "typescript": "~5.7.2",
         "vite": "^6.0.11",
         "vite-plugin-pwa": "^0.21.1",
+        "vite-plugin-static-copy": "^3.0.0",
         "vue-tsc": "^2.2.0",
         "workbox-core": "^7.3.0",
         "workbox-precaching": "^7.3.0",
