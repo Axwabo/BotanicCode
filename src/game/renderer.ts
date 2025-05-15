@@ -16,6 +16,16 @@ export function render() {
             for (const row of game.board.getChunk(x, y).rows)
                 for (const tile of row.tiles)
                     drawTile(ctx, tile);
+    ctx.font = "20px monospace";
+    ctx.textBaseline = "bottom";
+    for (const [ name, bot ] of game.agents) {
+        ctx.fillStyle = "white";
+        ctx.beginPath();
+        ctx.arc(bot.position.x, bot.position.y, tileSize * 0.4, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.closePath();
+        ctx.fillText(name, bot.position.x, bot.position.y - tileSize * 0.5);
+    }
     if (!isNaN(pointerX) && !isNaN(pointerY)) {
         const { x: tileX, y: tileY } = canvasToWorld(pointerX, pointerY);
         ctx.fillStyle = "rgba(255, 255, 0, 0.3)";
@@ -24,7 +34,6 @@ export function render() {
     ctx.resetTransform();
     ctx.textBaseline = "top";
     ctx.fillStyle = "white";
-    ctx.font = "20px monospace";
     ctx.fillText(`X: ${x} (chunk: ${Math.floor(worldToChunk(x))})`, 5, 5);
     ctx.fillText(`Y: ${y} (chunk: ${Math.floor(worldToChunk(y))})`, 5, 25);
 }
