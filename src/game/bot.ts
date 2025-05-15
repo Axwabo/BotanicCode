@@ -30,6 +30,8 @@ export default class Bot {
                 this.errored = true;
                 break;
             case "ready":
+                if (this.ready)
+                    break;
                 this.ready = true;
                 editorHandler.dispatchEvent(new BotReadyEvent(this.name));
                 break;
