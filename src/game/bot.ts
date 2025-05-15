@@ -5,7 +5,14 @@ export default class Bot {
     constructor(entryPoint: string) {
         this.worker = new Worker(`bot/sdk/run.js?t=${Date.now()}&entryPoint=${encodeURI(entryPoint)}`, { type: "module" });
         this.position = { x: 0, y: 0 };
-        this.worker.addEventListener("message", console.log /*TODO*/);
+        this.worker.addEventListener("message", event => this.handleMessage(event));
+    }
+
+    private handleMessage(event: MessageEvent) {
+        if (event.data?.type !== "move")
+            return;
+        this.position.x += event.data.x;
+        this.position.y += event.data.y;
     }
 
     terminate() {
