@@ -80,11 +80,17 @@ registerRoute(/\/bot\/.*/i, async ({ url }) => {
     const text = await cached.text();
     // TODO: prevent importing from parent directory
     return new Response(
-        text.replace(/(?:^|\w)import([\s\S]+?)from\s*["'](.+?)["']/g, (_, members, file) => `import ${members} from "/bot/${file}?t=${lastRun}"`)
+        text.replace(/(?:^|\w)import([\s\S]+?)from\s*["'](.+?)["']/g, (_, members, file) => `import ${members} from "${transformFile(file)}?t=${lastRun}"`)
         .replace(/(?:^|\w)import\s["'](.+?)["']*/, (_, file) => `import "/bot/${file}?t=${lastRun}"`),
         { status: 200, headers }
     );
 });
+
+function transformFile(file: string) {
+    return file.startsWith("./util/") || file.startsWith("/util/") || file.startsWith("util/")
+        ? file
+        : `/bot/${file}`;
+}
 
 // self.__WB_MANIFEST is the default injection point
 precacheAndRoute(self.__WB_MANIFEST);

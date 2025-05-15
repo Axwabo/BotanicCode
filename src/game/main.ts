@@ -3,7 +3,7 @@ import { storeToRefs } from "pinia";
 import useGameStore from "../gameStore.ts";
 import { canvasToWorld } from "./ctx.ts";
 import TileClickEvent from "./editor/tileClickEvent.ts";
-import { tileSize } from "./tileConstants.ts";
+import { tileSize } from "../util/tileConstants.js";
 
 const { game, dragging, uiEventsRegistered, pointer } = storeToRefs(useGameStore());
 

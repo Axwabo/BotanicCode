@@ -1,5 +1,5 @@
-import { chunkSize } from "./tileConstants.ts";
 import ChunkStore from "./chunkStore.ts";
+import { chunkSize } from "../util/tileConstants.js";
 
 export function getChunkRemainder(coord: number) {
     return coord >= 0 ? coord % chunkSize : chunkSize - Math.abs(coord) % chunkSize;

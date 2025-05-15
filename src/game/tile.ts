@@ -1,5 +1,6 @@
-import { chunkSize, type TileType } from "./tileConstants.ts";
+import { type TileType } from "./tileType.ts";
 import type { TileData } from "./tileData.ts";
+import { chunkSize } from "../util/tileConstants";
 
 const defaultTileType: TileType = "grass";
 

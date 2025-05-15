@@ -1,5 +1,5 @@
 import getContext, { canvasToWorld } from "./ctx.ts";
-import { tileSize, worldToChunk } from "./tileConstants.ts";
+import { tileSize, worldToChunk } from "../util/tileConstants.js";
 import type { Tile } from "./tile.ts";
 import type { Facing } from "./tileData.ts";
 

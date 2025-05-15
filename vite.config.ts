@@ -40,6 +40,10 @@ export default defineConfig({
             {
                 src: "src/bot/sdk",
                 dest: "bot"
+            },
+            {
+                src: "src/util",
+                dest: "."
             }
         ]
     }) ],
