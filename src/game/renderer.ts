@@ -52,8 +52,8 @@ function viewportChunks(x: number, y: number, width: number, height: number) {
 }
 
 function drawTile(ctx: CanvasRenderingContext2D, tile: Tile) {
-    const x = tile.worldX * tileSize;
-    const y = tile.worldY * tileSize;
+    const x = tile.x * tileSize;
+    const y = tile.y * tileSize;
     if (tile.type !== "air") {
         ctx.fillStyle = tile.type === "dirt"
             ? "brown"

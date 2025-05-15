@@ -5,28 +5,18 @@ import { chunkSize } from "../util/tileConstants";
 const defaultTileType: TileType = "grass";
 
 export interface Tile {
-    row: Row;
-    rowX: number;
-    worldX: number;
-    worldY: number;
+    x: number;
+    y: number;
     type: TileType;
     data?: TileData
 }
 
 export class Row {
-    readonly chunk: Chunk;
-    readonly chunkY: number;
     readonly tiles: Tile[] = [];
 
     constructor(chunk: Chunk, y: number) {
-        this.chunk = chunk;
-        this.chunkY = y;
         for (let x = 0; x < chunkSize; x++)
-            this.tiles.push({ row: this, rowX: x, worldX: this.chunk.worldX + x, worldY: this.worldY, type: defaultTileType });
-    }
-
-    get worldY() {
-        return this.chunk.worldY + this.chunkY;
+            this.tiles.push({ x: chunk.worldX + x, y: chunk.worldY + y, type: defaultTileType });
     }
 
     getTile(x: number) {
