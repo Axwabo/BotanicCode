@@ -14,7 +14,9 @@ function createFile() {
 </script>
 
 <template>
-    <span class="view-label">Project</span>
+    <div class="view-title-bar">
+        <span class="view-label">Project</span>
+    </div>
     <div id="projectContainer">
         <div class="create-container">
             <input type="text" v-model="newFile" placeholder="Create file">

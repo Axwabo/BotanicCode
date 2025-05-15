@@ -27,6 +27,12 @@ body {
     padding: 0.5rem;
 }
 
+.view-title-bar {
+    display: flex;
+    align-items: center;
+    gap: 0.5em;
+}
+
 .view-label {
     background-color: black;
     flex: 1;

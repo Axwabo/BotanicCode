@@ -6,18 +6,10 @@ const { resetPosition, resetBoard } = useGameStore();
 </script>
 
 <template>
-    <div class="game-top-controls">
+    <div class="view-title-bar">
         <span class="view-label">Farm</span>
         <button v-on:click="resetPosition">Back to (0, 0)</button>
         <button v-on:click="resetBoard">Reset Board</button>
     </div>
     <FarmEditor/>
 </template>
-
-<style scoped>
-.game-top-controls {
-    display: flex;
-    align-items: center;
-    gap: 0.5em;
-}
-</style>

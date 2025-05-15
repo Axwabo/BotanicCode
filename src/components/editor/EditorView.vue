@@ -60,7 +60,7 @@ watch(currentFile, async value => {
 </script>
 
 <template>
-    <div class="editor-buttons">
+    <div class="view-title-bar">
         <span class="view-label">{{ loadedFile || "Editor" }}</span>
         <button v-on:click="saveChanges();" v-bind:disabled="saving">Save Changes</button>
     </div>
@@ -71,12 +71,6 @@ watch(currentFile, async value => {
 </template>
 
 <style scoped>
-.editor-buttons {
-    display: flex;
-    align-items: center;
-    gap: 0.5em;
-}
-
 #editorContainer {
     min-height: 20rem;
     height: calc(100% - 0.5rem);
