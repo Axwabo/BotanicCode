@@ -8,6 +8,8 @@ const base = self.location.origin;
 
 let fileCache: Cache | undefined;
 
+let lastRun = 0; // TODO: group by worker
+
 async function getCache() {
     return fileCache ??= await caches.open("Files");
 }
@@ -23,8 +25,13 @@ self.addEventListener("message", event => {
         void self.skipWaiting();
 });
 
+const headers = {
+    "Content-Type": "text/javascript",
+    "Content-Security-Policy": "script-src 'strict-dynamic'"
+};
+
 self.addEventListener("fetch", event => {
-    if (!fileCache || event.request.method !== "POST")
+    if (!fileCache || event.request.method !== "POST") // TODO: disallow requests going out of /bot/
         return;
     const path = event.request.url.substring(base.length).replace(/^\//, "");
     if (!path.startsWith("bot/"))
@@ -32,10 +39,7 @@ self.addEventListener("fetch", event => {
     const url = new URL(path, base);
     event.respondWith(getCache().then(cache => cache.put(url, new Response(event.request.body, {
         status: 200,
-        headers: {
-            "Content-Type": "text/javascript",
-            "Content-Security-Policy": "script-src 'strict-dynamic'"
-        }
+        headers
     }))).then(() => new Response(path, { status: 201 })));
 });
 
@@ -51,26 +55,33 @@ registerRoute(/\/bot\/sdk\/run*/, async options => {
     if (!entry)
         return new Response(null, { status: 401 });
     // TODO: sanitize input
-    return new Response(`import "${entry}"`, {
+    lastRun = Date.now();
+    return new Response(`import "${entry}?t=${lastRun}"`, {
         status: 200,
-        headers: {
-            "Content-Type": "text/javascript",
-            "Content-Security-Policy": "script-src 'strict-dynamic'"
-        }
+        headers
     });
 });
 
 registerRoute(/\/bot\/.*/i, async ({ url }) => {
     if (!fileCache)
         return new Response(null, { status: 503 });
+    const isTimed = url.searchParams.has("t");
     url.searchParams.delete("t");
     const cached = await fileCache.match(url);
-    if (cached)
+    if (!cached)
+        return new Response(null, {
+            status: 404,
+            statusText: "File Not Found"
+        });
+    else if (!isTimed)
         return cached;
-    return new Response(null, {
-        status: 404,
-        statusText: "File Not Found"
-    });
+    const text = await cached.text();
+    // TODO: prevent importing from parent directory
+    return new Response(
+        text.replace(/(?:^|\w)import([\s\S]+?)from\s*["'](.+?)["']/g, (_, members, file) => `import ${members} from "/bot/${file}?t=${lastRun}"`)
+        .replace(/(?:^|\w)import\s["'](.+?)["']*/, (_, file) => `import "/bot/${file}?t=${lastRun}"`),
+        { status: 200, headers }
+    );
 });
 
 // self.__WB_MANIFEST is the default injection point
