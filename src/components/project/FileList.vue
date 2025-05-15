@@ -36,13 +36,11 @@ const sorted = computed(() => {
 function process(statuses: { path: string, status: FileStatus }[], root: string, list: ListItem[], depth: number = 0, start: number = 0) {
     let count = 0;
     for (let i = start; i < statuses.length; i++) {
-        count++;
         const { path, status } = statuses[i];
         if (!path.startsWith(root))
             break;
+        count++;
         const descendant = path.substring(root.length);
-        if (!descendant)
-            continue;
         const slash = descendant.indexOf("/", 1);
         if (slash === -1) {
             list.push({ path, status, start: root.length + 1, length: path.length, depth });
