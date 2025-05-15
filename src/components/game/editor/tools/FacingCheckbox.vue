@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import type { Facing } from "../../../../game/tileData.ts";
 import useEditorStore from "../../../../editorStore.ts";
 import { ref, watch } from "vue";
+import type { Facing } from "../../../../game/tile.d.ts";
 
 const { facings } = useEditorStore();
 

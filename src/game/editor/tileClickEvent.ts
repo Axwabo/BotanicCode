@@ -1,4 +1,4 @@
-import { type Board } from "../board.ts";
+import { type Board } from "../../util/world/board.js";
 
 export default class TileClickEvent extends Event {
     readonly board: Board;

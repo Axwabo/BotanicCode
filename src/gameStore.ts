@@ -1,6 +1,6 @@
 import { defineStore } from "pinia";
 import type { GameState } from "./game/gameState.ts";
-import { Board } from "./game/board.ts";
+import { Board } from "./util/world/board.js";
 import type Bot from "./game/bot.ts";
 
 interface Renderer {

@@ -1,4 +1,4 @@
-import type { Board } from "./board.ts";
+import type { Board } from "../util/world/board.js";
 import type Bot from "./bot.ts";
 
 export interface GameState {

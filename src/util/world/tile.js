@@ -1,35 +1,36 @@
-import { type TileType } from "./tileType.ts";
-import type { TileData } from "./tileData.ts";
-import { chunkSize } from "../util/tileConstants";
+import { chunkSize } from "../tileConstants.js";
 
-const defaultTileType: TileType = "grass";
+/** @type {TileType} */
+const defaultTileType = "grass";
 
-export interface Tile {
-    x: number;
-    y: number;
-    type: TileType;
-    data?: TileData
-}
 
 export class Row {
-    readonly tiles: Tile[] = [];
+    /** @type {Tile[]} */
+    tiles = [];
 
-    constructor(chunk: Chunk, y: number) {
+    constructor(chunk, y) {
         for (let x = 0; x < chunkSize; x++)
             this.tiles.push({ x: chunk.worldX + x, y: chunk.worldY + y, type: defaultTileType });
     }
 
-    getTile(x: number) {
+    getTile(x) {
         return this.tiles[x];
     }
 }
 
 export class Chunk {
-    readonly rows: Row[] = [];
-    readonly x: number;
-    readonly y: number;
+    /** @type {Row[]} */
+    rows = [];
+    /** @type {number} */
+    x;
+    /** @type {number} */
+    y;
 
-    constructor(x: number, y: number) {
+    /**
+     * @param x {number}
+     * @param y {number}
+     */
+    constructor(x, y) {
         this.x = x;
         this.y = y;
         for (let row = 0; row < chunkSize; row++)
@@ -44,7 +45,11 @@ export class Chunk {
         return this.y * chunkSize;
     }
 
-    getTile(x: number, y: number) {
+    /**
+     * @param x {number}
+     * @param y {number}
+     */
+    getTile(x, y) {
         return this.rows[y].getTile(x);
     }
 }
