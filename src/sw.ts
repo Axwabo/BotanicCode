@@ -4,8 +4,6 @@ import { NavigationRoute, registerRoute } from "workbox-routing";
 
 declare let self: ServiceWorkerGlobalScope;
 
-const base = self.location.origin;
-
 let fileCache: Cache | undefined;
 
 let lastRun = 0; // TODO: group by worker
@@ -30,13 +28,26 @@ const headers = {
     "Content-Security-Policy": "script-src 'strict-dynamic'"
 };
 
+const botDirectory = /^\/bot\/(?!sdk\/)/ig;
+
 self.addEventListener("fetch", event => {
+    const path = new URL(event.request.url).pathname;
+    const referrerUrl = new URL(event.request.referrer);
+    if (referrerUrl.origin === self.location.origin
+        && referrerUrl.pathname.match(botDirectory)
+        && !path.startsWith("/bot/")
+        && !path.startsWith("/util/")) {
+        event.respondWith(new Response("Cannot fetch resources outside `/bot/` or `/util/` from a bot module.", {
+            status: 403,
+            statusText: "Illegal Import"
+        }));
+        return;
+    }
     if (!fileCache || event.request.method !== "POST") // TODO: disallow requests going out of /bot/
         return;
-    const path = event.request.url.substring(base.length).replace(/^\//, "");
-    if (!path.startsWith("bot/"))
+    if (!path.match(botDirectory))
         return;
-    const url = new URL(path, base);
+    const url = new URL(path, self.location.origin);
     event.respondWith(getCache().then(cache => cache.put(url, new Response(event.request.body, {
         status: 200,
         headers
@@ -45,7 +56,7 @@ self.addEventListener("fetch", event => {
 
 registerRoute("/file-list/bot", async () => {
     const keys = await (await getCache()).keys();
-    const response = new Response(keys.map(f => f.url.substring(base.length)).join("\n"));
+    const response = new Response(keys.map(f => new URL(f.url, self.location.origin).pathname).join("\n"));
     response.headers.set("Content-Type", "text/plain");
     return response;
 });

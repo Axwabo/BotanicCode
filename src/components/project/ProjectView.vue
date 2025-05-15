@@ -9,8 +9,14 @@ const { navigate } = useFileStore();
 
 const newFile = ref("");
 
+const filenamePattern = "[A-z0-9_\\/\\-]+";
+
+const filenameRegex = new RegExp(`^${filenamePattern}?$`);
+
 function createFile() {
-    navigate(`bot/${newFile.value}`, "created");
+    if (!newFile.value.match(filenameRegex))
+        return;
+    navigate(`bot/${newFile.value}.js`, "created");
     newFile.value = "";
 }
 
@@ -29,7 +35,7 @@ function run() {
     </div>
     <div id="projectContainer">
         <div class="create-container">
-            <input type="text" v-model="newFile" placeholder="Create file">
+            <input type="text" v-model="newFile" placeholder="Create file" :pattern="filenamePattern">
             <button v-on:click="createFile()">+</button>
         </div>
         <hr>
@@ -46,5 +52,9 @@ function run() {
 .create-container {
     display: flex;
     gap: 0.25rem;
+}
+
+.create-container input:invalid {
+    color: #f55;
 }
 </style>
