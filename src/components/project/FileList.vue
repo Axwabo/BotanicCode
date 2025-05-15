@@ -12,6 +12,7 @@ interface ListItem {
     status?: FileStatus;
     start: number;
     length: number;
+    depth: number;
 }
 
 const response = await fetch("file-list/bot");
@@ -32,39 +33,38 @@ const sorted = computed(() => {
     return listing;
 });
 
-function process(statuses: { path: string, status: FileStatus }[], root: string, list: ListItem[]) {
-    // TODO: SLIDING WINDOW OMG
-    const subdirectories = new Map<string, Record<string, FileStatus>>();
-    for (const { path, status } of statuses) {
+function process(statuses: { path: string, status: FileStatus }[], root: string, list: ListItem[], depth: number = 0, start: number = 0) {
+    let count = 0;
+    for (let i = start; i < statuses.length; i++) {
+        count++;
+        const { path, status } = statuses[i];
+        if (!path.startsWith(root))
+            break;
         const descendant = path.substring(root.length);
         if (!descendant)
             continue;
         const slash = descendant.indexOf("/", 1);
         if (slash === -1) {
-            list.push({ path, status, start: root.length, length: path.length });
+            list.push({ path, status, start: root.length + 1, length: path.length, depth });
             continue;
         }
         const directory = root + descendant.substring(0, slash);
-        if (directory.indexOf("/", 1) !== -1) {
-
-            break;
-        }
-        let subdirectory = subdirectories.get(directory);
-        if (!subdirectory) {
-            list.push({ path: directory, start: root.length, length: slash + 1 });
-            subdirectories.set(directory, subdirectory = {});
-        }
-        subdirectory[path] = status;
+        list.push({ path: descendant, start: +(root !== "/"), length: slash, depth });
+        list.push({ path, status, start: directory.length + 1, length: path.length, depth: depth + 1 });
+        const processed = process(statuses, directory, list, depth + 1, i + 1);
+        i += processed;
+        count += processed;
     }
+    return count;
 }
 </script>
 
 <template>
     <p v-if="sorted.length === 0" class="empty">No files</p>
     <div class="file-list">
-        <template v-for="{path, start, length, status} in sorted" :key="path">
-            <File v-if="status" :path="path" :filename="path.substring(start, length)" :status="status"/>
-            <span v-else>{{ path.substring(start, length) }}</span>
+        <template v-for="{path, start, length, status, depth} in sorted" :key="path">
+            <File v-if="status" :path="path" :filename="path.substring(start, length)" :status="status" :style="`margin-left: ${depth}rem`"/>
+            <span v-else :style="`margin-left: ${depth}rem`">{{ path.substring(start, length) }}</span>
         </template>
     </div>
 </template>
