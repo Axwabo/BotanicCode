@@ -5,16 +5,18 @@ import FileList from "./FileList.vue";
 import useGameStore from "../../gameStore.ts";
 import Bot from "../../game/bot.ts";
 
+const { navigate } = useFileStore();
+
 const newFile = ref("");
 
-const filenamePattern = "[^\\/][A-z0-9_\\/\\-]+?[^\\/]";
+const filenamePattern = "[A-z0-9_\\/\\-]+";
 
-const filenameRegex = new RegExp(`^${filenamePattern}$`);
+const filenameRegex = new RegExp(`^${filenamePattern}?$`);
 
 function createFile() {
     if (!newFile.value.match(filenameRegex))
         return;
-    useFileStore().navigate(`bot/${newFile.value}.js`, "created");
+    navigate(`bot/${newFile.value}.js`, "created");
     newFile.value = "";
 }
 
