@@ -10,8 +10,7 @@ await navigator.serviceWorker.ready;
 interface ListItem {
     path: string;
     status?: FileStatus;
-    start: number;
-    length: number;
+    display: string;
     depth: number;
 }
 
@@ -29,40 +28,42 @@ const sorted = computed(() => {
     const flatStatuses = Array.from(files).map(([ path, status ]) => ({ path, status }));
     flatStatuses.sort((a, b) => a.path.localeCompare(b.path));
     const listing: ListItem[] = [];
-    process(flatStatuses, "/", listing);
+    process(flatStatuses, listing);
     return listing;
 });
 
-function process(statuses: { path: string, status: FileStatus }[], root: string, list: ListItem[], depth: number = 0, start: number = 0) {
-    let count = 0;
-    for (let i = start; i < statuses.length; i++) {
+function process(statuses: { path: string, status: FileStatus }[], list: ListItem[]) {
+    let previousSlash = 0;
+    let root = "/";
+    for (let i = 0; i < statuses.length; i++) {
         const { path, status } = statuses[i];
-        if (!path.startsWith(root))
-            break;
-        count++;
-        const descendant = path.substring(root.length);
-        const slash = descendant.indexOf("/", 1);
-        if (slash === -1) {
-            list.push({ path, status, start: root.length + 1, length: path.length, depth });
-            continue;
-        }
-        const directory = root + descendant.substring(0, slash);
-        list.push({ path: descendant, start: +(root !== "/"), length: slash, depth });
-        list.push({ path, status, start: directory.length + 1, length: path.length, depth: depth + 1 });
-        const processed = process(statuses, directory, list, depth + 1, i + 1);
-        i += processed;
-        count += processed;
+        const slash = path.lastIndexOf("/");
+        if (slash > previousSlash && path.startsWith(root)) {
+            root = path.substring(0, slash);
+            let previousIndent = previousSlash;
+            let indentSlash = previousSlash;
+            while (true) {
+                indentSlash = path.indexOf("/", indentSlash + 1);
+                if (indentSlash === -1 || indentSlash > slash)
+                    break;
+                const depth = path.substring(0, indentSlash).split("/").length - 2;
+                list.push({ path, depth, display: path.substring(previousIndent + 1, indentSlash) });
+                previousIndent = indentSlash;
+            }
+        } else if (slash !== previousSlash)
+            root = path.substring(0, slash);
+        list.push({ path, status, depth: path.split("/").length - 2, display: path.substring(slash + 1) });
+        previousSlash = slash;
     }
-    return count;
 }
 </script>
 
 <template>
     <p v-if="sorted.length === 0" class="empty">No files</p>
     <div class="file-list">
-        <template v-for="{path, start, length, status, depth} in sorted" :key="path">
-            <File v-if="status" :path="path" :filename="path.substring(start, length)" :status="status" :style="`margin-left: ${depth}rem`"/>
-            <span v-else :style="`margin-left: ${depth}rem`">{{ path.substring(start, length) }}</span>
+        <template v-for="{path, display, status, depth} in sorted" :key="path">
+            <File v-if="status" :key="path" :path="path" :filename="display" :status="status" :style="`margin-left: ${depth}rem`"/>
+            <span v-else :style="`margin-left: ${depth}rem`">{{ display }}</span>
         </template>
     </div>
 </template>
