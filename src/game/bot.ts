@@ -1,4 +1,6 @@
 import { editorHandler } from "./main.ts";
+import BotReadyEvent from "./botReadyEvent.ts";
+import type { Board } from "../util/world/board";
 
 export default class Bot {
     readonly name: string;
@@ -29,6 +31,7 @@ export default class Bot {
                 break;
             case "ready":
                 this.ready = true;
+                editorHandler.dispatchEvent(new BotReadyEvent(this.name));
                 break;
             case "move":
                 this.position.x += event.data.x;
@@ -40,6 +43,10 @@ export default class Bot {
     terminate() {
         editorHandler.removeEventListener("render", this.renderCallback);
         this.worker.terminate();
+    }
+
+    sendBoard(board: Board) {
+        this.worker.postMessage({ type: "world", board: JSON.stringify(board.chunkStore) });
     }
 
     get isReady() {

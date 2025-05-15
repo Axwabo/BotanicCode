@@ -4,6 +4,7 @@ import useGameStore from "../gameStore.ts";
 import { canvasToWorld } from "./ctx.ts";
 import TileClickEvent from "./editor/tileClickEvent.ts";
 import { tileSize } from "../util/tileConstants.js";
+import type BotReadyEvent from "./botReadyEvent.ts";
 
 const { game, dragging, uiEventsRegistered, pointer } = storeToRefs(useGameStore());
 
@@ -19,6 +20,8 @@ export default function beginLoop() {
     window.addEventListener("mousedown", handleMouseDown);
     window.addEventListener("mouseup", handleMouseUp);
     window.addEventListener("mousemove", handleMouseMove);
+
+    editorHandler.addEventListener("botready", sendBoard);
 
     loop();
 }
@@ -88,4 +91,10 @@ function handleMouseMove(event: MouseEvent) {
         return;
     game.value.position.x -= event.movementX;
     game.value.position.y -= event.movementY;
+}
+
+function sendBoard(event: Event) {
+    const ready = <BotReadyEvent>event;
+    const { board, bots } = game.value;
+    bots.get(ready.name)!.sendBoard(board);
 }
