@@ -3,6 +3,7 @@ import { defineAsyncComponent, ref, watch } from "vue";
 import useFileStore from "../../fileStore.ts";
 import { storeToRefs } from "pinia";
 import Loading from "./Loading.vue";
+import EditorList from "./EditorList.vue";
 
 const { currentFile } = storeToRefs(useFileStore());
 const { navigate, files, editors } = useFileStore();
@@ -68,9 +69,7 @@ watch(currentFile, async value => {
         <button v-on:click="saveChanges();" v-bind:disabled="saving">Save Changes</button>
     </div>
     <div id="editorContainer" v-on:keydown="handleSave">
-        <div class="editor-list">
-            <button v-for="file in editors.keys()" :key="file" v-on:click="navigate(file)" :class="{ file: true, highlighted: file === currentFile }">{{ file }}</button>
-        </div>
+        <EditorList/>
         <div id="currentEditor">
             <monaco v-if="editors.size" v-for="file in editors.keys()" v-show="file === currentFile" :key="file" :path="file"/>
             <p v-else>Click on a file to open it, or create a new one</p>
@@ -90,22 +89,5 @@ watch(currentFile, async value => {
     display: grid;
     place-items: center;
     background-color: #1e1e1e;
-}
-
-.editor-list {
-    width: 100%;
-    display: flex;
-    justify-content: flex-start;
-    gap: 0.5rem;
-}
-
-.file {
-    border: none;
-    box-sizing: border-box;
-    padding: 0.25em;
-}
-
-.highlighted {
-    border-bottom: 2px solid aqua;
 }
 </style>
