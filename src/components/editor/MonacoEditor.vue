@@ -4,8 +4,9 @@ import * as monaco from "monaco-editor";
 
 import editorWorker from "monaco-editor/esm/vs/editor/editor.worker?worker"
 import tsWorker from "monaco-editor/esm/vs/language/typescript/ts.worker?worker"
-import { storeToRefs } from "pinia";
 import useFileStore from "../../fileStore.ts";
+
+const { path } = defineProps<{ path: string; }>();
 
 self.MonacoEnvironment ??= {
     getWorker(_, label) {
@@ -13,7 +14,9 @@ self.MonacoEnvironment ??= {
     }
 };
 
-const { fileContents, requestEditorText } = storeToRefs(useFileStore());
+const { editors } = useFileStore();
+
+const instance = editors.get(path)!;
 
 let editor: monaco.editor.IStandaloneCodeEditor | undefined;
 
@@ -23,14 +26,14 @@ onMounted(() => {
     editor = monaco.editor.create(element.value!, {
         language: "javascript",
         theme: "vs-dark",
-        value: fileContents.value
+        value: instance.text
     });
-    requestEditorText.value = () => editor!.getValue();
+    instance.contents = () => editor!.getValue();
 });
 
 onUnmounted(() => {
     editor?.dispose();
-    requestEditorText.value = () => "";
+    instance.contents = () => "";
 });
 </script>
 

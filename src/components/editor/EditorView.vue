@@ -4,8 +4,8 @@ import useFileStore from "../../fileStore.ts";
 import { storeToRefs } from "pinia";
 import Loading from "./Loading.vue";
 
-const { currentFile, fileContents, requestEditorText } = storeToRefs(useFileStore());
-const { files } = useFileStore();
+const { currentFile } = storeToRefs(useFileStore());
+const { navigate, files, editors } = useFileStore();
 
 let controller = new AbortController();
 
@@ -23,9 +23,10 @@ async function saveChanges() {
     saving.value = true;
     try {
         const path = loadedFile.value;
+        const body = editors.get(loadedFile.value)!.contents();
         const response = await fetch(path, {
             method: "POST",
-            body: requestEditorText.value()
+            body
         });
         if (response.status !== 201)
             alert("Failed to save file");
@@ -47,14 +48,14 @@ watch(currentFile, async value => {
     if (!value)
         return;
     if (files.get(value) === "created") {
-        fileContents.value = "";
         loadedFile.value = value;
         return;
     }
     controller?.abort("Navigating file");
     controller = new AbortController();
     const response = await fetch(value, { signal: controller.signal });
-    fileContents.value = response.ok ? await response.text() : "";
+    const contents = response.ok ? await response.text() : "";
+    navigate(value, contents);
     loadedFile.value = value;
 }, { immediate: true });
 </script>
@@ -65,7 +66,7 @@ watch(currentFile, async value => {
         <button v-on:click="saveChanges();" v-bind:disabled="saving">Save Changes</button>
     </div>
     <div id="editorContainer" v-on:keydown="handleSave">
-        <monaco v-if="loadedFile" :key="loadedFile"/>
+        <monaco v-if="editors.size" v-for="{file} in editors.values()" v-show="file === currentFile" :key="file" :path="file"/>
         <p v-else>Click on a file to open it, or create a new one</p>
     </div>
 </template>
