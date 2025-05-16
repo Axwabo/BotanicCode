@@ -4,6 +4,7 @@ import useFileStore from "../../fileStore.ts";
 import FileList from "./FileList.vue";
 import useGameStore from "../../gameStore.ts";
 import Bot from "../../game/bot.ts";
+import ConfirmDeleteDialog from "./ConfirmDeleteDialog.vue";
 
 const { navigate } = useFileStore();
 
@@ -32,6 +33,7 @@ function run() {
     <div class="view-title-bar">
         <span class="view-label">Project</span>
         <button v-on:click="run()">Run</button>
+        <ConfirmDeleteDialog/>
     </div>
     <div id="projectContainer">
         <div class="create-container">

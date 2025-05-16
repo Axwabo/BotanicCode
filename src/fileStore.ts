@@ -7,6 +7,7 @@ interface State {
     files: Map<string, FileStatus>;
     currentFile: string;
     editors: Map<string, EditorInstance>;
+    deleteConfirmation: string;
 }
 
 export interface EditorInstance {
@@ -20,7 +21,7 @@ function reactiveMap<T>() {
 }
 
 const useFileStore = defineStore("projectFiles", {
-    state: (): State => ({ files: reactiveMap(), currentFile: "", editors: reactiveMap() }),
+    state: (): State => ({ files: reactiveMap(), currentFile: "", editors: reactiveMap(), deleteConfirmation: "" }),
     actions: {
         navigate(path: string, content?: string) {
             if (this.files.get(this.currentFile) === "created")
