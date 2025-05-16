@@ -2,6 +2,7 @@
 import { cleanupOutdatedCaches, createHandlerBoundToURL, precacheAndRoute } from "workbox-precaching"
 import { NavigationRoute, registerRoute } from "workbox-routing";
 import staticRoutes from "./staticRoutes.ts";
+import { cacheNames } from "workbox-core";
 
 declare let self: ServiceWorkerGlobalScope;
 
@@ -71,7 +72,14 @@ registerRoute("/file-list/bot", async () => {
     return new Response(keys.map(f => new URL(f.url, self.location.origin).pathname).concat(staticRoutes).join("\n"), plainInit);
 });
 
-registerRoute("/file-list/static", async () => new Response(staticRoutes, plainInit));
+registerRoute("/file-list/static", async () => {
+    const cache = await caches.open(cacheNames.precache);
+    const keys = await cache.keys();
+    return new Response(keys.map(e => new URL(e.url))
+    .filter(e => e.origin === self.location.origin && (e.pathname.startsWith("/util") || e.pathname.startsWith("/bot")))
+    .map(e => e.pathname)
+    .join("\n"), plainInit);
+});
 
 registerRoute(/\/bot\/sdk\/run*/, async options => {
     const entry = options.url.searchParams.get("entryPoint");

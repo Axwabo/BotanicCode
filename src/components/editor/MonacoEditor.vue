@@ -26,7 +26,8 @@ onMounted(() => {
     editor = monaco.editor.create(element.value!, {
         language: "javascript",
         theme: "vs-dark",
-        value: instance.text
+        value: instance.text,
+        readOnly: files.get(path) === "locked"
     });
     editor.onDidChangeModelContent(() => files.set(path, "modified"));
     instance.contents = () => editor!.getValue();
