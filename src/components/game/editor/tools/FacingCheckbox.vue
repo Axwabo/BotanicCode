@@ -18,10 +18,8 @@ watch(selected, value => {
 </script>
 
 <template>
-    <input type="checkbox" :id="facing" v-model="selected">
-    <label :for="facing">{{ facing }} </label>
+    <div>
+        <input type="checkbox" :id="facing" v-model="selected">
+        <label :for="facing">{{ facing }} </label>
+    </div>
 </template>
-
-<style scoped>
-
-</style>

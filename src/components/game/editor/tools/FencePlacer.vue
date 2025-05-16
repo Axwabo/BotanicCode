@@ -10,16 +10,17 @@ useTileClickHandler(tile => tile.data = { type: "fence", posts: Array.from(facin
 
 <template>
     <div class="facing-checkboxes">
-        <FacingCheckbox facing="north"/>
-        <FacingCheckbox facing="east"/>
-        <FacingCheckbox facing="south"/>
-        <FacingCheckbox facing="west"/>
+        <FacingCheckbox facing="north" style="grid-column: 2;"/>
+        <FacingCheckbox facing="west" style="grid-row: 2;"/>
+        <FacingCheckbox facing="east" style="grid-row: 2; grid-column: 3;"/>
+        <FacingCheckbox facing="south" style="grid-row: 3; grid-column: 2;"/>
     </div>
 </template>
 
 <style scoped>
 .facing-checkboxes {
     display: grid;
-    grid-template-columns: auto 1fr auto 1fr;
+    grid-template-columns: repeat(3, auto);
+    grid-template-rows: repeat(3, auto);
 }
 </style>
