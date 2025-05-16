@@ -25,7 +25,7 @@ async function saveChanges() {
     saving.value = true;
     try {
         const path = currentFile.value;
-        const body = editors.get(path).contents();
+        const body = editors.get(path)!.contents();
         const response = await fetch(path, {
             method: "POST",
             body
@@ -63,7 +63,7 @@ watch(currentFile, async value => {
 
 <template>
     <div class="view-title-bar">
-        <span class="view-label">{{ currentFile || "Editor" }}</span>
+        <span class="view-label">Editor</span>
         <button v-on:click="saveChanges();" v-bind:disabled="saving">Save Changes</button>
     </div>
     <div id="editorContainer" v-on:keydown="handleSave">
@@ -86,6 +86,5 @@ watch(currentFile, async value => {
 #currentEditor:has(> p) {
     display: grid;
     place-items: center;
-    background-color: #1e1e1e;
 }
 </style>

@@ -27,20 +27,21 @@ function close() {
             break;
     }
     editors.delete(file);
-    if (current !== file || !editors.size)
+    if (current !== file)
         return;
+    if (!editors.size) {
+        currentFile.value = "";
+        return;
+    }
     const targetIndex = Math.max(0, Math.min(editors.size - 1, openIndex));
     editorPaths = editors.keys();
     let targetPath = "";
     for (i = 0; i <= targetIndex; i++)
-        targetPath = editorPaths.next().value;
+        targetPath = editorPaths.next().value!;
     navigate(targetPath);
 }
 
 function handleClick(event: MouseEvent) {
-    const target = event.target as HTMLButtonElement;
-    if (target?.innerText === "X")
-        return;
     if (event.button === 1)
         close();
     else
@@ -49,21 +50,30 @@ function handleClick(event: MouseEvent) {
 </script>
 
 <template>
-    <button v-on:mouseup="handleClick" :class="{ file: true, highlighted: file === currentFile }">
-        <span :class="status">{{ file }}</span>
+    <div :class="{ file: true, highlighted: file === currentFile }">
+        <button v-on:mouseup="handleClick" class="navigate">
+            <span :class="status">{{ file }}</span>
+        </button>
         <button v-on:click="close" class="close">X</button>
-    </button>
+    </div>
 </template>
 
 <style scoped>
 .file {
-    border: none;
-    box-sizing: border-box;
-    padding: 0.25em;
+    background-color: #444;
 }
 
-.highlighted {
-    border-bottom: 2px solid aqua;
+.file button {
+    border: none;
+    background-color: transparent;
+}
+
+.navigate {
+    padding-bottom: 0.25rem;
+}
+
+.file:hover {
+    background-color: #777;
 }
 
 .file:hover .close {
@@ -74,7 +84,16 @@ function handleClick(event: MouseEvent) {
     display: inline-block;
     visibility: hidden;
     padding: 0 0.25em;
-    margin-left: 0.25em;
+    margin-right: 0.25em;
     font-size: 0.75em;
+    border-radius: 100%;
+}
+
+.close:hover {
+    background-color: #fff5;
+}
+
+.highlighted {
+    border-bottom: 2px solid aqua;
 }
 </style>
