@@ -22,16 +22,14 @@ function reactiveMap<T>() {
 const useFileStore = defineStore("projectFiles", {
     state: (): State => ({ files: reactiveMap(), currentFile: "", editors: reactiveMap() }),
     actions: {
-        navigate(path: string, create?: string) {
-            if (this.currentFile === path)
-                return;
+        navigate(path: string, content?: string) {
             if (this.files.get(this.currentFile) === "created")
                 this.files.delete(this.currentFile);
-            if (create)
+            if (!this.files.get(path))
                 this.files.set(path, "created");
             const editor = this.editors.get(path);
-            if (!editor)
-                this.editors.set(path, { file: path, text: create ?? "", contents: () => "" });
+            if (!editor && content !== undefined)
+                this.editors.set(path, { file: path, text: content ?? "", contents: () => "" });
             this.currentFile = path;
         }
     }

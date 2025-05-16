@@ -16,7 +16,10 @@ const loadedFile = ref("");
 const monaco = defineAsyncComponent({
     delay: 0,
     loadingComponent: Loading,
-    loader: () => import("./MonacoEditor.vue")
+    loader: async () => {
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        return await import("./MonacoEditor.vue");
+    }
 });
 
 async function saveChanges() {
@@ -47,16 +50,15 @@ function handleSave(event: KeyboardEvent) {
 watch(currentFile, async value => {
     if (!value)
         return;
-    if (files.get(value) === "created") {
-        loadedFile.value = value;
-        return;
-    }
     controller?.abort("Navigating file");
     controller = new AbortController();
+    if (editors.get(value)) {
+        navigate(value);
+        return;
+    }
     const response = await fetch(value, { signal: controller.signal });
     const contents = response.ok ? await response.text() : "";
     navigate(value, contents);
-    loadedFile.value = value;
 }, { immediate: true });
 </script>
 
@@ -66,8 +68,13 @@ watch(currentFile, async value => {
         <button v-on:click="saveChanges();" v-bind:disabled="saving">Save Changes</button>
     </div>
     <div id="editorContainer" v-on:keydown="handleSave">
-        <monaco v-if="editors.size" v-for="{file} in editors.values()" v-show="file === currentFile" :key="file" :path="file"/>
-        <p v-else>Click on a file to open it, or create a new one</p>
+        <div class="editor-list">
+            <button v-for="file in editors.keys()" :key="file" v-on:click="navigate(file)" :class="{ file: true, highlighted: file === currentFile }">{{ file }}</button>
+        </div>
+        <div id="currentEditor">
+            <monaco v-if="editors.size" v-for="file in editors.keys()" v-show="file === currentFile" :key="file" :path="file"/>
+            <p v-else>Click on a file to open it, or create a new one</p>
+        </div>
     </div>
 </template>
 
@@ -75,11 +82,30 @@ watch(currentFile, async value => {
 #editorContainer {
     min-height: 20rem;
     height: calc(100% - 0.5rem);
+    display: grid;
+    grid-template-rows: auto 1fr;
 }
 
-#editorContainer:has(> p) {
+#currentEditor:has(> p) {
     display: grid;
     place-items: center;
     background-color: #1e1e1e;
+}
+
+.editor-list {
+    width: 100%;
+    display: flex;
+    justify-content: flex-start;
+    gap: 0.5rem;
+}
+
+.file {
+    border: none;
+    box-sizing: border-box;
+    padding: 0.25em;
+}
+
+.highlighted {
+    border-bottom: 2px solid aqua;
 }
 </style>

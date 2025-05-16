@@ -16,7 +16,7 @@ const filenameRegex = new RegExp(`^${filenamePattern}?$`);
 function createFile() {
     if (!newFile.value.match(filenameRegex))
         return;
-    navigate(`/bot/${newFile.value}.js`, "created");
+    navigate(`/bot/${newFile.value}.js`);
     newFile.value = "";
 }
 
