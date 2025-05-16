@@ -24,7 +24,7 @@ function handleClick(event: MouseEvent) {
         <button v-on:mouseup="handleClick" class="navigate">
             <span :class="status">{{ file }}</span>
         </button>
-        <button v-on:click="close" class="close">X</button>
+        <button v-on:click="close(file)" class="close">X</button>
     </div>
 </template>
 
