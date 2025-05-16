@@ -43,15 +43,20 @@ self.addEventListener("fetch", event => {
         }));
         return;
     }
-    if (!fileCache || event.request.method !== "POST") // TODO: disallow requests going out of /bot/
-        return;
-    if (!path.match(botDirectory))
+    if (!fileCache || !path.match(botDirectory))
         return;
     const url = new URL(path, self.location.origin);
-    event.respondWith(getCache().then(cache => cache.put(url, new Response(event.request.body, {
-        status: 200,
-        headers
-    }))).then(() => new Response(path, { status: 201 })));
+    switch (event.request.method) {
+        case "POST":
+            event.respondWith(getCache().then(cache => cache.put(url, new Response(event.request.body, {
+                status: 200,
+                headers
+            }))).then(() => new Response(path, { status: 201 })));
+            break;
+        case "DELETE":
+            event.respondWith(getCache().then(cache => cache.delete(url)).then(() => new Response(null, { status: 200 })));
+            break;
+    }
 });
 
 registerRoute("/file-list/bot", async () => {

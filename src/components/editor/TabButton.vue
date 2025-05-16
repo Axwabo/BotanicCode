@@ -5,45 +5,15 @@ import { computed } from "vue";
 
 const { file } = defineProps<{ file: string; }>();
 
-const { files, editors, navigate } = useFileStore();
+const { files, navigate, close } = useFileStore();
 
 const { currentFile } = storeToRefs(useFileStore());
 
 const status = computed(() => files.get(file));
 
-function close() {
-    const current = currentFile.value;
-    let editorPaths = editors.keys();
-    let openIndex = -1;
-    let i = 0;
-    while (true) {
-        const { value, done } = editorPaths.next();
-        if (value === current) {
-            openIndex = i;
-            break;
-        }
-        i++;
-        if (done)
-            break;
-    }
-    editors.delete(file);
-    if (current !== file)
-        return;
-    if (!editors.size) {
-        currentFile.value = "";
-        return;
-    }
-    const targetIndex = Math.max(0, Math.min(editors.size - 1, openIndex));
-    editorPaths = editors.keys();
-    let targetPath = "";
-    for (i = 0; i <= targetIndex; i++)
-        targetPath = editorPaths.next().value!;
-    navigate(targetPath);
-}
-
 function handleClick(event: MouseEvent) {
     if (event.button === 1)
-        close();
+        close(file);
     else
         navigate(file);
 }

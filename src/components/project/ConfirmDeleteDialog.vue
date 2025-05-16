@@ -3,6 +3,8 @@ import { storeToRefs } from "pinia";
 import useFileStore from "../../fileStore.ts";
 import { ref, watch } from "vue";
 
+const { files, close } = useFileStore();
+
 const { deleteConfirmation } = storeToRefs(useFileStore());
 
 const confirmation = ref<HTMLDialogElement>();
@@ -20,7 +22,10 @@ watch(deleteConfirmation, file => {
 async function deleteFile() {
     deleting.value = true;
     try {
-        await fetch(deleteConfirmation.value, { method: "DELETE" });
+        const file = deleteConfirmation.value;
+        await fetch(file, { method: "DELETE" });
+        close(file);
+        files.delete(file);
         deleteConfirmation.value = "";
     } finally {
         deleting.value = false;
@@ -30,13 +35,22 @@ async function deleteFile() {
 
 <template>
     <dialog ref="confirmation" v-on:close="deleteConfirmation = ''">
-        <h1>Are you sure you want to delete this file?</h1>
-        <code>{{ deleteConfirmation }}</code>
-        <button v-bind:disabled="deleting" v-on:click="deleteFile">Yes</button>
-        <button v-bind:disabled="deleting" v-on:click="deleteConfirmation = ''">No</button>
+        <h4>Are you sure you want to delete this file?</h4>
+        <p><code>{{ deleteConfirmation }}</code></p>
+        <section class="choices">
+            <button v-bind:disabled="deleting" v-on:click="deleteFile">Yes</button>
+            <button v-bind:disabled="deleting" v-on:click="deleteConfirmation = ''" autofocus>No</button>
+        </section>
     </dialog>
 </template>
 
 <style scoped>
+.choices {
+    display: flex;
+    gap: 1rem;
+}
 
+.choices button {
+    flex: 1;
+}
 </style>

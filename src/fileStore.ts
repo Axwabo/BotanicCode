@@ -32,6 +32,35 @@ const useFileStore = defineStore("projectFiles", {
             if (!editor && content !== undefined)
                 this.editors.set(path, { file: path, text: content ?? "", contents: () => "" });
             this.currentFile = path;
+        },
+        close(path: string) {
+            const current = this.currentFile;
+            let editorPaths = this.editors.keys();
+            let openIndex = -1;
+            let i = 0;
+            while (true) {
+                const { value, done } = editorPaths.next();
+                if (value === current) {
+                    openIndex = i;
+                    break;
+                }
+                i++;
+                if (done)
+                    break;
+            }
+            this.editors.delete(path);
+            if (current !== path)
+                return;
+            if (!this.editors.size) {
+                this.currentFile = "";
+                return;
+            }
+            const targetIndex = Math.max(0, Math.min(this.editors.size - 1, openIndex));
+            editorPaths = this.editors.keys();
+            let targetPath = "";
+            for (i = 0; i <= targetIndex; i++)
+                targetPath = editorPaths.next().value!;
+            this.navigate(targetPath);
         }
     }
 });
