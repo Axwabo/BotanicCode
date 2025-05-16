@@ -14,7 +14,7 @@ self.MonacoEnvironment ??= {
     }
 };
 
-const { editors } = useFileStore();
+const { files, editors } = useFileStore();
 
 const instance = editors.get(path)!;
 
@@ -28,6 +28,7 @@ onMounted(() => {
         theme: "vs-dark",
         value: instance.text
     });
+    editor.onDidChangeModelContent(() => files.set(path, "modified"));
     instance.contents = () => editor!.getValue();
 });
 

@@ -1,12 +1,15 @@
 <script setup lang="ts">
 import { storeToRefs } from "pinia";
 import useFileStore from "../../fileStore.ts";
+import { computed } from "vue";
 
 const { file } = defineProps<{ file: string; }>();
 
-const { editors, navigate } = useFileStore();
+const { files, editors, navigate } = useFileStore();
 
 const { currentFile } = storeToRefs(useFileStore());
+
+const status = computed(() => files.get(file));
 
 function close() {
     const current = currentFile.value;
@@ -47,13 +50,12 @@ function handleClick(event: MouseEvent) {
 
 <template>
     <button v-on:mouseup="handleClick" :class="{ file: true, highlighted: file === currentFile }">
-        <span>{{ file }}</span>
+        <span :class="status">{{ file }}</span>
         <button v-on:click="close" class="close">X</button>
     </button>
 </template>
 
 <style scoped>
-
 .file {
     border: none;
     box-sizing: border-box;

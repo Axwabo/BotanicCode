@@ -10,9 +10,13 @@ const { navigate } = useFileStore();
     <button v-on:click="navigate(path)" :class="status">{{ filename }}</button>
 </template>
 
-<style scoped>
+<style>
 .modified, .created {
     font-style: italic;
+}
+
+.modified::after {
+    content: "*";
 }
 
 .created {

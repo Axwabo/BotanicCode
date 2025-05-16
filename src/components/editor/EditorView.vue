@@ -12,8 +12,6 @@ let controller = new AbortController();
 
 const saving = ref(false);
 
-const loadedFile = ref("");
-
 const monaco = defineAsyncComponent({
     delay: 0,
     loadingComponent: Loading,
@@ -26,8 +24,8 @@ const monaco = defineAsyncComponent({
 async function saveChanges() {
     saving.value = true;
     try {
-        const path = loadedFile.value;
-        const body = editors.get(loadedFile.value)!.contents();
+        const path = currentFile.value;
+        const body = editors.get(path).contents();
         const response = await fetch(path, {
             method: "POST",
             body
@@ -65,7 +63,7 @@ watch(currentFile, async value => {
 
 <template>
     <div class="view-title-bar">
-        <span class="view-label">{{ loadedFile || "Editor" }}</span>
+        <span class="view-label">{{ currentFile || "Editor" }}</span>
         <button v-on:click="saveChanges();" v-bind:disabled="saving">Save Changes</button>
     </div>
     <div id="editorContainer" v-on:keydown="handleSave">
