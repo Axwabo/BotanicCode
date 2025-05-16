@@ -76,17 +76,17 @@ function handleClick(event: MouseEvent) {
     background-color: #777;
 }
 
-.file:hover .close {
-    visibility: visible;
-}
-
 .close {
     display: inline-block;
-    visibility: hidden;
+    opacity: 0;
     padding: 0 0.25em;
     margin-right: 0.25em;
     font-size: 0.75em;
     border-radius: 100%;
+}
+
+.file:hover .close, .close:focus {
+    opacity: 1;
 }
 
 .close:hover {
