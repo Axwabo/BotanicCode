@@ -1,6 +1,7 @@
 /// <reference lib="webworker" />
 import { cleanupOutdatedCaches, createHandlerBoundToURL, precacheAndRoute } from "workbox-precaching"
 import { NavigationRoute, registerRoute } from "workbox-routing";
+import staticRoutes from "./staticRoutes.ts";
 
 declare let self: ServiceWorkerGlobalScope;
 
@@ -58,13 +59,19 @@ self.addEventListener("fetch", event => {
             break;
     }
 });
+const plainInit = {
+    headers: {
+        "Content-Type": "text/plain"
+    }
+};
 
 registerRoute("/file-list/bot", async () => {
-    const keys = await (await getCache()).keys();
-    const response = new Response(keys.map(f => new URL(f.url, self.location.origin).pathname).join("\n"));
-    response.headers.set("Content-Type", "text/plain");
-    return response;
+    const cache = await getCache();
+    const keys = await cache.keys();
+    return new Response(keys.map(f => new URL(f.url, self.location.origin).pathname).concat(staticRoutes).join("\n"), plainInit);
 });
+
+registerRoute("/file-list/static", async () => new Response(staticRoutes, plainInit));
 
 registerRoute(/\/bot\/sdk\/run*/, async options => {
     const entry = options.url.searchParams.get("entryPoint");

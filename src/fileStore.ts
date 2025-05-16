@@ -1,7 +1,7 @@
 import { defineStore } from "pinia";
 import { reactive } from "vue";
 
-export type FileStatus = "created" | "modified" | "saved";
+export type FileStatus = "created" | "modified" | "saved" | "locked";
 
 interface State {
     files: Map<string, FileStatus>;

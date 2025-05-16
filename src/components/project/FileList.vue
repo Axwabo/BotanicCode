@@ -14,14 +14,20 @@ interface ListItem {
     depth: number;
 }
 
-const response = await fetch("file-list/bot");
+await Promise.all([
+    requestList("bot", "saved"),
+    requestList("static", "locked")
+]);
 
-if (response.ok && response.headers.get("Content-Type") === "text/plain") {
+async function requestList(type: string, status: FileStatus) {
+    const response = await fetch(`file-list/${type}`);
+    if (!response.ok || response.headers.get("Content-Type") !== "text/plain")
+        return;
     const text = await response.text();
     const lines = text.split("\n");
     for (const line of lines)
         if (line)
-            files.set(line, "saved");
+            files.set(line, status);
 }
 
 const sorted = computed(() => {
