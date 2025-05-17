@@ -3,7 +3,6 @@ import { storeToRefs } from "pinia";
 import useGameStore from "../gameStore.ts";
 import { canvasToWorld } from "./ctx.ts";
 import ClickEvent from "./editor/clickEvent.ts";
-import type BotReadyEvent from "./botReadyEvent.ts";
 
 const { game, dragging, uiEventsRegistered, pointer } = storeToRefs(useGameStore());
 
@@ -20,7 +19,7 @@ export default function beginLoop() {
     window.addEventListener("mouseup", handleMouseUp);
     window.addEventListener("mousemove", handleMouseMove);
 
-    editorHandler.addEventListener("botready", sendBoard);
+    editorHandler.addEventListener("workerready", sendBoard);
 
     loop();
 }
@@ -88,8 +87,7 @@ function handleMouseMove(event: MouseEvent) {
     game.value.position.y -= event.movementY;
 }
 
-function sendBoard(event: Event) {
-    const ready = <BotReadyEvent>event;
-    const { board, bots } = game.value;
-    bots.get(ready.name)!.sendBoard(board);
+function sendBoard() {
+    const { board, botManager } = game.value;
+    botManager.sendBoard(board);
 }

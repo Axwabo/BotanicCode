@@ -12,8 +12,8 @@ const { currentFile, canRun } = storeToRefs(useFileStore());
 const { game } = useGameStore();
 
 function run() {
-    const name = Date.now().toString(32);
-    game.bots.set(name, new BotManager(name, currentFile.value));
+    game.botManager.terminate();
+    game.botManager = new BotManager(currentFile.value);
 }
 
 function toggleHidden(event: Event) {

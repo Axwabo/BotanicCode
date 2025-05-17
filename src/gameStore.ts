@@ -1,9 +1,9 @@
 import { defineStore } from "pinia";
 import type { GameState } from "./game/gameState.ts";
 import { Board } from "./util/world/board.js";
-import type BotManager from "./game/botManager.ts";
+import BotManager from "./game/botManager.ts";
 import useEditorStore from "./editorStore.ts";
-import type { Position } from "./util/tile";
+import type { WorldPosition } from "./util/tile";
 
 interface Renderer {
     canvas: HTMLCanvasElement;
@@ -15,7 +15,7 @@ interface State {
     game: GameState;
     dragging: boolean;
     uiEventsRegistered: boolean;
-    pointer: Position
+    pointer: WorldPosition
 }
 
 function createBoard() {
@@ -38,7 +38,7 @@ const useGameStore = defineStore("game", {
                 x: 0,
                 y: 0
             },
-            bots: new Map<string, BotManager>()
+            botManager: new BotManager()
         },
         dragging: false,
         uiEventsRegistered: false,
@@ -53,10 +53,8 @@ const useGameStore = defineStore("game", {
             this.game.position.y = 0;
         },
         resetBoard() {
-            for (const agent of this.game.bots.values())
-                agent.terminate();
             useEditorStore().selectedBot = "";
-            this.game.bots.clear();
+            this.game.botManager.terminate();
             this.game.board = createBoard();
         }
     }

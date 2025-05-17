@@ -1,6 +1,6 @@
 import type { Chunk } from "./world/tile.js";
 
-export interface Position {
+export interface WorldPosition {
     x: number;
     y: number;
 }

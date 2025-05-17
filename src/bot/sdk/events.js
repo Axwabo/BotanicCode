@@ -1,10 +1,7 @@
 import WorldLoadedEvent from "../../util/world/events/worldLoadedEvent.js";
 import createBoardFromJson from "../../util/world/worldDeserializer.js";
 
-export default function registerEvents() {
-    addEventListener("message", handleMessage);
-}
-
+addEventListener("message", handleMessage);
 /** @param ev {MessageEvent<GameMessage>} */
 function handleMessage(ev) {
     if (!ev.data)

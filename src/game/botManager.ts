@@ -1,22 +1,22 @@
 import { editorHandler } from "./main.ts";
-import BotReadyEvent from "./botReadyEvent.ts";
 import type { Board } from "../util/world/board";
 import type { WorkerMessage } from "../util/messages";
-import type { Position } from "../util/tile";
+import type { WorldPosition } from "../util/tile";
+import type { BotRequest } from "../bot/sdk/requests";
 
 export default class BotManager {
-    readonly name: string;
-    private readonly worker: Worker;
-    private readonly renderCallback: () => void;
-    position: Position;
+    private readonly worker?: Worker;
+    private readonly renderCallback?: () => void;
+    readonly bots: Map<string, WorldPosition>; // TODO: managed bot instance
     private ready = false;
     private _error?: any;
 
-    constructor(name: string, entryPoint: string) {
-        this.name = name;
+    constructor(entryPoint?: string) {
+        this.bots = new Map<string, WorldPosition>();
+        if (!entryPoint)
+            return;
         this.worker = new Worker(`bot/sdk/run.js?t=${Date.now()}&entryPoint=${encodeURI(entryPoint)}`, { type: "module" });
-        this.position = { x: 0, y: 0 };
-        this.renderCallback = () => this.worker.postMessage({ type: "render" });
+        this.renderCallback = () => this.worker!.postMessage({ type: "render" });
         this.worker.addEventListener("message", event => this.handleMessage(event));
         editorHandler.addEventListener("render", this.renderCallback);
     }
@@ -33,22 +33,42 @@ export default class BotManager {
                 if (this.ready)
                     break;
                 this.ready = true;
-                editorHandler.dispatchEvent(new BotReadyEvent(this.name));
+                editorHandler.dispatchEvent(new Event("workerready"));
                 break;
+            case "bot":
+                this.handleBotMessage(event.data.request, event.data.name);
+                break;
+        }
+    }
+
+    private handleBotMessage(request: BotRequest, name: string) {
+        if (request.type === "create") {
+            this.bots.set(name, { x: 0, y: 0 });
+            return;
+        }
+        const bot = this.bots.get(name);
+        if (!bot)
+            return;
+        switch (request.type) {
             case "move":
-                this.position.x += event.data.x;
-                this.position.y += event.data.y;
+                bot.x += request.deltaX;
+                bot.y += request.deltaY;
+                break;
+            case "terminate":
+                this.bots.delete(name);
                 break;
         }
     }
 
     terminate() {
-        editorHandler.removeEventListener("render", this.renderCallback);
-        this.worker.terminate();
+        if (this.renderCallback)
+            editorHandler.removeEventListener("render", this.renderCallback);
+        this.worker?.terminate();
+        this.bots.clear();
     }
 
     sendBoard(board: Board) {
-        this.worker.postMessage({ type: "world", board: JSON.stringify(board.chunkStore) });
+        this.worker?.postMessage({ type: "world", board: JSON.stringify(board.chunkStore) });
     }
 
     get isReady() {
