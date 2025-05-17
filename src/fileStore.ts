@@ -38,8 +38,6 @@ const useFileStore = defineStore("projectFiles", {
     state: (): State => ({ files: reactiveMap(), currentFile: "", editors: reactiveMap(), deleteConfirmation: "" }),
     actions: {
         navigate(path: string, content?: string) {
-            if (this.files.get(this.currentFile) === "created")
-                this.files.delete(this.currentFile);
             if (!this.files.get(path))
                 this.files.set(path, "created");
             const editor = this.editors.get(path);
