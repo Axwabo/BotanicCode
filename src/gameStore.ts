@@ -1,7 +1,7 @@
 import { defineStore } from "pinia";
 import type { GameState } from "./game/gameState.ts";
 import { Board } from "./util/world/board.js";
-import type Bot from "./game/bot.ts";
+import type BotManager from "./game/botManager.ts";
 import useEditorStore from "./editorStore.ts";
 import type { Position } from "./util/tile";
 
@@ -38,7 +38,7 @@ const useGameStore = defineStore("game", {
                 x: 0,
                 y: 0
             },
-            bots: new Map<string, Bot>()
+            bots: new Map<string, BotManager>()
         },
         dragging: false,
         uiEventsRegistered: false,

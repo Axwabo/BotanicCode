@@ -4,7 +4,7 @@ import type { Board } from "../util/world/board";
 import type { WorkerMessage } from "../util/messages";
 import type { Position } from "../util/tile";
 
-export default class Bot {
+export default class BotManager {
     readonly name: string;
     private readonly worker: Worker;
     private readonly renderCallback: () => void;

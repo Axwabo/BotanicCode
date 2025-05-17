@@ -2,7 +2,7 @@
 import ConfirmDeleteDialog from "./ConfirmDeleteDialog.vue";
 import useFileStore from "../../fileStore.ts";
 import useGameStore from "../../gameStore.ts";
-import Bot from "../../game/bot.ts";
+import BotManager from "../../game/botManager.ts";
 import { storeToRefs } from "pinia";
 
 const { setSdkVisibility } = useFileStore();
@@ -13,7 +13,7 @@ const { game } = useGameStore();
 
 function run() {
     const name = Date.now().toString(32);
-    game.bots.set(name, new Bot(name, currentFile.value));
+    game.bots.set(name, new BotManager(name, currentFile.value));
 }
 
 function toggleHidden(event: Event) {

@@ -2,7 +2,7 @@ import getContext, { canvasToWorld } from "./ctx.ts";
 import { tileSize, worldToChunk } from "../util/tileConstants.js";
 import type { Facing, Tile } from "../util/tile.d.ts";
 import { isInRange } from "../util/distance";
-import type Bot from "./bot.ts";
+import type BotManager from "./botManager.ts";
 
 export function render() {
     const { ctx, width, height, game, pointerX, pointerY, tool } = getContext();
@@ -21,7 +21,7 @@ export function render() {
     ctx.textBaseline = "bottom";
     ctx.textAlign = "center";
     const { x: pointerWorldX, y: pointerWorldY } = canvasToWorld(pointerX, pointerY);
-    let highlightedBot: Bot | undefined;
+    let highlightedBot: BotManager | undefined;
     for (const bot of game.bots.values()) {
         // TODO: better state presentation
         ctx.fillStyle = bot.error !== undefined ? "red" : bot.isReady ? "white" : "gray";

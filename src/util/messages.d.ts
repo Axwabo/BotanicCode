@@ -1,16 +1,17 @@
 import type { Board } from "./world/board";
+import type { BotRequest, BotResponse } from "../bot/sdk/requests";
 
-export type WorkerMessage = Ready | Move | Error;
-export type GameMessage = Render | World;
+export type WorkerMessage = Ready | BotRequestMessage | Error;
+export type GameMessage = Render | BotResponseMessage | World;
 
 interface Ready {
     type: "ready";
 }
 
-interface Move {
-    type: "move";
-    x: number;
-    y: number;
+interface BotRequestMessage {
+    type: "bot";
+    name: string;
+    request: BotRequest;
 }
 
 interface Error {
@@ -25,4 +26,10 @@ interface Render {
 interface World {
     type: "world";
     board: Board;
+}
+
+interface BotResponseMessage {
+    type: "bot";
+    name: string;
+    response: BotResponse;
 }
