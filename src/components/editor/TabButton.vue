@@ -31,6 +31,7 @@ function handleClick(event: MouseEvent) {
 <style scoped>
 .file {
     background-color: #444;
+    white-space: nowrap;
 }
 
 .file button {

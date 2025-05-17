@@ -13,7 +13,8 @@ const { editors } = useFileStore();
 
 <style scoped>
 #editorList {
-    width: 100%;
+    max-width: 100%;
+    overflow-x: scroll;
     display: flex;
     justify-content: flex-start;
     gap: 0.5rem;
