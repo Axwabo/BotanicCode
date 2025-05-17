@@ -2,11 +2,9 @@
 import { ref } from "vue";
 import useFileStore from "../../fileStore.ts";
 import FileList from "./FileList.vue";
-import useGameStore from "../../gameStore.ts";
-import Bot from "../../game/bot.ts";
-import ConfirmDeleteDialog from "./ConfirmDeleteDialog.vue";
+import ProjectTitleBar from "./ProjectTitleBar.vue";
 
-const { navigate, setSdkVisibility } = useFileStore();
+const { navigate } = useFileStore();
 
 const newFile = ref("");
 
@@ -20,29 +18,11 @@ function createFile() {
     navigate(`/bot/${newFile.value}.js`);
     newFile.value = "";
 }
-
-function run() {
-    const { currentFile } = useFileStore();
-    const { game } = useGameStore();
-    const name = Date.now().toString(32);
-    game.bots.set(name, new Bot(name, currentFile));
-}
-
-function toggleHidden(event: Event) {
-    const checkbox = <HTMLInputElement>event.target;
-    setSdkVisibility(checkbox.checked);
-}
 </script>
 
 <template>
     <div class="view-title-bar">
-        <span class="view-label">Project</span>
-        <div>
-            <label for="sdk">Show SDK</label>
-            <input type="checkbox" id="sdk" checked v-on:change="toggleHidden">
-        </div>
-        <button v-on:click="run()">Run</button>
-        <ConfirmDeleteDialog/>
+        <ProjectTitleBar/>
     </div>
     <div id="projectContainer">
         <div class="create-container">

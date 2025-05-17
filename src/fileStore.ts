@@ -36,6 +36,11 @@ function findIndex(editorPaths: Map<string, EditorInstance>, current: string) {
 
 const useFileStore = defineStore("projectFiles", {
     state: (): State => ({ files: reactiveMap(), currentFile: "", editors: reactiveMap(), deleteConfirmation: "" }),
+    getters: {
+        canRun(state: State) {
+            return state.files.get(state.currentFile) === "saved";
+        }
+    },
     actions: {
         navigate(path: string, content?: string) {
             if (!this.files.get(path))
