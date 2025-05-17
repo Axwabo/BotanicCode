@@ -2,8 +2,7 @@ import { render } from "./renderer.ts";
 import { storeToRefs } from "pinia";
 import useGameStore from "../gameStore.ts";
 import { canvasToWorld } from "./ctx.ts";
-import TileClickEvent from "./editor/tileClickEvent.ts";
-import { tileSize } from "../util/tileConstants.js";
+import ClickEvent from "./editor/clickEvent.ts";
 import type BotReadyEvent from "./botReadyEvent.ts";
 
 const { game, dragging, uiEventsRegistered, pointer } = storeToRefs(useGameStore());
@@ -68,11 +67,7 @@ function handleMouseDown(event: MouseEvent) {
     if (event.button !== 0)
         return;
     const { x, y } = canvasToWorld(event.offsetX, event.offsetY);
-    editorHandler.dispatchEvent(new TileClickEvent(
-        game.value.board,
-        Math.floor(x / tileSize),
-        Math.floor(y / tileSize)
-    ));
+    editorHandler.dispatchEvent(new ClickEvent(game.value.board, x, y));
 }
 
 function handleMouseUp(event: MouseEvent) {

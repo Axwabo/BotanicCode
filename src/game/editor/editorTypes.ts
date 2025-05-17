@@ -1,1 +1,1 @@
-export type Tool = "Tile Placer" | "Fence Placer" | "Clear Tile"
+export type Tool = "Inspector" | "Tile Placer" | "Fence Placer" | "Clear Tile";

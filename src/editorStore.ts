@@ -6,13 +6,15 @@ interface State {
     tool: Tool;
     tileType: TileType;
     facings: Set<Facing>;
+    selectedBot: string;
 }
 
 const useEditorStore = defineStore("editor", {
     state: (): State => ({
-        tool: "Tile Placer",
+        tool: "Inspector",
         tileType: "gravel",
-        facings: new Set<Facing>()
+        facings: new Set<Facing>(),
+        selectedBot: ""
     }),
     actions: {
         isTool(tool: Tool) {

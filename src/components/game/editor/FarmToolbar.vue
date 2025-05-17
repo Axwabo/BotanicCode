@@ -4,15 +4,20 @@ import ToolView from "./ToolView.vue";
 import TilePlacer from "./tools/TilePlacer.vue";
 import FencePlacer from "./tools/FencePlacer.vue";
 import ClearTile from "./tools/ClearTile.vue";
+import BotInspector from "./tools/BotInspector.vue";
 </script>
 
 <template>
     <div class="farm-toolbar">
         <div class="tool-selector">
+            <ToolButton tool="Inspector"/>
             <ToolButton tool="Tile Placer"/>
             <ToolButton tool="Fence Placer"/>
             <ToolButton tool="Clear Tile"/>
         </div>
+        <ToolView tool="Inspector">
+            <BotInspector/>
+        </ToolView>
         <ToolView tool="Tile Placer">
             <TilePlacer/>
         </ToolView>

@@ -2,6 +2,7 @@ import { defineStore } from "pinia";
 import type { GameState } from "./game/gameState.ts";
 import { Board } from "./util/world/board.js";
 import type Bot from "./game/bot.ts";
+import useEditorStore from "./editorStore.ts";
 
 interface Renderer {
     canvas: HTMLCanvasElement;
@@ -56,6 +57,7 @@ const useGameStore = defineStore("game", {
         resetBoard() {
             for (const agent of this.game.bots.values())
                 agent.terminate();
+            useEditorStore().selectedBot = "";
             this.game.bots.clear();
             this.game.board = createBoard();
         }
