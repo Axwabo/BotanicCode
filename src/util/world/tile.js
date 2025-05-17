@@ -1,4 +1,4 @@
-import { chunkSize } from "../tileConstants.js";
+import { tilesPerChunk } from "../tileConstants.js";
 
 /** @type {TileType} */
 const defaultTileType = "grass";
@@ -9,7 +9,7 @@ export class Row {
     tiles = [];
 
     constructor(chunk, y) {
-        for (let x = 0; x < chunkSize; x++)
+        for (let x = 0; x < tilesPerChunk; x++)
             this.tiles.push({ x: chunk.worldX + x, y: chunk.worldY + y, type: defaultTileType });
     }
 
@@ -33,16 +33,16 @@ export class Chunk {
     constructor(x, y) {
         this.x = x;
         this.y = y;
-        for (let row = 0; row < chunkSize; row++)
+        for (let row = 0; row < tilesPerChunk; row++)
             this.rows.push(new Row(this, row));
     }
 
     get worldX() {
-        return this.x * chunkSize;
+        return this.x * tilesPerChunk;
     }
 
     get worldY() {
-        return this.y * chunkSize;
+        return this.y * tilesPerChunk;
     }
 
     /**

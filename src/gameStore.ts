@@ -32,25 +32,28 @@ function createBoard() {
 }
 
 const useGameStore = defineStore("game", {
-    state: (): State => ({
-        renderer: undefined,
-        game: {
-            board: createBoard(),
-            position: {
+    state: (): State => {
+        const board = createBoard();
+        return {
+            renderer: undefined,
+            game: {
+                board,
+                position: {
+                    x: 0,
+                    y: 0
+                },
+                botManager: new BotManager(board)
+            },
+            dragging: false,
+            uiEventsRegistered: false,
+            pointer: {
                 x: 0,
                 y: 0
             },
-            botManager: new BotManager()
-        },
-        dragging: false,
-        uiEventsRegistered: false,
-        pointer: {
-            x: 0,
-            y: 0
-        },
-        workerReady: false,
-        workerError: undefined
-    }),
+            workerReady: false,
+            workerError: undefined
+        };
+    },
     actions: {
         resetPosition() {
             this.game.position.x = 0;

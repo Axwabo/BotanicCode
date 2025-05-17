@@ -31,7 +31,7 @@ function handleResponse(bot, response) {
         case "terminate":
             bot.terminate();
             break;
-        case"position":
+        case "position":
             bot.position.x = response.x;
             bot.position.y = response.y;
             break;

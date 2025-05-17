@@ -5,15 +5,18 @@ import type { BotRequest } from "../bot/sdk/requests";
 import { editorHandler } from "./events/editorHandler.ts";
 import WorkerErrorEvent from "./events/workerErrorEvent.ts";
 import type TerminatingBotEvent from "./events/terminatingBotEvent.ts";
+import { validateMove } from "../util/movement";
 
 export default class BotManager {
+    private readonly board: Board;
     private readonly worker?: Worker;
     private readonly renderCallback?: () => void;
     private readonly terminateCallback?: (event: Event) => void;
     readonly bots: Map<string, WorldPosition>; // TODO: managed bot instance
 
-    constructor(entryPoint?: string) {
+    constructor(board: Board, entryPoint?: string) {
         editorHandler.dispatchEvent(new Event("workerinit"));
+        this.board = board;
         this.bots = new Map<string, WorldPosition>();
         if (!entryPoint)
             return;
@@ -51,8 +54,11 @@ export default class BotManager {
             return;
         switch (request.type) {
             case "move":
-                bot.x += request.deltaX;
-                bot.y += request.deltaY;
+                const { x, y, valid } = validateMove(this.board, bot, request.deltaX, request.deltaY);
+                bot.x = x;
+                bot.y = y;
+                if (!valid)
+                    this.send({ type: "bot", name, response: { type: "position", x, y } });
                 break;
             case "terminate":
                 this.bots.delete(name);

@@ -1,5 +1,5 @@
 import ChunkStore from "./chunkStore.js";
-import { chunkSize, getChunkRemainder } from "../tileConstants.js";
+import { getChunkRemainder, tilesPerChunk } from "../tileConstants.js";
 
 export class Board {
     chunkStore = new ChunkStore();
@@ -19,7 +19,7 @@ export class Board {
      * @return {Chunk}
      */
     getChunkAt(tileX, tileY) {
-        return this.getChunk(Math.floor(tileX / chunkSize), Math.floor(tileY / chunkSize));
+        return this.getChunk(Math.floor(tileX / tilesPerChunk), Math.floor(tileY / tilesPerChunk));
     }
 
     /**

@@ -13,7 +13,7 @@ const { game } = useGameStore();
 
 function run() {
     game.botManager.terminate();
-    game.botManager = new BotManager(currentFile.value);
+    game.botManager = new BotManager(game.board, currentFile.value);
 }
 
 function toggleHidden(event: Event) {

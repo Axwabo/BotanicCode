@@ -1,12 +1,17 @@
-export const chunkSize = 32;
+export const tilesPerChunk = 32;
 export const tileSize = 30;
 
 /** @param coord {number} */
-export function worldToChunk(coord) {
-    return coord / tileSize / chunkSize;
+export function worldToTile(coord) {
+    return coord / tileSize;
 }
 
 /** @param coord {number} */
-export function getChunkRemainder(coord) {
-    return coord >= 0 ? coord % chunkSize : chunkSize - Math.abs(coord) % chunkSize;
+export function worldToChunk(coord) {
+    return coord / tileSize / tilesPerChunk;
+}
+
+/** @param tile {number} */
+export function getChunkRemainder(tile) {
+    return tile >= 0 ? tile % tilesPerChunk : tilesPerChunk - Math.abs(tile) % tilesPerChunk;
 }
