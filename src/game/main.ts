@@ -3,10 +3,9 @@ import { storeToRefs } from "pinia";
 import useGameStore from "../gameStore.ts";
 import { canvasToWorld } from "./ctx.ts";
 import ClickEvent from "./editor/clickEvent.ts";
+import { editorHandler } from "./editorHandler.ts";
 
 const { game, dragging, uiEventsRegistered, pointer } = storeToRefs(useGameStore());
-
-export const editorHandler = new EventTarget();
 
 export default function beginLoop() {
     if (uiEventsRegistered.value)

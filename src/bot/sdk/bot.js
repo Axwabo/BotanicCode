@@ -14,7 +14,7 @@ export class Bot {
         this.#name = name;
         this.position = { x: 0, y: 0 };
         bots.set(name, this);
-        this.request({ type: "create" });
+        this.#request({ type: "create" });
     }
 
     get name() {
@@ -22,12 +22,16 @@ export class Bot {
     }
 
     /** @param request {BotRequest} */
-    request(request) {
+    #request(request) {
         sendMessage({ type: "bot", name: this.#name, request });
     }
 
+    move(deltaX, deltaY) {
+        this.#request({ type: "move", deltaX, deltaY });
+    }
+
     terminate() {
-        this.request({ type: "terminate" });
+        this.#request({ type: "terminate" });
     }
 }
 

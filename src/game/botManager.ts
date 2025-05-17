@@ -1,8 +1,8 @@
-import { editorHandler } from "./main.ts";
 import type { Board } from "../util/world/board";
 import type { WorkerMessage } from "../util/messages";
 import type { WorldPosition } from "../util/tile";
 import type { BotRequest } from "../bot/sdk/requests";
+import { editorHandler } from "./editorHandler.ts";
 
 export default class BotManager {
     private readonly worker?: Worker;

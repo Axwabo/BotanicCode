@@ -2,11 +2,11 @@
 import { storeToRefs } from "pinia";
 import useEditorStore from "../../../../editorStore.ts";
 import { computed, onMounted, onUnmounted } from "vue";
-import { editorHandler } from "../../../../game/main.ts";
 import type ClickEvent from "../../../../game/editor/clickEvent.ts";
 import useGameStore from "../../../../gameStore.ts";
 import { tileSize } from "../../../../util/tileConstants";
 import { isInRange } from "../../../../util/distance";
+import { editorHandler } from "../../../../game/editorHandler.ts";
 
 const { selectedBot } = storeToRefs(useEditorStore());
 
