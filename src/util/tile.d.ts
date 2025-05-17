@@ -1,5 +1,10 @@
 import type { Chunk } from "./world/tile.js";
 
+export interface Position {
+    x: number;
+    y: number;
+}
+
 export type TileType = "grass" | "dirt" | "gravel" | "air";
 
 export interface Tile {

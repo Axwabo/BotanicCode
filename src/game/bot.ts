@@ -2,12 +2,13 @@ import { editorHandler } from "./main.ts";
 import BotReadyEvent from "./botReadyEvent.ts";
 import type { Board } from "../util/world/board";
 import type { WorkerMessage } from "../util/messages";
+import type { Position } from "../util/tile";
 
 export default class Bot {
     readonly name: string;
     private readonly worker: Worker;
     private readonly renderCallback: () => void;
-    position: { x: number; y: number; };
+    position: Position;
     private ready = false;
     private _error?: any;
 

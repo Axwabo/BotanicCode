@@ -3,6 +3,7 @@ import type { GameState } from "./game/gameState.ts";
 import { Board } from "./util/world/board.js";
 import type Bot from "./game/bot.ts";
 import useEditorStore from "./editorStore.ts";
+import type { Position } from "./util/tile";
 
 interface Renderer {
     canvas: HTMLCanvasElement;
@@ -14,10 +15,7 @@ interface State {
     game: GameState;
     dragging: boolean;
     uiEventsRegistered: boolean;
-    pointer: {
-        x: number,
-        y: number
-    }
+    pointer: Position
 }
 
 function createBoard() {

@@ -6,6 +6,7 @@ import { editorHandler } from "../../../../game/main.ts";
 import type ClickEvent from "../../../../game/editor/clickEvent.ts";
 import useGameStore from "../../../../gameStore.ts";
 import { tileSize } from "../../../../util/tileConstants";
+import { isInRange } from "../../../../util/distance";
 
 const { selectedBot } = storeToRefs(useEditorStore());
 
@@ -16,7 +17,7 @@ const bot = computed(() => game.bots.get(selectedBot.value));
 function handleClick(event: Event) {
     const { x, y } = <ClickEvent>event;
     for (const bot of game.bots.values()) {
-        if (Math.pow(x - bot.position.x, 2) + Math.pow(y - bot.position.y, 2) > tileSize * tileSize)
+        if (!isInRange(bot.position.x, bot.position.y, x, y, tileSize * 0.5))
             continue;
         selectedBot.value = bot.name;
         return;

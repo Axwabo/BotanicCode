@@ -1,8 +1,12 @@
 import useGameStore from "../gameStore.ts";
 import { storeToRefs } from "pinia";
 import type { GameState } from "./gameState.ts";
+import useEditorStore from "../editorStore.ts";
+import type { Tool } from "./editor/editorTypes.ts";
 
 const { renderer, game, pointer } = storeToRefs(useGameStore());
+
+const { tool } = storeToRefs(useEditorStore());
 
 interface ContextAttributes {
     ctx: CanvasRenderingContext2D;
@@ -11,6 +15,7 @@ interface ContextAttributes {
     game: GameState;
     pointerX: number;
     pointerY: number;
+    tool: Tool;
 }
 
 export default function getContext(): ContextAttributes {
@@ -24,7 +29,8 @@ export default function getContext(): ContextAttributes {
         height: currentRenderer.canvas.height,
         game: game.value,
         pointerX: x,
-        pointerY: y
+        pointerY: y,
+        tool: tool.value
     };
 }
 

@@ -1,9 +1,10 @@
 import getContext, { canvasToWorld } from "./ctx.ts";
 import { tileSize, worldToChunk } from "../util/tileConstants.js";
 import type { Facing, Tile } from "../util/tile.d.ts";
+import { isInRange } from "../util/distance";
 
 export function render() {
-    const { ctx, width, height, game, pointerX, pointerY } = getContext();
+    const { ctx, width, height, game, pointerX, pointerY, tool } = getContext();
     ctx.resetTransform();
     ctx.clearRect(0, 0, width, height);
     ctx.translate(Math.floor(width * 0.5), Math.floor(height * 0.5));
@@ -18,6 +19,7 @@ export function render() {
     ctx.font = "20px monospace";
     ctx.textBaseline = "bottom";
     ctx.textAlign = "center";
+    const { x: pointerWorldX, y: pointerWorldY } = canvasToWorld(pointerX, pointerY);
     for (const [ name, bot ] of game.bots) {
         // TODO: better state presentation
         ctx.fillStyle = bot.isReady ? "white" : bot.error !== undefined ? "red" : "gray";
@@ -25,12 +27,12 @@ export function render() {
         ctx.arc(bot.position.x, bot.position.y, tileSize * 0.4, 0, Math.PI * 2);
         ctx.fill();
         ctx.closePath();
-        ctx.fillText(name, bot.position.x, bot.position.y - tileSize * 0.5);
+        if (tool === "Inspector" && isInRange(bot.position.x, bot.position.y, pointerWorldX, pointerWorldY, tileSize * 0.5))
+            ctx.fillText(name, bot.position.x, bot.position.y - tileSize * 0.5);
     }
-    if (!isNaN(pointerX) && !isNaN(pointerY)) {
-        const { x: tileX, y: tileY } = canvasToWorld(pointerX, pointerY);
+    if (tool !== "Inspector" && !isNaN(pointerWorldX) && !isNaN(pointerWorldY)) {
         ctx.fillStyle = "rgba(255, 255, 0, 0.3)";
-        ctx.fillRect(Math.floor(tileX / tileSize) * tileSize, Math.floor(tileY / tileSize) * tileSize, tileSize, tileSize);
+        ctx.fillRect(Math.floor(pointerWorldX / tileSize) * tileSize, Math.floor(pointerWorldY / tileSize) * tileSize, tileSize, tileSize);
     }
     ctx.resetTransform();
     ctx.textBaseline = "top";
