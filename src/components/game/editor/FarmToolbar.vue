@@ -32,8 +32,8 @@ import BotInspector from "./tools/BotInspector.vue";
 
 <style scoped>
 .farm-toolbar {
-    display: flex;
-    align-items: center;
+    display: grid;
+    grid-template-columns: max-content auto;
     gap: 0.5rem;
 }
 

@@ -11,9 +11,6 @@ const { selectedBot } = storeToRefs(useEditorStore());
 
 const { game } = useGameStore();
 
-onMounted(() => editorHandler.addEventListener("click", handleClick));
-onUnmounted(() => editorHandler.removeEventListener("click", handleClick));
-
 const bot = computed(() => game.bots.get(selectedBot.value));
 
 function handleClick(event: Event) {
@@ -22,18 +19,63 @@ function handleClick(event: Event) {
         if (Math.pow(x - bot.position.x, 2) + Math.pow(y - bot.position.y, 2) > tileSize * tileSize)
             continue;
         selectedBot.value = bot.name;
-        break;
+        return;
     }
+    selectedBot.value = "";
 }
+
+function terminateBot() {
+    game.bots.delete(selectedBot.value);
+    bot.value?.terminate();
+    selectedBot.value = "";
+}
+
+onMounted(() => editorHandler.addEventListener("click", handleClick));
+onUnmounted(() => editorHandler.removeEventListener("click", handleClick));
 </script>
 
 <template>
-    <div v-if="selectedBot">
-        <h2>{{ selectedBot }}</h2>
+    <div v-if="selectedBot && bot" id="botInspector">
+        <div class="details">
+            <h2 class="bot-name">{{ selectedBot }}</h2>
+            <span>X: {{ bot.position.x }} Y: {{ bot.position.y }}</span>
+            <button v-on:click="terminateBot">Terminate</button>
+        </div>
+        <div class="bot-status">
+            <p class="ready" v-if="bot.isReady">Ready</p>
+            <p class="error" v-if="bot.error">{{ bot.error }}</p>
+        </div>
     </div>
     <p v-else>Click a bot to inspect it</p>
 </template>
 
 <style scoped>
+#botInspector {
+    display: flex;
+    gap: 0.5rem;
+}
 
+.details {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.bot-name, .ready, .error {
+    margin: 0;
+}
+
+.ready {
+    color: #0f0;
+}
+
+.error {
+    color: red;
+    text-overflow: ellipsis;
+}
+
+.bot-status {
+    word-wrap: break-word;
+    /* TODO: prevent overflow */
+}
 </style>

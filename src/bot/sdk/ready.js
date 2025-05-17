@@ -1,7 +1,9 @@
+import sendMessage from "./message.js";
+
 export function signalReady() {
-    postMessage({ type: "ready" });
+    sendMessage({ type: "ready" });
 }
 
 export function signalError(error) {
-    postMessage({ type: "error", error });
+    sendMessage({ type: "error", error });
 }

@@ -1,6 +1,7 @@
 import { editorHandler } from "./main.ts";
 import BotReadyEvent from "./botReadyEvent.ts";
 import type { Board } from "../util/world/board";
+import type { WorkerMessage } from "../util/messages";
 
 export default class Bot {
     readonly name: string;
@@ -8,7 +9,7 @@ export default class Bot {
     private readonly renderCallback: () => void;
     position: { x: number; y: number; };
     private ready = false;
-    private errored = false;
+    private _error?: any;
 
     constructor(name: string, entryPoint: string) {
         this.name = name;
@@ -19,15 +20,13 @@ export default class Bot {
         editorHandler.addEventListener("render", this.renderCallback);
     }
 
-    private handleMessage(event: MessageEvent) {
+    private handleMessage(event: MessageEvent<WorkerMessage>) {
         if (!event.data)
             return;
         switch (event.data.type) {
             case "error":
-                // TODO: present error as a non-blocking operation (e.g. toast)
-                alert(`Worker "${this.name}" failed to initialize. Check the console for details.`);
                 console.error(event.data.error);
-                this.errored = true;
+                this._error = event.data.error;
                 break;
             case "ready":
                 if (this.ready)
@@ -55,7 +54,7 @@ export default class Bot {
         return this.ready;
     }
 
-    get isError() {
-        return this.errored;
+    get error() {
+        return this._error;
     }
 }

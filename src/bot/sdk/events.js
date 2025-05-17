@@ -5,6 +5,7 @@ export default function registerEvents() {
     addEventListener("message", handleMessage);
 }
 
+/** @param ev {MessageEvent<GameMessage>} */
 function handleMessage(ev) {
     if (!ev.data)
         return;

@@ -1,3 +1,5 @@
+import sendMessage from "./message.js";
+
 export function moveBy(x, y) {
-    postMessage({ type: "move", x, y });
+    sendMessage({ type: "move", x, y });
 }

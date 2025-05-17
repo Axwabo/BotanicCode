@@ -20,7 +20,7 @@ useTileClickHandler(tile => tile.data = { type: "fence", posts: Array.from(facin
 <style scoped>
 .facing-checkboxes {
     display: grid;
-    grid-template-columns: repeat(3, auto);
-    grid-template-rows: repeat(3, auto);
+    grid-template-columns: repeat(3, max-content);
+    grid-template-rows: repeat(3, max-content);
 }
 </style>

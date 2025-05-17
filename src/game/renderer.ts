@@ -20,7 +20,7 @@ export function render() {
     ctx.textAlign = "center";
     for (const [ name, bot ] of game.bots) {
         // TODO: better state presentation
-        ctx.fillStyle = bot.isReady ? "white" : bot.isError ? "red" : "gray";
+        ctx.fillStyle = bot.isReady ? "white" : bot.error !== undefined ? "red" : "gray";
         ctx.beginPath();
         ctx.arc(bot.position.x, bot.position.y, tileSize * 0.4, 0, Math.PI * 2);
         ctx.fill();
