@@ -18,6 +18,6 @@ export function isInRange(sx, sy, ex, ey, maxRange) {
  */
 export function distanceSquared(sx, sy, ex, ey) {
     const x = sx - ex;
-    const y = sx - ey;
+    const y = sy - ey;
     return x * x + y * y;
 }
