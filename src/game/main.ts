@@ -2,8 +2,8 @@ import { render } from "./renderer.ts";
 import { storeToRefs } from "pinia";
 import useGameStore from "../gameStore.ts";
 import { canvasToWorld } from "./ctx.ts";
-import ClickEvent from "./editor/clickEvent.ts";
-import { editorHandler } from "./editorHandler.ts";
+import ClickEvent from "./events/clickEvent.ts";
+import { editorHandler } from "./events/editorHandler.ts";
 import type WorkerErrorEvent from "./events/workerErrorEvent.ts";
 import type TerminatingBotEvent from "./events/terminatingBotEvent.ts";
 import useEditorStore from "../editorStore.ts";
@@ -107,9 +107,8 @@ function resetWorkerState() {
     workerError.value = undefined;
 }
 
-function setError(event: Event) {
-    const errorEvent = <WorkerErrorEvent>event;
-    workerError.value = errorEvent.error;
+function setError(event: WorkerErrorEvent) {
+    workerError.value = event.error;
 }
 
 function sendBoard() {
@@ -120,8 +119,7 @@ function sendBoard() {
     botManager.sendBoard(board);
 }
 
-function deselectBot(event: Event) {
-    const terminatingEvent = <TerminatingBotEvent>event;
-    if (selectedBot.value === terminatingEvent.name)
+function deselectBot(event: TerminatingBotEvent) {
+    if (selectedBot.value === event.name)
         selectedBot.value = "";
 }

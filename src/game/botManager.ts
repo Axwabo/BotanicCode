@@ -2,7 +2,7 @@ import type { Board } from "../util/world/board";
 import type { GameMessage, WorkerMessage } from "../util/messages";
 import type { WorldPosition } from "../util/tile";
 import type { BotRequest } from "../bot/sdk/requests";
-import { editorHandler } from "./editorHandler.ts";
+import { editorHandler } from "./events/editorHandler.ts";
 import WorkerErrorEvent from "./events/workerErrorEvent.ts";
 import type TerminatingBotEvent from "./events/terminatingBotEvent.ts";
 

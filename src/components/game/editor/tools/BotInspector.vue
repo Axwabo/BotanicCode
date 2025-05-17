@@ -2,11 +2,11 @@
 import { storeToRefs } from "pinia";
 import useEditorStore from "../../../../editorStore.ts";
 import { computed, onMounted, onUnmounted } from "vue";
-import type ClickEvent from "../../../../game/editor/clickEvent.ts";
+import type ClickEvent from "../../../../game/events/clickEvent.ts";
 import useGameStore from "../../../../gameStore.ts";
 import { tileSize } from "../../../../util/tileConstants";
 import { isInRange } from "../../../../util/distance";
-import { editorHandler } from "../../../../game/editorHandler.ts";
+import { editorHandler } from "../../../../game/events/editorHandler.ts";
 import TerminatingBotEvent from "../../../../game/events/terminatingBotEvent.ts";
 
 const { selectedBot } = storeToRefs(useEditorStore());
@@ -17,8 +17,8 @@ const { workerReady, workerError } = storeToRefs(useGameStore());
 
 const bot = computed(() => game.botManager.bots.get(selectedBot.value));
 
-function handleClick(event: Event) {
-    const { x, y } = <ClickEvent>event;
+function handleClick(event: ClickEvent) {
+    const { x, y } = event;
     for (const [ name, position ] of game.botManager.bots) {
         if (!isInRange(position.x, position.y, x, y, tileSize * 0.5))
             continue;
