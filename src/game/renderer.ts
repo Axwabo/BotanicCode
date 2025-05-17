@@ -2,6 +2,7 @@ import getContext, { canvasToWorld } from "./ctx.ts";
 import { tileSize, worldToChunk } from "../util/tileConstants.js";
 import type { Facing, Tile } from "../util/tile.d.ts";
 import { isInRange } from "../util/distance";
+import type Bot from "./bot.ts";
 
 export function render() {
     const { ctx, width, height, game, pointerX, pointerY, tool } = getContext();
@@ -20,7 +21,8 @@ export function render() {
     ctx.textBaseline = "bottom";
     ctx.textAlign = "center";
     const { x: pointerWorldX, y: pointerWorldY } = canvasToWorld(pointerX, pointerY);
-    for (const [ name, bot ] of game.bots) {
+    let highlightedBot: Bot | undefined;
+    for (const bot of game.bots.values()) {
         // TODO: better state presentation
         ctx.fillStyle = bot.isReady ? "white" : bot.error !== undefined ? "red" : "gray";
         ctx.beginPath();
@@ -28,7 +30,13 @@ export function render() {
         ctx.fill();
         ctx.closePath();
         if (tool === "Inspector" && isInRange(bot.position.x, bot.position.y, pointerWorldX, pointerWorldY, tileSize * 0.5))
-            ctx.fillText(name, bot.position.x, bot.position.y - tileSize * 0.5);
+            highlightedBot = bot;
+    }
+    if (highlightedBot) {
+        ctx.strokeStyle = "black";
+        ctx.lineWidth = 3;
+        ctx.strokeText(highlightedBot.name, highlightedBot.position.x, highlightedBot.position.y - tileSize * 0.5);
+        ctx.fillText(highlightedBot.name, highlightedBot.position.x, highlightedBot.position.y - tileSize * 0.5);
     }
     if (tool !== "Inspector" && !isNaN(pointerWorldX) && !isNaN(pointerWorldY)) {
         ctx.fillStyle = "rgba(255, 255, 0, 0.3)";
