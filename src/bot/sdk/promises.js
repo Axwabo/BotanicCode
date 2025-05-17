@@ -5,6 +5,10 @@ export function loadWorld() {
     return new Promise(resolve => addEventListener(
         "worldloaded",
         /** @param e {WorldLoadedEvent} */e => resolve(e.board),
-        { once: true }
+        true
     ));
+}
+
+export function nextFrame() {
+    return new Promise(resolve => addEventListener("render", resolve, true));
 }

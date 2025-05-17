@@ -11,12 +11,12 @@ export function validateMove(board, from, deltaX, deltaY) {
     const fromY = from.y;
     const toX = from.x + deltaX;
     const toY = from.y + deltaY;
-    const right = toX > fromX;
-    const down = toY > fromY;
     let lastValidX = fromX;
     let lastValidY = fromY;
-    for (let x = from.x; right ? x < toX : x > toX; x += right ? tileSize : -tileSize)
-        for (let y = fromY; down ? y < toY : y > toY; y += down ? tileSize : -tileSize) {
+    const right = toX > fromX ? tileSize : -tileSize;
+    const down = toY > fromY ? tileSize : -tileSize;
+    for (let x = fromX + right; toX > fromX ? x < toX : x > toX; x += right)
+        for (let y = fromY + down; down ? y < toY : y > toY; y += down) {
             const tile = tileAt(board, x, y);
             if (tile.data?.type === "fence")
                 return { x: lastValidX, y: lastValidY, valid: false };
@@ -24,10 +24,9 @@ export function validateMove(board, from, deltaX, deltaY) {
             lastValidY = y;
         }
     const tile = tileAt(board, toX, toY);
-    if (tile.data?.type === "fence")
-        return { x: lastValidX, y: lastValidY, valid: false };
-    // TODO: clamp
-    return { x: toX, y: toY, valid: true };
+    if (tile.data?.type !== "fence")
+        return { x: toX, y: toY, valid: true };
+    return { x: lastValidX - Math.sign(deltaX), y: lastValidY - Math.sign(deltaY), valid: false };
 }
 
 /**
