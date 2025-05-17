@@ -36,12 +36,12 @@ export default class BotManager {
                 editorHandler.dispatchEvent(new Event("workerready"));
                 break;
             case "bot":
-                this.handleBotMessage(event.data.request, event.data.name);
+                this.handleRequest(event.data.request, event.data.name);
                 break;
         }
     }
 
-    private handleBotMessage(request: BotRequest, name: string) {
+    private handleRequest(request: BotRequest, name: string) {
         if (request.type === "create") {
             this.bots.set(name, { x: 0, y: 0 });
             return;

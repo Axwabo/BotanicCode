@@ -12,23 +12,21 @@ const { selectedBot } = storeToRefs(useEditorStore());
 
 const { game } = useGameStore();
 
-const bot = computed(() => game.bots.get(selectedBot.value));
+const bot = computed(() => game.botManager.bots.get(selectedBot.value));
 
 function handleClick(event: Event) {
     const { x, y } = <ClickEvent>event;
-    for (const bot of game.bots.values()) {
-        if (!isInRange(bot.position.x, bot.position.y, x, y, tileSize * 0.5))
+    for (const [ name, position ] of game.botManager.bots) {
+        if (!isInRange(position.x, position.y, x, y, tileSize * 0.5))
             continue;
-        selectedBot.value = bot.name;
+        selectedBot.value = name;
         return;
     }
     selectedBot.value = "";
 }
 
 function terminateBot() {
-    game.bots.delete(selectedBot.value);
-    bot.value?.terminate();
-    selectedBot.value = "";
+    // TODO
 }
 
 onMounted(() => editorHandler.addEventListener("click", handleClick));
@@ -36,18 +34,18 @@ onUnmounted(() => editorHandler.removeEventListener("click", handleClick));
 </script>
 
 <template>
-    <div v-if="selectedBot && bot" id="botInspector">
-        <div class="details">
+    <div id="botInspector">
+        <div v-if="selectedBot && bot" class="details">
             <h2 class="bot-name">{{ selectedBot }}</h2>
-            <span>X: {{ bot.position.x }} Y: {{ bot.position.y }}</span>
+            <span>X: {{ bot.x }} Y: {{ bot.y }}</span>
             <button v-on:click="terminateBot">Terminate</button>
         </div>
+        <!--        TODO: status to ref-->
         <div class="bot-status">
-            <p class="ready" v-if="bot.isReady">Ready</p>
-            <p class="error" v-if="bot.error">{{ bot.error instanceof Error ? bot.error.stack : bot.error }}</p>
+            <p class="ready" v-if="game.botManager.isReady">Ready</p>
+            <p class="error" v-if="game.botManager.error">{{ game.botManager.error instanceof Error ? game.botManager.error.stack : game.botManager.error }}</p>
         </div>
     </div>
-    <p v-else>Click a bot to inspect it</p>
 </template>
 
 <style scoped>
