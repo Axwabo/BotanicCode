@@ -51,7 +51,9 @@ onUnmounted(() => editorHandler.removeEventListener("click", handleClick));
 
 <style scoped>
 #botInspector {
-    display: flex;
+    min-height: 0;
+    display: grid;
+    grid-template-columns: 8rem 1fr;
     gap: 0.5rem;
 }
 
@@ -75,7 +77,10 @@ onUnmounted(() => editorHandler.removeEventListener("click", handleClick));
 }
 
 .bot-status {
+    min-height: 0;
     word-wrap: break-word;
-    /* TODO: prevent overflow */
+    overflow-y: auto;
+    scrollbar-gutter: stable;
+    font-family: monospace;
 }
 </style>

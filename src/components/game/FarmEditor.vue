@@ -13,7 +13,7 @@ import FarmToolbar from "./editor/FarmToolbar.vue";
 <style scoped>
 .farm-editor-container {
     width: 100%;
-    height: 100%;
+    min-height: 0;
     display: grid;
     grid-template-rows: 1fr auto;
     gap: 0.5rem;
