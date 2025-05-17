@@ -1,6 +1,6 @@
 import { defineStore } from "pinia";
 import type { Tool } from "./game/editor/editorTypes.ts";
-import type { Facing, TileType } from "./game/tile.d.ts";
+import type { Facing, TileType } from "./util/tile.d.ts";
 
 interface State {
     tool: Tool;

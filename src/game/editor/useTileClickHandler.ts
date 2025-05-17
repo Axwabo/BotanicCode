@@ -2,7 +2,7 @@ import { onMounted, onUnmounted } from "vue";
 import { editorHandler } from "../main.ts";
 import type TileClickEvent from "./tileClickEvent.ts";
 
-import type { Tile } from "../tile.d.ts";
+import type { Tile } from "../../util/tile.d.ts";
 
 export default function useTileClickHandler(handler: (tile: Tile) => void) {
     const handleClick = (event: Event) => {

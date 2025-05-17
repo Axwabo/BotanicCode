@@ -1,6 +1,6 @@
 import getContext, { canvasToWorld } from "./ctx.ts";
 import { tileSize, worldToChunk } from "../util/tileConstants.js";
-import type { Facing, Tile } from "./tile.d.ts";
+import type { Facing, Tile } from "../util/tile.d.ts";
 
 export function render() {
     const { ctx, width, height, game, pointerX, pointerY } = getContext();

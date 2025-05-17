@@ -1,4 +1,4 @@
-import type { Chunk } from "../util/world/tile.js";
+import type { Chunk } from "./world/tile.js";
 
 export type TileType = "grass" | "dirt" | "gravel" | "air";
 
