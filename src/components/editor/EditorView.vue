@@ -78,7 +78,7 @@ watch(currentFile, async value => {
 <style scoped>
 #editorContainer {
     min-height: 20rem;
-    height: calc(100% - 0.5rem);
+    height: 100%;
     display: grid;
     grid-template-rows: auto 1fr;
 }
