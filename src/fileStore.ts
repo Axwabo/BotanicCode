@@ -38,7 +38,8 @@ const useFileStore = defineStore("projectFiles", {
     state: (): State => ({ files: reactiveMap(), currentFile: "", editors: reactiveMap(), deleteConfirmation: "" }),
     getters: {
         canRun(state: State) {
-            return state.files.get(state.currentFile) === "saved";
+            const status = state.files.get(state.currentFile);
+            return status === "saved" || status === "modified";
         }
     },
     actions: {
