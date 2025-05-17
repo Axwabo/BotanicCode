@@ -46,7 +46,7 @@ onUnmounted(() => editorHandler.removeEventListener("click", handleClick));
         <p v-else>Click a bot to inspect</p>
         <div class="bot-status">
             <p class="ready" v-if="workerReady">Ready</p>
-            <p class="error" v-if="workerError">{{ workerError instanceof Error ? workerError.stack : workerError }}</p>
+            <pre class="error" v-if="workerError">{{ workerError instanceof Error ? workerError.stack : workerError }}</pre>
         </div>
     </div>
 </template>

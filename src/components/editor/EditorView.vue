@@ -31,7 +31,7 @@ async function saveChanges() {
             body
         });
         if (response.status !== 201)
-            alert("Failed to save file");
+            alert("Failed to save file"); // TODO: toast
         else
             files.set(path, "saved");
     } finally {
