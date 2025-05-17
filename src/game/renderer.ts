@@ -24,7 +24,7 @@ export function render() {
     let highlightedBot: Bot | undefined;
     for (const bot of game.bots.values()) {
         // TODO: better state presentation
-        ctx.fillStyle = bot.isReady ? "white" : bot.error !== undefined ? "red" : "gray";
+        ctx.fillStyle = bot.error !== undefined ? "red" : bot.isReady ? "white" : "gray";
         ctx.beginPath();
         ctx.arc(bot.position.x, bot.position.y, tileSize * 0.4, 0, Math.PI * 2);
         ctx.fill();
@@ -34,6 +34,7 @@ export function render() {
     }
     if (highlightedBot) {
         ctx.strokeStyle = "black";
+        ctx.fillStyle = "white";
         ctx.lineWidth = 3;
         ctx.strokeText(highlightedBot.name, highlightedBot.position.x, highlightedBot.position.y - tileSize * 0.5);
         ctx.fillText(highlightedBot.name, highlightedBot.position.x, highlightedBot.position.y - tileSize * 0.5);

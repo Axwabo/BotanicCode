@@ -44,7 +44,7 @@ onUnmounted(() => editorHandler.removeEventListener("click", handleClick));
         </div>
         <div class="bot-status">
             <p class="ready" v-if="bot.isReady">Ready</p>
-            <p class="error" v-if="bot.error">{{ bot.error }}</p>
+            <p class="error" v-if="bot.error">{{ bot.error instanceof Error ? bot.error.stack : bot.error }}</p>
         </div>
     </div>
     <p v-else>Click a bot to inspect it</p>
