@@ -53,7 +53,10 @@ function process(statuses: { path: string, status: FileStatus }[], list: ListIte
                 if (indentSlash === -1 || indentSlash > slash)
                     break;
                 const depth = path.substring(0, indentSlash).split("/").length - 2;
-                list.push({ path, depth, display: path.substring(previousIndent + 1, indentSlash) });
+                const directory: ListItem = { path, depth, display: path.substring(previousIndent + 1, indentSlash) };
+                if (status === "hidden")
+                    directory.status = "hidden";
+                list.push(directory);
                 previousIndent = indentSlash;
             }
         } else if (slash !== previousSlash)
@@ -68,8 +71,10 @@ function process(statuses: { path: string, status: FileStatus }[], list: ListIte
     <p v-if="sorted.length === 0" class="empty">No files</p>
     <div class="file-list">
         <template v-for="{path, display, status, depth} in sorted" :key="path">
-            <File v-if="status" :key="path" :path="path" :filename="display" :status="status" :style="`margin-left: ${depth}rem`"/>
-            <span v-else :style="`margin-left: ${depth}rem`">{{ display }}</span>
+            <template v-if="status !== 'hidden'">
+                <File v-if="status" :key="path" :path="path" :filename="display" :status="status" :style="`margin-left: ${depth}rem`"/>
+                <span v-else :style="`margin-left: ${depth}rem`">{{ display }}</span>
+            </template>
         </template>
     </div>
 </template>

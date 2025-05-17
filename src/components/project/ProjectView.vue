@@ -6,7 +6,7 @@ import useGameStore from "../../gameStore.ts";
 import Bot from "../../game/bot.ts";
 import ConfirmDeleteDialog from "./ConfirmDeleteDialog.vue";
 
-const { navigate } = useFileStore();
+const { navigate, setSdkVisibility } = useFileStore();
 
 const newFile = ref("");
 
@@ -27,11 +27,20 @@ function run() {
     const name = Date.now().toString(32);
     game.bots.set(name, new Bot(name, currentFile));
 }
+
+function toggleHidden(event: Event) {
+    const checkbox = <HTMLInputElement>event.target;
+    setSdkVisibility(checkbox.checked);
+}
 </script>
 
 <template>
     <div class="view-title-bar">
         <span class="view-label">Project</span>
+        <div>
+            <label for="sdk">Show SDK</label>
+            <input type="checkbox" id="sdk" checked v-on:change="toggleHidden">
+        </div>
         <button v-on:click="run()">Run</button>
         <ConfirmDeleteDialog/>
     </div>

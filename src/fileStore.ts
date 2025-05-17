@@ -1,7 +1,7 @@
 import { defineStore } from "pinia";
 import { reactive } from "vue";
 
-export type FileStatus = "created" | "modified" | "saved" | "locked";
+export type FileStatus = "created" | "modified" | "saved" | "locked" | "hidden";
 
 interface State {
     files: Map<string, FileStatus>;
@@ -20,6 +20,20 @@ function reactiveMap<T>() {
     return reactive(new Map<string, T>());
 }
 
+function findIndex(editorPaths: Map<string, EditorInstance>, current: string) {
+    const iterator = editorPaths.keys();
+    let i = 0;
+    while (true) {
+        const { value, done } = iterator.next();
+        if (value === current)
+            return i;
+        i++;
+        if (done)
+            break;
+    }
+    return -1;
+}
+
 const useFileStore = defineStore("projectFiles", {
     state: (): State => ({ files: reactiveMap(), currentFile: "", editors: reactiveMap(), deleteConfirmation: "" }),
     actions: {
@@ -33,21 +47,20 @@ const useFileStore = defineStore("projectFiles", {
                 this.editors.set(path, { file: path, text: content ?? "", contents: () => "" });
             this.currentFile = path;
         },
+        setSdkVisibility(visible: boolean) {
+            const change: string[] = [];
+            for (const [ path, status ] of this.files)
+                if (status === "locked" || status === "hidden")
+                    change.push(path);
+            const targetStatus = visible ? "locked" : "hidden";
+            this.$patch(state => {
+                for (const path of change)
+                    state.files.set(path, targetStatus);
+            });
+        },
         close(path: string) {
             const current = this.currentFile;
-            let editorPaths = this.editors.keys();
-            let openIndex = -1;
-            let i = 0;
-            while (true) {
-                const { value, done } = editorPaths.next();
-                if (value === current) {
-                    openIndex = i;
-                    break;
-                }
-                i++;
-                if (done)
-                    break;
-            }
+            const openIndex = findIndex(this.editors, current);
             this.editors.delete(path);
             if (current !== path)
                 return;
@@ -56,9 +69,9 @@ const useFileStore = defineStore("projectFiles", {
                 return;
             }
             const targetIndex = Math.max(0, Math.min(this.editors.size - 1, openIndex));
-            editorPaths = this.editors.keys();
+            const editorPaths = this.editors.keys();
             let targetPath = "";
-            for (i = 0; i <= targetIndex; i++)
+            for (let i = 0; i <= targetIndex; i++)
                 targetPath = editorPaths.next().value!;
             this.navigate(targetPath);
         }
