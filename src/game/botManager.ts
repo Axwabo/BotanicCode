@@ -6,6 +6,7 @@ import { editorHandler } from "./events/editorHandler.ts";
 import WorkerErrorEvent from "./events/workerErrorEvent.ts";
 import type TerminatingBotEvent from "./events/terminatingBotEvent.ts";
 import { validateMove } from "../util/movement";
+import type TileUpdatedEvent from "../util/world/events/tileUpdatedEvent";
 
 export default class BotManager {
     private readonly board: Board;
@@ -77,6 +78,10 @@ export default class BotManager {
 
     sendBoard(board: Board) {
         this.send({ type: "world", board: JSON.stringify(board.chunkStore) });
+    }
+
+    sendTileUpdate(event: TileUpdatedEvent) {
+        this.send({ type: "tile", tile: event.tile });
     }
 
     private send(message: GameMessage) {

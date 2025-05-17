@@ -33,6 +33,11 @@ class Bot {
         sendMessage({ type: "bot", name: this.#name, request });
     }
 
+    /**
+     * @param deltaX {number}
+     * @param deltaY {number}
+     * @return {boolean}
+     */
     move(deltaX, deltaY) {
         const { x, y, valid } = validateMove(this.#board, this.position, deltaX, deltaY);
         if (valid)
@@ -44,6 +49,7 @@ class Bot {
         }
         this.position.x = x;
         this.position.y = y;
+        return valid;
     }
 
     terminate() {

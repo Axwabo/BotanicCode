@@ -1,7 +1,8 @@
 import type { BotRequest, BotResponse } from "../bot/sdk/requests";
+import type { Tile } from "./tile";
 
 export type WorkerMessage = Ready | BotRequestMessage | Error;
-export type GameMessage = Render | BotResponseMessage | World;
+export type GameMessage = Render | BotResponseMessage | World | TileUpdate;
 
 interface Ready {
     type: "ready";
@@ -25,6 +26,11 @@ interface Render {
 interface World {
     type: "world";
     board: string;
+}
+
+interface TileUpdate {
+    type: "tile"
+    tile: Tile
 }
 
 interface BotResponseMessage {

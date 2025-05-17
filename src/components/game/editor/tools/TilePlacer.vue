@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import { storeToRefs } from "pinia";
 import useEditorStore from "../../../../editorStore.ts";
-import useTileClickHandler from "../../../../game/editor/useTileClickHandler.ts";
+import useTileModifier from "../../../../game/editor/useTileModifier.ts";
 
 const { tileType } = storeToRefs(useEditorStore());
 
-useTileClickHandler(tile => tile.type = tileType.value);
+useTileModifier(tile => tile.type = tileType.value);
 </script>
 
 <template>

@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import useTileClickHandler from "../../../../game/editor/useTileClickHandler.ts";
+import useTileModifier from "../../../../game/editor/useTileModifier.ts";
 
-useTileClickHandler(tile => tile.data = undefined);
+useTileModifier(tile => tile.data = undefined);
 </script>
 
 <template>

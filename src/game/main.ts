@@ -7,6 +7,7 @@ import { editorHandler } from "./events/editorHandler.ts";
 import type WorkerErrorEvent from "./events/workerErrorEvent.ts";
 import type TerminatingBotEvent from "./events/terminatingBotEvent.ts";
 import useEditorStore from "../editorStore.ts";
+import type TileUpdatedEvent from "../util/world/events/tileUpdatedEvent";
 
 const {
     game,
@@ -35,6 +36,8 @@ export default function beginLoop() {
     editorHandler.addEventListener("workererror", setError);
 
     editorHandler.addEventListener("terminatingbot", deselectBot);
+
+    editorHandler.addEventListener("tileupdated", updateTile);
 
     loop();
 }
@@ -122,4 +125,8 @@ function sendBoard() {
 function deselectBot(event: TerminatingBotEvent) {
     if (selectedBot.value === event.name)
         selectedBot.value = "";
+}
+
+function updateTile(event: TileUpdatedEvent) {
+    game.value.botManager.sendTileUpdate(event);
 }
