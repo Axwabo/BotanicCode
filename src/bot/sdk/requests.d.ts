@@ -1,5 +1,5 @@
 export type BotRequest = Create | Move | Terminate;
-export type BotResponse = PositionUpdate;
+export type BotResponse = Terminate | PositionUpdate;
 
 interface Create {
     type: "create";

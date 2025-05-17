@@ -1,24 +1,28 @@
 import type { Board } from "../util/world/board";
-import type { WorkerMessage } from "../util/messages";
+import type { GameMessage, WorkerMessage } from "../util/messages";
 import type { WorldPosition } from "../util/tile";
 import type { BotRequest } from "../bot/sdk/requests";
 import { editorHandler } from "./editorHandler.ts";
+import WorkerErrorEvent from "./events/workerErrorEvent.ts";
+import type TerminatingBotEvent from "./events/terminatingBotEvent.ts";
 
 export default class BotManager {
     private readonly worker?: Worker;
     private readonly renderCallback?: () => void;
+    private readonly terminateCallback?: (event: Event) => void;
     readonly bots: Map<string, WorldPosition>; // TODO: managed bot instance
-    private ready = false;
-    private _error?: any;
 
     constructor(entryPoint?: string) {
+        editorHandler.dispatchEvent(new Event("workerinit"));
         this.bots = new Map<string, WorldPosition>();
         if (!entryPoint)
             return;
         this.worker = new Worker(`bot/sdk/run.js?t=${Date.now()}&entryPoint=${encodeURI(entryPoint)}`, { type: "module" });
-        this.renderCallback = () => this.worker!.postMessage({ type: "render" });
+        this.renderCallback = () => this.send({ type: "render" });
+        this.terminateCallback = event => this.send({ type: "bot", name: (<TerminatingBotEvent>event).name, response: { type: "terminate" } });
         this.worker.addEventListener("message", event => this.handleMessage(event));
         editorHandler.addEventListener("render", this.renderCallback);
+        editorHandler.addEventListener("terminatingbot", this.terminateCallback);
     }
 
     private handleMessage(event: MessageEvent<WorkerMessage>) {
@@ -26,13 +30,9 @@ export default class BotManager {
             return;
         switch (event.data.type) {
             case "error":
-                console.error(event.data.error);
-                this._error = event.data.error;
+                editorHandler.dispatchEvent(new WorkerErrorEvent(event.data.error));
                 break;
             case "ready":
-                if (this.ready)
-                    break;
-                this.ready = true;
                 editorHandler.dispatchEvent(new Event("workerready"));
                 break;
             case "bot":
@@ -63,19 +63,17 @@ export default class BotManager {
     terminate() {
         if (this.renderCallback)
             editorHandler.removeEventListener("render", this.renderCallback);
+        if (this.terminateCallback)
+            editorHandler.removeEventListener("terminatingbot", this.terminateCallback);
         this.worker?.terminate();
         this.bots.clear();
     }
 
     sendBoard(board: Board) {
-        this.worker?.postMessage({ type: "world", board: JSON.stringify(board.chunkStore) });
+        this.send({ type: "world", board: JSON.stringify(board.chunkStore) });
     }
 
-    get isReady() {
-        return this.ready;
-    }
-
-    get error() {
-        return this._error;
+    private send(message: GameMessage) {
+        this.worker?.postMessage(message);
     }
 }

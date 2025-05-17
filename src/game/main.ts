@@ -4,8 +4,20 @@ import useGameStore from "../gameStore.ts";
 import { canvasToWorld } from "./ctx.ts";
 import ClickEvent from "./editor/clickEvent.ts";
 import { editorHandler } from "./editorHandler.ts";
+import type WorkerErrorEvent from "./events/workerErrorEvent.ts";
+import type TerminatingBotEvent from "./events/terminatingBotEvent.ts";
+import useEditorStore from "../editorStore.ts";
 
-const { game, dragging, uiEventsRegistered, pointer } = storeToRefs(useGameStore());
+const {
+    game,
+    dragging,
+    uiEventsRegistered,
+    pointer,
+    workerReady,
+    workerError
+} = storeToRefs(useGameStore());
+
+const { selectedBot } = storeToRefs(useEditorStore());
 
 export default function beginLoop() {
     if (uiEventsRegistered.value)
@@ -18,7 +30,11 @@ export default function beginLoop() {
     window.addEventListener("mouseup", handleMouseUp);
     window.addEventListener("mousemove", handleMouseMove);
 
+    editorHandler.addEventListener("workerinit", resetWorkerState);
     editorHandler.addEventListener("workerready", sendBoard);
+    editorHandler.addEventListener("workererror", setError);
+
+    editorHandler.addEventListener("terminatingbot", deselectBot);
 
     loop();
 }
@@ -86,7 +102,26 @@ function handleMouseMove(event: MouseEvent) {
     game.value.position.y -= event.movementY;
 }
 
+function resetWorkerState() {
+    workerReady.value = false;
+    workerError.value = undefined;
+}
+
+function setError(event: Event) {
+    const errorEvent = <WorkerErrorEvent>event;
+    workerError.value = errorEvent.error;
+}
+
 function sendBoard() {
+    if (workerReady.value)
+        return;
+    workerReady.value = true;
     const { board, botManager } = game.value;
     botManager.sendBoard(board);
+}
+
+function deselectBot(event: Event) {
+    const terminatingEvent = <TerminatingBotEvent>event;
+    if (selectedBot.value === terminatingEvent.name)
+        selectedBot.value = "";
 }

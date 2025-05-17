@@ -7,10 +7,13 @@ import useGameStore from "../../../../gameStore.ts";
 import { tileSize } from "../../../../util/tileConstants";
 import { isInRange } from "../../../../util/distance";
 import { editorHandler } from "../../../../game/editorHandler.ts";
+import TerminatingBotEvent from "../../../../game/events/terminatingBotEvent.ts";
 
 const { selectedBot } = storeToRefs(useEditorStore());
 
 const { game } = useGameStore();
+
+const { workerReady, workerError } = storeToRefs(useGameStore());
 
 const bot = computed(() => game.botManager.bots.get(selectedBot.value));
 
@@ -26,7 +29,7 @@ function handleClick(event: Event) {
 }
 
 function terminateBot() {
-    // TODO
+    editorHandler.dispatchEvent(new TerminatingBotEvent(selectedBot.value));
 }
 
 onMounted(() => editorHandler.addEventListener("click", handleClick));
@@ -40,10 +43,10 @@ onUnmounted(() => editorHandler.removeEventListener("click", handleClick));
             <span>X: {{ bot.x }} Y: {{ bot.y }}</span>
             <button v-on:click="terminateBot">Terminate</button>
         </div>
-        <!--        TODO: status to ref-->
+        <p v-else>Click a bot to inspect</p>
         <div class="bot-status">
-            <p class="ready" v-if="game.botManager.isReady">Ready</p>
-            <p class="error" v-if="game.botManager.error">{{ game.botManager.error instanceof Error ? game.botManager.error.stack : game.botManager.error }}</p>
+            <p class="ready" v-if="workerReady">Ready</p>
+            <p class="error" v-if="workerError">{{ workerError instanceof Error ? workerError.stack : workerError }}</p>
         </div>
     </div>
 </template>

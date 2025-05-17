@@ -15,7 +15,9 @@ interface State {
     game: GameState;
     dragging: boolean;
     uiEventsRegistered: boolean;
-    pointer: WorldPosition
+    pointer: WorldPosition;
+    workerReady: boolean;
+    workerError: any | undefined;
 }
 
 function createBoard() {
@@ -45,7 +47,9 @@ const useGameStore = defineStore("game", {
         pointer: {
             x: 0,
             y: 0
-        }
+        },
+        workerReady: false,
+        workerError: undefined
     }),
     actions: {
         resetPosition() {

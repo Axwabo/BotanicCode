@@ -1,4 +1,3 @@
-import type { Board } from "./world/board";
 import type { BotRequest, BotResponse } from "../bot/sdk/requests";
 
 export type WorkerMessage = Ready | BotRequestMessage | Error;
@@ -25,7 +24,7 @@ interface Render {
 
 interface World {
     type: "world";
-    board: Board;
+    board: string;
 }
 
 interface BotResponseMessage {
