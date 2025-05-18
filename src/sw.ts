@@ -1,7 +1,6 @@
 /// <reference lib="webworker" />
 import { cleanupOutdatedCaches, createHandlerBoundToURL, precacheAndRoute } from "workbox-precaching"
 import { NavigationRoute, registerRoute } from "workbox-routing";
-import staticRoutes from "./staticRoutes.ts";
 import { cacheNames } from "workbox-core";
 
 declare let self: ServiceWorkerGlobalScope;
@@ -30,15 +29,15 @@ const headers = {
     "Content-Security-Policy": "script-src 'strict-dynamic'"
 };
 
-const botDirectory = /^\/bot\/(?!sdk\/)/ig;
+const botDirectory = new RegExp(`^${import.meta.env.BASE_URL.replace("/", "\\/")}\\/bot\\/(?!sdk\\/)`);
 
 self.addEventListener("fetch", event => {
     const path = new URL(event.request.url).pathname;
     const referrerUrl = event.request.referrer ? new URL(event.request.referrer) : undefined;
     if (referrerUrl?.origin === self.location.origin
         && referrerUrl.pathname.match(botDirectory)
-        && !path.startsWith("/bot/")
-        && !path.startsWith("/util/")) {
+        && !path.startsWith(import.meta.env.BASE_URL + "/bot/")
+        && !path.startsWith(import.meta.env.BASE_URL + "/util/")) {
         event.respondWith(new Response("Cannot fetch resources outside `/bot/` or `/util/` from a bot module.", {
             status: 403,
             statusText: "Illegal Import"
@@ -66,18 +65,18 @@ const plainInit = {
     }
 };
 
-registerRoute("/file-list/bot", async () => {
+registerRoute(import.meta.env.BASE_URL + "/file-list/bot", async () => {
     const cache = await getCache();
     const keys = await cache.keys();
-    return new Response(keys.map(f => new URL(f.url, self.location.origin).pathname).concat(staticRoutes).join("\n"), plainInit);
+    return new Response(keys.map(f => new URL(f.url, self.location.origin).pathname.replace(import.meta.env.BASE_URL, "")).join("\n"), plainInit);
 });
 
-registerRoute("/file-list/static", async () => {
+registerRoute(import.meta.env.BASE_URL + "/file-list/static", async () => {
     const cache = await caches.open(cacheNames.precache);
     const keys = await cache.keys();
     return new Response(keys.map(e => new URL(e.url))
     .filter(e => e.origin === self.location.origin && (e.pathname.startsWith("/util") || e.pathname.startsWith("/bot")))
-    .map(e => e.pathname)
+    .map(e => e.pathname.replace(import.meta.env.BASE_URL, ""))
     .join("\n"), plainInit);
 });
 
@@ -87,7 +86,7 @@ registerRoute(/\/bot\/sdk\/run*/, async options => {
         return new Response(null, { status: 401 });
     // TODO: sanitize input
     lastRun = Date.now();
-    return new Response(`import { signalReady, signalError } from "./ready.js";import "./events.js";import("${entry}?t=${lastRun}").then(signalReady).catch(signalError);`, {
+    return new Response(`import { signalReady, signalError } from "./ready.js";import "./events.js";import("${import.meta.env.BASE_URL}${entry}?t=${lastRun}").then(signalReady).catch(signalError);`, {
         status: 200,
         headers
     });
@@ -110,15 +109,15 @@ registerRoute(/\/bot\/(?!sdk\/)/i, async ({ url }) => {
     // TODO: prevent importing from parent directory
     return new Response(
         text.replace(/(?:^|\w)import([\s\S]+?)from\s*["'](.+?)["']/g, (_, members, file) => `import ${members} from "${transformFile(file)}"`)
-        .replace(/(?:^|\w)import\s["'](.+?)["']*/, (_, file) => `import "/bot/${file}?t=${lastRun}"`),
+        .replace(/(?:^|\w)import\s["'](.+?)["']*/, (_, file) => `import "${import.meta.env.BASE_URL}/bot/${file}?t=${lastRun}"`),
         { status: 200, headers }
     );
 });
 
-const staticAssets = /^(?:\/util\/|\.\/sdk\/|sdk\/|\/bot\/sdk\/)/;
+const staticAssets = /^(?:\.\.\/util\/|\/util\/|\.\/sdk\/|sdk\/|\/bot\/sdk\/)/;
 
 function transformFile(file: string) {
-    return file.match(staticAssets) ? file : `/bot/${file}?t=${lastRun}`;
+    return file.match(staticAssets) ? file : `${import.meta.env.BASE_URL}/bot/${file}?t=${lastRun}`;
 }
 
 // self.__WB_MANIFEST is the default injection point

@@ -16,9 +16,9 @@ const loading = ref(false);
 
 async function importExample() {
     loading.value = true;
-    const response = await fetch("/example.js");
+    const response = await fetch(import.meta.env.BASE_URL + "/example.js");
     const text = await response.text();
-    await fetch("/bot/main.js", {
+    await fetch(import.meta.env.BASE_URL + "/bot/main.js", {
         method: "POST",
         body: text
     });

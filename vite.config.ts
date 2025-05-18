@@ -37,7 +37,8 @@ export default defineConfig({
             navigateFallback: "index.html",
             suppressWarnings: true,
             type: "module"
-        }
+        },
+        base: "/BotanicCode"
     }), viteStaticCopy({
         targets: [
             {
@@ -56,5 +57,6 @@ export default defineConfig({
     }) ],
     server: {
         port: 8000
-    }
+    },
+    base: "/BotanicCode"
 })
