@@ -7,12 +7,13 @@ import WorkerErrorEvent from "./events/workerErrorEvent.ts";
 import type TerminatingBotEvent from "./events/terminatingBotEvent.ts";
 import { validateMove } from "../util/movement";
 import type TileUpdatedEvent from "../util/world/events/tileUpdatedEvent";
+import cloneData from "./cloneData.ts";
 
 export default class BotManager {
     private readonly board: Board;
     private readonly worker?: Worker;
     private readonly renderCallback?: () => void;
-    private readonly terminateCallback?: (event: Event) => void;
+    private readonly terminateCallback?: (event: TerminatingBotEvent) => void;
     readonly bots: Map<string, WorldPosition>; // TODO: managed bot instance
 
     constructor(board: Board, entryPoint?: string) {
@@ -23,7 +24,7 @@ export default class BotManager {
             return;
         this.worker = new Worker(`bot/sdk/run.js?t=${Date.now()}&entryPoint=${encodeURI(entryPoint)}`, { type: "module" });
         this.renderCallback = () => this.send({ type: "render" });
-        this.terminateCallback = event => this.send({ type: "bot", name: (<TerminatingBotEvent>event).name, response: { type: "terminate" } });
+        this.terminateCallback = event => this.send({ type: "bot", name: event.name, response: { type: "terminate" } });
         this.worker.addEventListener("message", event => this.handleMessage(event));
         editorHandler.addEventListener("render", this.renderCallback);
         editorHandler.addEventListener("terminatingbot", this.terminateCallback);
@@ -81,7 +82,7 @@ export default class BotManager {
     }
 
     sendTileUpdate(event: TileUpdatedEvent) {
-        this.send({ type: "tile", tile: event.tile });
+        this.send({ type: "tile", tile: { ...event.tile, data: cloneData(event.tile.data) } });
     }
 
     private send(message: GameMessage) {
