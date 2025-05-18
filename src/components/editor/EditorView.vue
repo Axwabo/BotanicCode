@@ -26,7 +26,7 @@ async function saveChanges() {
     try {
         const path = currentFile.value;
         const body = editors.get(path)!.contents();
-        const response = await fetch(import.meta.env.BASE_URL + path, {
+        const response = await fetch(import.meta.env.BASE_URL + path.replace(/^\//, ""), {
             method: "POST",
             body
         });
@@ -55,7 +55,7 @@ watch(currentFile, async value => {
         navigate(value);
         return;
     }
-    const response = await fetch(import.meta.env.BASE_URL + value, { signal: controller.signal });
+    const response = await fetch(import.meta.env.BASE_URL + value.replace(/^\//, ""), { signal: controller.signal });
     const contents = response.ok ? await response.text() : "";
     navigate(value, contents);
 }, { immediate: true });

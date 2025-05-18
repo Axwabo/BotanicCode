@@ -22,7 +22,7 @@ export default class BotManager {
         this.bots = new Map<string, WorldPosition>();
         if (!entryPoint)
             return;
-        this.worker = new Worker(`${import.meta.env.BASE_URL}/bot/sdk/run.js?t=${Date.now()}&entryPoint=${encodeURI(entryPoint)}`, { type: "module" });
+        this.worker = new Worker(`${import.meta.env.BASE_URL}bot/sdk/run.js?t=${Date.now()}&entryPoint=${encodeURI(entryPoint.replace(/^\//, ""))}`, { type: "module" });
         this.renderCallback = () => this.send({ type: "render" });
         this.terminateCallback = event => this.send({ type: "bot", name: event.name, response: { type: "terminate" } });
         this.worker.addEventListener("message", event => this.handleMessage(event));

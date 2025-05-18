@@ -18,7 +18,7 @@ await Promise.all([
 ]);
 
 async function requestList(type: string, status: FileStatus) {
-    const response = await fetch(`${import.meta.env.BASE_URL}/file-list/${type}`);
+    const response = await fetch(`${import.meta.env.BASE_URL}file-list/${type}`);
     if (!response.ok || response.headers.get("Content-Type") !== "text/plain")
         return;
     const text = await response.text();

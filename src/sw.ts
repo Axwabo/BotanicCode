@@ -29,7 +29,7 @@ const headers = {
     "Content-Security-Policy": "script-src 'strict-dynamic'"
 };
 
-const botDirectory = new RegExp(`^${import.meta.env.BASE_URL.replace("/", "\\/")}\\/bot\\/(?!sdk\\/)`);
+const botDirectory = new RegExp(`^${import.meta.env.BASE_URL.replace("/", "\\/")}bot\\/(?!sdk\\/)`);
 
 self.addEventListener("fetch", event => {
     const path = new URL(event.request.url).pathname;
@@ -65,13 +65,13 @@ const plainInit = {
     }
 };
 
-registerRoute(import.meta.env.BASE_URL + "/file-list/bot", async () => {
+registerRoute(import.meta.env.BASE_URL + "file-list/bot", async () => {
     const cache = await getCache();
     const keys = await cache.keys();
     return new Response(keys.map(f => new URL(f.url, self.location.origin).pathname.replace(import.meta.env.BASE_URL, "/")).join("\n"), plainInit);
 });
 
-registerRoute(import.meta.env.BASE_URL + "/file-list/static", async () => {
+registerRoute(import.meta.env.BASE_URL + "file-list/static", async () => {
     const cache = await caches.open(cacheNames.precache);
     const keys = await cache.keys();
     return new Response(keys.map(e => new URL(e.url))
@@ -111,7 +111,7 @@ registerRoute(/\/bot\/(?!sdk\/)/i, async ({ url }) => {
     // TODO: prevent importing from parent directory
     return new Response(
         text.replace(/(?:^|\w)import([\s\S]+?)from\s*["'](.+?)["']/g, (_, members, file) => `import ${members} from "${transformFile(file)}"`)
-        .replace(/(?:^|\w)import\s["'](.+?)["']*/, (_, file) => `import "${import.meta.env.BASE_URL}/bot/${file}?t=${lastRun}"`),
+        .replace(/(?:^|\w)import\s["'](.+?)["']*/, (_, file) => `import "${import.meta.env.BASE_URL}bot/${file}?t=${lastRun}"`),
         { status: 200, headers }
     );
 });
@@ -119,7 +119,7 @@ registerRoute(/\/bot\/(?!sdk\/)/i, async ({ url }) => {
 const staticAssets = /^(?:\.\.\/util\/|\/util\/|\.\/sdk\/|sdk\/|\/bot\/sdk\/)/;
 
 function transformFile(file: string) {
-    return file.match(staticAssets) ? file : `${import.meta.env.BASE_URL}/bot/${file}?t=${lastRun}`;
+    return file.match(staticAssets) ? file : `${import.meta.env.BASE_URL}bot/${file}?t=${lastRun}`;
 }
 
 // self.__WB_MANIFEST is the default injection point
