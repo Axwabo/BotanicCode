@@ -47,6 +47,10 @@ export default defineConfig({
             {
                 src: "src/util",
                 dest: "."
+            },
+            {
+                src: "src/bot/example.js",
+                dest: "."
             }
         ]
     }) ],

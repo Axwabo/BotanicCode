@@ -1,5 +1,6 @@
 import { signalReady } from "./ready.js";
 
+/** @returns {Promise<Board>} */
 export function loadWorld() {
     signalReady();
     return new Promise(resolve => addEventListener(

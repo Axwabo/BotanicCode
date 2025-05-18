@@ -11,6 +11,7 @@ class Bot {
     position;
     /** @type {Board} */
     #board;
+    #terminated = false;
 
     /**
      * @param name {string}
@@ -53,7 +54,12 @@ class Bot {
     }
 
     terminate() {
+        this.#terminated = true;
         this.#request({ type: "terminate" });
+    }
+
+    get isTerminated() {
+        return this.#terminated;
     }
 }
 

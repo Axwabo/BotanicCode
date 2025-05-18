@@ -44,7 +44,7 @@ async function deleteFile() {
     </dialog>
 </template>
 
-<style scoped>
+<style>
 .choices {
     display: flex;
     gap: 1rem;
