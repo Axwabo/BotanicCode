@@ -8,7 +8,7 @@ declare let self: ServiceWorkerGlobalScope;
 
 let fileCache: Cache | undefined;
 
-let lastRun = 0; // TODO: group by worker
+let lastRun = 0;
 
 async function getCache() {
     return fileCache ??= await caches.open("Files");
@@ -16,8 +16,8 @@ async function getCache() {
 
 self.addEventListener("activate", async () => {
     fileCache = await caches.open("Files");
-    await self.clients.claim();
     await self.skipWaiting();
+    await self.clients.claim();
 });
 
 self.addEventListener("message", event => {
@@ -34,8 +34,8 @@ const botDirectory = /^\/bot\/(?!sdk\/)/ig;
 
 self.addEventListener("fetch", event => {
     const path = new URL(event.request.url).pathname;
-    const referrerUrl = new URL(event.request.referrer);
-    if (referrerUrl.origin === self.location.origin
+    const referrerUrl = event.request.referrer ? new URL(event.request.referrer) : undefined;
+    if (referrerUrl?.origin === self.location.origin
         && referrerUrl.pathname.match(botDirectory)
         && !path.startsWith("/bot/")
         && !path.startsWith("/util/")) {

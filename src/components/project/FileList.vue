@@ -5,8 +5,6 @@ import File from "./File.vue";
 
 const { files } = useFileStore();
 
-await navigator.serviceWorker.ready;
-
 interface ListItem {
     path: string;
     status?: FileStatus;
