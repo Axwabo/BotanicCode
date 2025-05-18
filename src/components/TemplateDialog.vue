@@ -1,11 +1,15 @@
 <script setup lang="ts">
 import { onMounted, ref } from "vue";
+import useFileStore from "../fileStore.ts";
+
+const { files } = useFileStore();
 
 const dialogElement = ref<HTMLDialogElement>();
 
 const key = "BotanicCodeTemplateDialogShown";
 const dialogShown = ref(localStorage.getItem(key) === "true");
 localStorage.setItem(key, "true");
+
 onMounted(() => dialogElement.value?.showModal());
 
 const loading = ref(false);
@@ -18,8 +22,7 @@ async function importExample() {
         method: "POST",
         body: text
     });
-    const useFileStore = await import("../fileStore.ts");
-    useFileStore.default().files.set("/bot/main.js", "saved");
+    files.set("/bot/main.js", "saved");
     dialogElement.value?.close();
 }
 </script>
