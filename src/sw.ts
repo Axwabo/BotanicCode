@@ -36,8 +36,8 @@ self.addEventListener("fetch", event => {
     const referrerUrl = event.request.referrer ? new URL(event.request.referrer) : undefined;
     if (referrerUrl?.origin === self.location.origin
         && referrerUrl.pathname.match(botDirectory)
-        && !path.startsWith(import.meta.env.BASE_URL + "/bot/")
-        && !path.startsWith(import.meta.env.BASE_URL + "/util/")) {
+        && !path.startsWith(import.meta.env.BASE_URL + "bot/")
+        && !path.startsWith(import.meta.env.BASE_URL + "util/")) {
         event.respondWith(new Response("Cannot fetch resources outside `/bot/` or `/util/` from a bot module.", {
             status: 403,
             statusText: "Illegal Import"
@@ -68,7 +68,7 @@ const plainInit = {
 registerRoute(import.meta.env.BASE_URL + "/file-list/bot", async () => {
     const cache = await getCache();
     const keys = await cache.keys();
-    return new Response(keys.map(f => new URL(f.url, self.location.origin).pathname.replace(import.meta.env.BASE_URL, "")).join("\n"), plainInit);
+    return new Response(keys.map(f => new URL(f.url, self.location.origin).pathname.replace(import.meta.env.BASE_URL, "/")).join("\n"), plainInit);
 });
 
 registerRoute(import.meta.env.BASE_URL + "/file-list/static", async () => {
@@ -76,9 +76,9 @@ registerRoute(import.meta.env.BASE_URL + "/file-list/static", async () => {
     const keys = await cache.keys();
     return new Response(keys.map(e => new URL(e.url))
     .filter(e => e.origin === self.location.origin
-        && (e.pathname.startsWith(import.meta.env.BASE_URL + "/util/")
-            || e.pathname.startsWith(import.meta.env.BASE_URL + "/bot/")))
-    .map(e => e.pathname.replace(import.meta.env.BASE_URL, ""))
+        && (e.pathname.startsWith(import.meta.env.BASE_URL + "util/")
+            || e.pathname.startsWith(import.meta.env.BASE_URL + "bot/")))
+    .map(e => e.pathname.replace(import.meta.env.BASE_URL, "/"))
     .join("\n"), plainInit);
 });
 
