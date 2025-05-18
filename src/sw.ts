@@ -75,7 +75,9 @@ registerRoute(import.meta.env.BASE_URL + "/file-list/static", async () => {
     const cache = await caches.open(cacheNames.precache);
     const keys = await cache.keys();
     return new Response(keys.map(e => new URL(e.url))
-    .filter(e => e.origin === self.location.origin && (e.pathname.startsWith("/util") || e.pathname.startsWith("/bot")))
+    .filter(e => e.origin === self.location.origin
+        && (e.pathname.startsWith(import.meta.env.BASE_URL + "/util/")
+            || e.pathname.startsWith(import.meta.env.BASE_URL + "/bot/")))
     .map(e => e.pathname.replace(import.meta.env.BASE_URL, ""))
     .join("\n"), plainInit);
 });
