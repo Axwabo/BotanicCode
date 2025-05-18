@@ -38,7 +38,7 @@ export default defineConfig({
             suppressWarnings: true,
             type: "module"
         },
-        base: "/BotanicCode"
+        base: "/BotanicCode/"
     }), viteStaticCopy({
         targets: [
             {
@@ -58,5 +58,5 @@ export default defineConfig({
     server: {
         port: 8000
     },
-    base: "/BotanicCode"
+    base: "/BotanicCode/"
 })
