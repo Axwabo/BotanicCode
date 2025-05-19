@@ -72,8 +72,7 @@ registerRoute(/\/bot\/sdk\/run*/, async options => {
 });
 
 registerRoute(/\/bot\/(?!sdk\/)/i, async ({ url }) => {
-    if (!fileCache)
-        return new Response(null, { status: 503 });
+    fileCache ??= await caches.open("Files");
     const isTimed = url.searchParams.has("t");
     const cached = await fileCache.match(url.pathname.replace(import.meta.env.BASE_URL, "/"));
     if (!cached)
