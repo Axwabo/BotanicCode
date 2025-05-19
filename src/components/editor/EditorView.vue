@@ -6,9 +6,7 @@ import Loading from "./Loading.vue";
 import EditorList from "./EditorList.vue";
 
 const { currentFile } = storeToRefs(useFileStore());
-const { navigate, files, editors } = useFileStore();
-
-let controller = new AbortController();
+const { navigate, editors, get, save } = useFileStore();
 
 const saving = ref(false);
 
@@ -25,15 +23,7 @@ async function saveChanges() {
     saving.value = true;
     try {
         const path = currentFile.value;
-        const body = editors.get(path)!.contents();
-        const response = await fetch(import.meta.env.BASE_URL + path.replace(/^\//, ""), {
-            method: "POST",
-            body
-        });
-        if (response.status !== 201)
-            alert("Failed to save file"); // TODO: toast
-        else
-            files.set(path, "saved");
+        await save(path, editors.get(path)!.contents());
     } finally {
         saving.value = false;
     }
@@ -49,14 +39,11 @@ function handleSave(event: KeyboardEvent) {
 watch(currentFile, async value => {
     if (!value)
         return;
-    controller?.abort("Navigating file");
-    controller = new AbortController();
     if (editors.get(value)) {
         navigate(value);
         return;
     }
-    const response = await fetch(import.meta.env.BASE_URL + value.replace(/^\//, ""), { signal: controller.signal });
-    const contents = response.ok ? await response.text() : "";
+    const contents = await get(value);
     navigate(value, contents);
 }, { immediate: true });
 </script>

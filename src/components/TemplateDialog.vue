@@ -2,7 +2,7 @@
 import { onMounted, ref } from "vue";
 import useFileStore from "../fileStore.ts";
 
-const { files } = useFileStore();
+const { save } = useFileStore();
 
 const dialogElement = ref<HTMLDialogElement>();
 
@@ -18,11 +18,7 @@ async function importExample() {
     loading.value = true;
     const response = await fetch(import.meta.env.BASE_URL + "example.js");
     const text = await response.text();
-    await fetch(import.meta.env.BASE_URL + "bot/main.js", {
-        method: "POST",
-        body: text
-    });
-    files.set("/bot/main.js", "saved");
+    await save("/bot/main.js", text);
     dialogElement.value?.close();
 }
 </script>

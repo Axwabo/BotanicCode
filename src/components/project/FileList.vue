@@ -3,29 +3,15 @@ import useFileStore, { type FileStatus } from "../../fileStore.ts";
 import { computed } from "vue";
 import File from "./File.vue";
 
-const { files } = useFileStore();
+const { files, init } = useFileStore();
+
+await init();
 
 interface ListItem {
     path: string;
     status?: FileStatus;
     display: string;
     depth: number;
-}
-
-await Promise.all([
-    requestList("bot", "saved"),
-    requestList("static", "locked")
-]);
-
-async function requestList(type: string, status: FileStatus) {
-    const response = await fetch(`${import.meta.env.BASE_URL}file-list/${type}`);
-    if (!response.ok || response.headers.get("Content-Type") !== "text/plain")
-        return;
-    const text = await response.text();
-    const lines = text.split("\n");
-    for (const line of lines)
-        if (line)
-            files.set(line, status);
 }
 
 const sorted = computed(() => {

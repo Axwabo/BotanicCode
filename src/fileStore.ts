@@ -8,6 +8,7 @@ interface State {
     currentFile: string;
     editors: Map<string, EditorInstance>;
     deleteConfirmation: string;
+    cache?: Cache;
 }
 
 export interface EditorInstance {
@@ -40,9 +41,42 @@ const useFileStore = defineStore("projectFiles", {
         canRun(state: State) {
             const status = state.files.get(state.currentFile);
             return status === "saved" || status === "modified";
+        },
+        async cacheAsync(state: State) {
+            return state.cache ??= await caches.open("Files");
         }
     },
     actions: {
+        async init() {
+            const cache = await this.cacheAsync;
+            const keys = await cache.keys();
+            const states: [ string, FileStatus ][] = keys.map(e => [ new URL(e.url, location.origin).pathname, "saved" ]);
+            const response = await fetch(`${import.meta.env.BASE_URL}file-list/static`);
+            if (response.ok && response.headers.get("Content-Type") !== "text/plain") {
+                const text = await response.text();
+                states.concat(text.split("\n").filter(e => e).map(e => [ e, "locked" ]));
+            }
+            this.$patch(state => {
+                for (const [ path, status ] of states)
+                    state.files.set(path, status);
+            });
+
+        },
+        async get(path: string) {
+            const cache = await this.cacheAsync;
+            const response = await cache.match(path);
+            return response ? await response.text() : "";
+        },
+        async save(path: string, content: string) {
+            const cache = await this.cacheAsync;
+            await cache.put(path, new Response(content));
+            this.files.set(path, "saved");
+        },
+        async delete(path: string) {
+            const cache = await this.cacheAsync;
+            await cache.delete(path);
+            this.files.delete(path);
+        },
         navigate(path: string, content?: string) {
             if (!this.files.get(path))
                 this.files.set(path, "created");

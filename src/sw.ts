@@ -9,10 +9,6 @@ let fileCache: Cache | undefined;
 
 let lastRun = 0;
 
-async function getCache() {
-    return fileCache ??= await caches.open("Files");
-}
-
 self.addEventListener("activate", async () => {
     fileCache = await caches.open("Files");
     await self.skipWaiting();
@@ -33,43 +29,24 @@ const botDirectory = new RegExp(`^${import.meta.env.BASE_URL.replace("/", "\\/")
 
 self.addEventListener("fetch", event => {
     const path = new URL(event.request.url).pathname;
-    const referrerUrl = event.request.referrer ? new URL(event.request.referrer) : undefined;
+    if (!event.request.referrer)
+        return;
+    const referrerUrl = new URL(event.request.referrer);
     if (referrerUrl?.origin === self.location.origin
         && referrerUrl.pathname.match(botDirectory)
         && !path.startsWith(import.meta.env.BASE_URL + "bot/")
-        && !path.startsWith(import.meta.env.BASE_URL + "util/")) {
+        && !path.startsWith(import.meta.env.BASE_URL + "util/"))
         event.respondWith(new Response("Cannot fetch resources outside `/bot/` or `/util/` from a bot module.", {
             status: 403,
             statusText: "Illegal Import"
         }));
-        return;
-    }
-    if (!fileCache || !path.match(botDirectory))
-        return;
-    const url = new URL(path, self.location.origin);
-    switch (event.request.method) {
-        case "POST":
-            event.respondWith(getCache().then(cache => cache.put(url, new Response(event.request.body, {
-                status: 200,
-                headers
-            }))).then(() => new Response(path, { status: 201 })));
-            break;
-        case "DELETE":
-            event.respondWith(getCache().then(cache => cache.delete(url)).then(() => new Response(null, { status: 200 })));
-            break;
-    }
 });
+
 const plainInit = {
     headers: {
         "Content-Type": "text/plain"
     }
 };
-
-registerRoute(import.meta.env.BASE_URL + "file-list/bot", async () => {
-    const cache = await getCache();
-    const keys = await cache.keys();
-    return new Response(keys.map(f => new URL(f.url, self.location.origin).pathname.replace(import.meta.env.BASE_URL, "/")).join("\n"), plainInit);
-});
 
 registerRoute(import.meta.env.BASE_URL + "file-list/static", async () => {
     const cache = await caches.open(cacheNames.precache);
@@ -98,8 +75,7 @@ registerRoute(/\/bot\/(?!sdk\/)/i, async ({ url }) => {
     if (!fileCache)
         return new Response(null, { status: 503 });
     const isTimed = url.searchParams.has("t");
-    url.searchParams.delete("t");
-    const cached = await fileCache.match(url);
+    const cached = await fileCache.match(url.pathname.replace(import.meta.env.BASE_URL, "/"));
     if (!cached)
         return new Response(null, {
             status: 404,
