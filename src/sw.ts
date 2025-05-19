@@ -121,8 +121,11 @@ addPlugins([ {
     cacheWillUpdate: async ({ response }) => {
         if (precacheProgress.total)
             return response;
+        const cache = await caches.open(cacheNames.precache);
+        const keys = await cache.keys();
         precacheProgress.total = manifest.length;
-        updateChannel.postMessage({ type: "precaching", current: 0, total: manifest.length });
+        precacheProgress.current = keys.length;
+        updateChannel.postMessage({ type: "precaching", current: keys.length, total: manifest.length });
         return response;
     },
     cacheDidUpdate: async () => {

@@ -8,6 +8,7 @@ interface State {
     currentFile: string;
     editors: Map<string, EditorInstance>;
     deleteConfirmation: string;
+    swActivated: boolean;
     cache?: Cache;
 }
 
@@ -36,11 +37,11 @@ function findIndex(editorPaths: Map<string, EditorInstance>, current: string) {
 }
 
 const useFileStore = defineStore("projectFiles", {
-    state: (): State => ({ files: reactiveMap(), currentFile: "", editors: reactiveMap(), deleteConfirmation: "" }),
+    state: (): State => ({ files: reactiveMap(), currentFile: "", editors: reactiveMap(), deleteConfirmation: "", swActivated: false }),
     getters: {
         canRun(state: State) {
             const status = state.files.get(state.currentFile);
-            return status === "saved" || status === "modified";
+            return state.swActivated && (status === "saved" || status === "modified");
         },
         async cacheAsync(state: State) {
             return state.cache ??= await caches.open("Files");

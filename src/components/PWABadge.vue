@@ -1,11 +1,13 @@
 <script setup lang="ts">
-import { computed, ref } from "vue"
+import { computed } from "vue"
 import { useRegisterSW } from "virtual:pwa-register/vue"
+import { storeToRefs } from "pinia";
+import useFileStore from "../fileStore.ts";
 
 // check for updates every hour
 const period = 60 * 60 * 1000;
 
-const swActivated = ref(false);
+const { swActivated } = storeToRefs(useFileStore());
 
 /**
  * This function will register a periodic sync check every hour, you can modify the interval as needed.
