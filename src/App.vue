@@ -1,19 +1,15 @@
 <script setup lang="ts">
 import PWABadge from "./components/PWABadge.vue"
-import { defineAsyncComponent, ref } from "vue";
-import Loading from "./components/Loading.vue";
-
-const page = defineAsyncComponent({
-    delay: 0,
-    loader: () => import("./Page.vue"),
-    loadingComponent: Loading
-});
-
-const activated = ref(false);
+import TemplateDialog from "./components/TemplateDialog.vue";
+import EditorView from "./components/editor/EditorView.vue";
+import ProjectView from "./components/project/ProjectView.vue";
+import GameView from "./components/game/GameView.vue";
 </script>
 
 <template>
-    <PWABadge v-on:activated="activated = true"/>
-    <page v-if="activated"/>
-    <Loading v-else/>
+    <PWABadge/>
+    <ProjectView/>
+    <EditorView/>
+    <GameView/>
+    <TemplateDialog/>
 </template>

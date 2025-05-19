@@ -1,11 +1,18 @@
 <script setup lang="ts">
-import FarmCanvas from "./FarmCanvas.vue";
 import FarmToolbar from "./editor/FarmToolbar.vue";
+import { defineAsyncComponent } from "vue";
+import Loading from "./Loading.vue";
+
+const farmCanvas = defineAsyncComponent({
+    delay: 0,
+    loader: () => import("./FarmCanvas.vue"),
+    loadingComponent: Loading
+});
 </script>
 
 <template>
     <div class="farm-editor-container">
-        <FarmCanvas/>
+        <farmCanvas/>
         <FarmToolbar/>
     </div>
 </template>

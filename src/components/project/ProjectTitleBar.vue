@@ -26,7 +26,7 @@ function toggleHidden(event: Event) {
     <span class="view-label">Project</span>
     <div>
         <label for="sdk">Show SDK</label>
-        <input type="checkbox" id="sdk" checked v-on:change="toggleHidden">
+        <input type="checkbox" id="sdk" v-on:change="toggleHidden">
     </div>
     <button v-on:click="run()" v-bind:disabled="!canRun">Run</button>
     <ConfirmDeleteDialog/>

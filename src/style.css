@@ -28,12 +28,6 @@ body {
     padding: 0.5rem;
 }
 
-#app:has(> .loading) {
-    place-items: center;
-    grid-template-columns: unset;
-    grid-template-rows: unset;
-}
-
 .view-title-bar {
     display: flex;
     align-items: center;

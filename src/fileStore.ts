@@ -54,7 +54,7 @@ const useFileStore = defineStore("projectFiles", {
             const response = await fetch(`${import.meta.env.BASE_URL}file-list/static`);
             if (response.ok && response.headers.get("Content-Type") !== "text/plain") {
                 const text = await response.text();
-                states.concat(text.split("\n").filter(e => e).map(e => [ e, "locked" ]));
+                states.concat(text.split("\n").filter(e => e).map(e => [ e, "hidden" ]));
             }
             this.$patch(state => {
                 for (const [ path, status ] of states)
