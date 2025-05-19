@@ -3,6 +3,7 @@ import { ref } from "vue";
 import useFileStore from "../../fileStore.ts";
 import FileList from "./FileList.vue";
 import ProjectTitleBar from "./ProjectTitleBar.vue";
+import PrecacheProgress from "./PrecacheProgress.vue";
 
 const { navigate } = useFileStore();
 
@@ -29,17 +30,22 @@ function createFile() {
             <input type="text" v-model="newFile" placeholder="Create file" :pattern="filenamePattern">
             <button v-on:click="createFile()">+</button>
         </div>
-        <hr>
         <Suspense>
             <FileList/>
             <template #fallback>
                 <p>Loading...</p>
             </template>
         </Suspense>
+        <PrecacheProgress/>
     </div>
 </template>
 
 <style scoped>
+#projectContainer {
+    display: grid;
+    grid-template-rows: auto 1fr auto;
+}
+
 .create-container {
     display: flex;
     gap: 0.25rem;

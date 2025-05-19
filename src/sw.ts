@@ -1,5 +1,5 @@
 /// <reference lib="webworker" />
-import { cleanupOutdatedCaches, createHandlerBoundToURL, precacheAndRoute } from "workbox-precaching"
+import { addPlugins, cleanupOutdatedCaches, createHandlerBoundToURL, precacheAndRoute } from "workbox-precaching"
 import { NavigationRoute, registerRoute } from "workbox-routing";
 import { cacheNames } from "workbox-core";
 
@@ -8,6 +8,13 @@ declare let self: ServiceWorkerGlobalScope;
 let fileCache: Cache | undefined;
 
 let lastRun = 0;
+
+const precacheProgress = {
+    total: 0,
+    current: 0
+};
+
+const updateChannel = new BroadcastChannel("BotanicCodePrecache");
 
 self.addEventListener("activate", async () => {
     fileCache = await caches.open("Files");
@@ -52,10 +59,10 @@ registerRoute(import.meta.env.BASE_URL + "file-list/static", async () => {
     const cache = await caches.open(cacheNames.precache);
     const keys = await cache.keys();
     return new Response(keys.map(e => new URL(e.url))
-    .filter(e => e.origin === self.location.origin
-        && (e.pathname.startsWith(import.meta.env.BASE_URL + "util/")
-            || e.pathname.startsWith(import.meta.env.BASE_URL + "bot/")))
-    .map(e => e.pathname.replace(import.meta.env.BASE_URL, "/"))
+    .filter(e => e.origin === self.location.origin)
+    .map(e => new URL(e.pathname, e.origin + import.meta.env.BASE_URL))
+    .filter(e => e.pathname.startsWith("/util/") || e.pathname.startsWith("/bot/"))
+    .map(e => e.pathname)
     .join("\n"), plainInit);
 });
 
@@ -98,7 +105,8 @@ function transformFile(file: string) {
 }
 
 // self.__WB_MANIFEST is the default injection point
-precacheAndRoute(self.__WB_MANIFEST);
+const manifest = self.__WB_MANIFEST;
+precacheAndRoute(manifest);
 
 // clean old assets
 cleanupOutdatedCaches();
@@ -108,6 +116,20 @@ let allowlist;
 // in dev mode, we disable precaching to avoid caching issues
 if (import.meta.env.DEV)
     allowlist = [ /^\/$/ ];
+
+addPlugins([ {
+    cacheWillUpdate: async ({ response }) => {
+        if (precacheProgress.total)
+            return response;
+        precacheProgress.total = manifest.length;
+        updateChannel.postMessage({ type: "precaching", current: 0, total: manifest.length });
+        return response;
+    },
+    cacheDidUpdate: async () => {
+        precacheProgress.current++;
+        updateChannel.postMessage({ type: "precaching", total: precacheProgress.total, current: precacheProgress.current });
+    }
+} ]);
 
 // to allow work offline
 registerRoute(new NavigationRoute(

@@ -69,6 +69,7 @@ p.empty {
 }
 
 .file-list {
+    flex: 1;
     display: flex;
     flex-direction: column;
     gap: 0.5rem;

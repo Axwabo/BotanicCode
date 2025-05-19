@@ -2,8 +2,6 @@
 import { computed, ref } from "vue"
 import { useRegisterSW } from "virtual:pwa-register/vue"
 
-const emit = defineEmits([ "activated" ]);
-
 // check for updates every hour
 const period = 60 * 60 * 1000;
 
@@ -39,13 +37,12 @@ const { needRefresh, updateServiceWorker } = useRegisterSW({
         if (r?.active?.state === "activated") {
             swActivated.value = true;
             registerPeriodicSync(swUrl, r);
-            emit("activated");
         } else if (r?.installing) {
             r.installing.addEventListener("statechange", (e) => {
                 const sw = e.target as ServiceWorker;
                 swActivated.value = sw.state === "activated";
                 if (swActivated.value)
-                    emit("activated");
+                    registerPeriodicSync(swUrl, r);
             });
         }
     }
