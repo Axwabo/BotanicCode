@@ -1,4 +1,7 @@
 import { raycastTile } from "./raycast.js";
+import { tileSize } from "./tileConstants.js";
+
+const padding = tileSize * 0.5;
 
 /**
  * @param board {Board}
@@ -10,22 +13,9 @@ export function validateMove(board, from, deltaX, deltaY) {
     const toX = from.x + deltaX;
     const toY = from.y + deltaY;
     const angle = Math.atan2(deltaY, deltaX);
-    const result = raycastTile(board, from.x, from.y, angle, deltaX * deltaX + deltaY * deltaY);
+    const result = raycastTile(board, from.x, from.y, angle, deltaX * deltaX + deltaY * deltaY, padding);
     if (!result)
         return { x: toX, y: toY, valid: true };
-    return { ...result.hitPoint, valid: false };
+    const { x, y } = result.hitPoint;
+    return { x: x - Math.cos(angle) * padding, y: y - Math.sin(angle) * padding, valid: false };
 }
-
-// what I learned in math class:
-// need:
-// - normals of lines e and f (A, B)
-// - point on lines defined by (x0, y0)
-// line = Ax + By = A * x0 + B * y0
-
-// e = Ae * x + Be * y = Ae * x0e + Be * y0e
-// f = Af * x + Bf * y = Af * x0f + Bf * y0f
-
-// x = (Ae * x0e + Be * y0e - Be * y) / Ae
-
-// Af * ((Ae * x0e + Be * y0e - Be * y) / Ae) + Bf * y = Af * x0f + Bf * y0f
-// y = (Af * x0f + Bf * y0f) / (Af * ((Ae * x0e + Be * y0e - Be * y) / Ae) + Bf)
