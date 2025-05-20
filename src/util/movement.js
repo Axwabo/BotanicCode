@@ -15,3 +15,17 @@ export function validateMove(board, from, deltaX, deltaY) {
         return { x: toX, y: toY, valid: true };
     return { ...result.hitPoint, valid: false };
 }
+
+// what I learned in math class:
+// need:
+// - normals of lines e and f (A, B)
+// - point on lines defined by (x0, y0)
+// line = Ax + By = A * x0 + B * y0
+
+// e = Ae * x + Be * y = Ae * x0e + Be * y0e
+// f = Af * x + Bf * y = Af * x0f + Bf * y0f
+
+// x = (Ae * x0e + Be * y0e - Be * y) / Ae
+
+// Af * ((Ae * x0e + Be * y0e - Be * y) / Ae) + Bf * y = Af * x0f + Bf * y0f
+// y = (Af * x0f + Bf * y0f) / (Af * ((Ae * x0e + Be * y0e - Be * y) / Ae) + Bf)
