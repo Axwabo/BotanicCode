@@ -65,7 +65,10 @@ const useFileStore = defineStore("projectFiles", {
         async get(path: string) {
             const cache = await this.cacheAsync;
             const response = await cache.match(path);
-            return response ? await response.text() : "";
+            if (response)
+                return await response.text();
+            const network = await fetch(import.meta.env.BASE_URL + path);
+            return network.ok ? await network.text() : "";
         },
         async save(path: string, content: string) {
             const cache = await this.cacheAsync;

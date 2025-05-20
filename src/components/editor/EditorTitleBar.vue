@@ -1,0 +1,51 @@
+<script setup lang="ts">
+import { computed, onMounted, onUnmounted, ref } from "vue";
+import useFileStore from "../../fileStore.ts";
+import { storeToRefs } from "pinia";
+import useGameStore from "../../gameStore.ts";
+import BotManager from "../../game/botManager.ts";
+
+const { files, editors, save } = useFileStore();
+
+const { currentFile, canRun } = storeToRefs(useFileStore());
+
+const { game } = useGameStore();
+
+const saving = ref(false);
+
+const canSave = computed(() => {
+    const status = files.get(currentFile.value);
+    return !saving.value && (status === "modified" || status === "created");
+});
+
+async function saveChanges() {
+    saving.value = true;
+    try {
+        const path = currentFile.value;
+        await save(path, editors.get(path)!.contents());
+    } finally {
+        saving.value = false;
+    }
+}
+
+function handleSave(event: KeyboardEvent) {
+    if (!event.ctrlKey || event.key !== "s")
+        return;
+    saveChanges();
+    event.preventDefault();
+}
+
+function run() {
+    game.botManager.terminate();
+    game.botManager = new BotManager(game.board, currentFile.value);
+}
+
+onMounted(() => window.addEventListener("keydown", handleSave));
+onUnmounted(() => window.removeEventListener("keydown", handleSave));
+</script>
+
+<template>
+    <span class="view-label">Editor</span>
+    <button v-on:click="saveChanges" v-bind:disabled="!canSave">Save Changes</button>
+    <button v-on:click="run" v-bind:disabled="!canRun">Run</button>
+</template>
