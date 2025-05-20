@@ -1,7 +1,6 @@
 /// <reference lib="webworker" />
 import { addPlugins, cleanupOutdatedCaches, createHandlerBoundToURL, precacheAndRoute } from "workbox-precaching"
 import { NavigationRoute, registerRoute } from "workbox-routing";
-import { cacheNames } from "workbox-core";
 
 declare let self: ServiceWorkerGlobalScope;
 
@@ -14,6 +13,9 @@ const precacheProgress = {
     current: 0,
     updateId: 0
 };
+
+// self.__WB_MANIFEST is the default injection point
+const manifest = self.__WB_MANIFEST;
 
 const updateChannel = new BroadcastChannel("BotanicCodePrecache");
 
@@ -57,12 +59,9 @@ const plainInit = {
 };
 
 registerRoute(/\/file-list\/static/, async () => {
-    const cache = await caches.open(cacheNames.precache);
-    const keys = await cache.keys();
-    return new Response(keys.map(e => new URL(e.url))
-    .filter(e => e.origin === self.location.origin && e.pathname.startsWith(import.meta.env.BASE_URL))
-    .map(e => e.pathname.substring(import.meta.env.BASE_URL.length - 1))
-    .filter(e => e.startsWith("/util/") || e.startsWith("/bot/"))
+    return new Response(manifest.map(e => typeof e === "string" ? e : e.url)
+    .filter(e => e.startsWith("util/") || e.startsWith("bot/"))
+    .map(e => `/${e}`)
     .join("\n"), plainInit);
 });
 
@@ -101,8 +100,6 @@ function transformFile(file: string) {
     return file.match(staticAssets) ? file : `${import.meta.env.BASE_URL}bot/${file}?t=${lastRun}`;
 }
 
-// self.__WB_MANIFEST is the default injection point
-const manifest = self.__WB_MANIFEST;
 precacheAndRoute(manifest);
 
 // clean old assets
