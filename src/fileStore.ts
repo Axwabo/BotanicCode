@@ -53,15 +53,14 @@ const useFileStore = defineStore("projectFiles", {
             const keys = await cache.keys();
             const states: [ string, FileStatus ][] = keys.map(e => [ new URL(e.url, location.origin).pathname, "saved" ]);
             const response = await fetch(`${import.meta.env.BASE_URL}file-list/static`);
-            if (response.ok && response.headers.get("Content-Type") !== "text/plain") {
+            if (response.ok && response.headers.get("Content-Type") === "text/plain") {
                 const text = await response.text();
-                states.concat(text.split("\n").filter(e => e).map(e => [ e, "hidden" ]));
+                states.push(...(<[ string, FileStatus ][]>text.split("\n").filter(e => e).map(e => [ e, "hidden" ])));
             }
             this.$patch(state => {
                 for (const [ path, status ] of states)
                     state.files.set(path, status);
             });
-
         },
         async get(path: string) {
             const cache = await this.cacheAsync;

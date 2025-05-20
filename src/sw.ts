@@ -11,7 +11,8 @@ let lastRun = 0;
 
 const precacheProgress = {
     total: 0,
-    current: 0
+    current: 0,
+    updateId: 0
 };
 
 const updateChannel = new BroadcastChannel("BotanicCodePrecache");
@@ -55,14 +56,13 @@ const plainInit = {
     }
 };
 
-registerRoute(import.meta.env.BASE_URL + "file-list/static", async () => {
+registerRoute(/\/file-list\/static/, async () => {
     const cache = await caches.open(cacheNames.precache);
     const keys = await cache.keys();
     return new Response(keys.map(e => new URL(e.url))
-    .filter(e => e.origin === self.location.origin)
-    .map(e => new URL(e.pathname, e.origin + import.meta.env.BASE_URL))
-    .filter(e => e.pathname.startsWith("/util/") || e.pathname.startsWith("/bot/"))
-    .map(e => e.pathname)
+    .filter(e => e.origin === self.location.origin && e.pathname.startsWith(import.meta.env.BASE_URL))
+    .map(e => e.pathname.substring(import.meta.env.BASE_URL.length - 1))
+    .filter(e => e.startsWith("/util/") || e.startsWith("/bot/"))
     .join("\n"), plainInit);
 });
 
@@ -80,15 +80,12 @@ registerRoute(/\/bot\/sdk\/run*/, async options => {
 
 registerRoute(/\/bot\/(?!sdk\/)/i, async ({ url }) => {
     fileCache ??= await caches.open("Files");
-    const isTimed = url.searchParams.has("t");
     const cached = await fileCache.match(url.pathname.replace(import.meta.env.BASE_URL, "/"));
     if (!cached)
         return new Response(null, {
             status: 404,
             statusText: "File Not Found"
         });
-    else if (!isTimed)
-        return cached;
     const text = await cached.text();
     // TODO: prevent importing from parent directory
     return new Response(
@@ -119,18 +116,14 @@ if (import.meta.env.DEV)
 
 addPlugins([ {
     cacheWillUpdate: async ({ response }) => {
-        if (precacheProgress.total)
-            return response;
-        const cache = await caches.open(cacheNames.precache);
-        const keys = await cache.keys();
-        precacheProgress.total = manifest.length;
-        precacheProgress.current = keys.length;
-        updateChannel.postMessage({ type: "precaching", current: keys.length, total: manifest.length });
+        if (response.url.endsWith(".js"))
+            response = new Response(response.body, {
+                status: response.status,
+                headers: { ...response.headers, "Content-Type": "text/javascript" }
+            });
+        precacheProgress.total++;
+        updateChannel.postMessage({ type: "precaching" });
         return response;
-    },
-    cacheDidUpdate: async () => {
-        precacheProgress.current++;
-        updateChannel.postMessage({ type: "precaching", total: precacheProgress.total, current: precacheProgress.current });
     }
 } ]);
 
