@@ -8,6 +8,7 @@ import type TerminatingBotEvent from "./events/terminatingBotEvent.ts";
 import { validateMove } from "../util/movement";
 import type TileUpdatedEvent from "../util/world/events/tileUpdatedEvent";
 import cloneData from "./cloneData.ts";
+import { reactive } from "vue";
 
 export default class BotManager {
     private readonly board: Board;
@@ -48,7 +49,7 @@ export default class BotManager {
 
     private handleRequest(request: BotRequest, name: string) {
         if (request.type === "create") {
-            this.bots.set(name, { x: 0, y: 0 });
+            this.bots.set(name, reactive({ x: 0, y: 0 }));
             return;
         }
         const bot = this.bots.get(name);
