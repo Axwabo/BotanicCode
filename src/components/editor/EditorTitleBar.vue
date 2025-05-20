@@ -11,6 +11,8 @@ const { currentFile, canRun } = storeToRefs(useFileStore());
 
 const { game } = useGameStore();
 
+const { workerReady } = storeToRefs(useGameStore());
+
 const saving = ref(false);
 
 const canSave = computed(() => {
@@ -35,8 +37,13 @@ function handleSave(event: KeyboardEvent) {
     event.preventDefault();
 }
 
-function run() {
+function stop() {
     game.botManager.terminate();
+    workerReady.value = false;
+}
+
+function run() {
+    stop();
     game.botManager = new BotManager(game.board, currentFile.value);
 }
 
@@ -48,4 +55,5 @@ onUnmounted(() => window.removeEventListener("keydown", handleSave));
     <span class="view-label">Editor</span>
     <button v-on:click="saveChanges" v-bind:disabled="!canSave">Save Changes</button>
     <button v-on:click="run" v-bind:disabled="!canRun">Run</button>
+    <button v-on:click="stop" v-bind:disabled="!workerReady">Stop</button>
 </template>
