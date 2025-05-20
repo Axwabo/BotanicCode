@@ -17,19 +17,20 @@ export function raycastTile(board, x, y, angle, maxDistanceSquared, padding = 0)
     const sin = Math.sin(angle);
     const deltaX = cos * tileSize;
     const deltaY = sin * tileSize;
-    x += cos * padding;
-    y += sin * padding;
+    let currentX = x + cos * padding;
+    let currentY = y + sin * padding;
     let currentDistanceSquared = 0;
     while (currentDistanceSquared < maxDistanceSquared) {
-        const tile = board.getTileAt(x, y);
+        const tile = board.getTileAt(currentX, currentY);
         if (tile.data)
-            return intersectTile(x, y, deltaX, deltaY, tile);
+            return intersectTile(currentX, currentY, deltaX, deltaY, tile);
         currentDistanceSquared += tileSize;
-        x += deltaX;
-        y += deltaY;
+        currentX += deltaX;
+        currentY += deltaY;
     }
-    // TODO: check remaining part
-    return undefined;
+    const maxDistance = Math.sqrt(maxDistanceSquared);
+    const tile = board.getTileAt(x + cos * maxDistance, y + sin * maxDistance);
+    return tile.data ? intersectTile(currentX - deltaX, currentY - deltaY, deltaX, deltaY, tile) : undefined;
 }
 
 /**
@@ -61,7 +62,7 @@ function intersectTile(x, y, deltaX, deltaY, tile) {
         minDistanceSquared = distanceSquared;
         hitPoint = result;
     }
-    return { hitPoint, tile, distanceSquared: minDistanceSquared };
+    return hitPoint ? { hitPoint, tile, distanceSquared: minDistanceSquared } : undefined;
 }
 
 // line intercept math by Paul Bourke http://paulbourke.net/geometry/pointlineplane/
@@ -89,7 +90,7 @@ function intersect(x1, y1, x2, y2, x3, y3, x4, y4) {
         return false;
     }
 
-    // Return a object with the x and y coordinates of the intersection
+    // Return an object with the x and y coordinates of the intersection
     const x = x1 + ua * (x2 - x1);
     const y = y1 + ua * (y2 - y1);
 
