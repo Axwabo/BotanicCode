@@ -18,6 +18,5 @@ export function validateMove(board, from, deltaX, deltaY) {
     if (!result)
         return { x: toX, y: toY, valid: true };
     const { x, y } = result.hitPoint;
-    const offset = padding - (Math.sqrt(maxDistanceSquared) - Math.sqrt(result.distanceSquared));
-    return { x: x + Math.cos(angle) * offset, y: y + Math.sin(angle) * offset, valid: false };
+    return { x: x - Math.cos(angle) * padding, y: y - Math.sin(angle) * padding, valid: false };
 }
