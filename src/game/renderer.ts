@@ -1,9 +1,10 @@
 import getContext, { canvasToWorld } from "./ctx.ts";
 import { tileSize, worldToChunk } from "../util/tileConstants.js";
-import type { Facing, Tile, WorldPosition } from "../util/tile.d.ts";
+import type { Tile, WorldPosition } from "../util/tile.d.ts";
 import { isInRange } from "../util/distance";
 import type { Gizmo } from "../util/gizmos";
 import { editorHandler } from "./events/editorHandler.ts";
+import { getBoundingBoxes } from "../util/world/boundingBoxes";
 
 const gizmos: Gizmo[] = [];
 
@@ -85,21 +86,10 @@ function drawTile(ctx: CanvasRenderingContext2D, tile: Tile) {
     switch (data.type) {
         case "fence":
             ctx.fillStyle = "orange";
-            ctx.fillRect(x + tileSize * 0.5 - 3, y + 5, 6, tileSize - 10);
-            drawFencePosts(ctx, x, y, data.posts);
             break;
     }
-}
-
-function drawFencePosts(ctx: CanvasRenderingContext2D, x: number, y: number, posts: Facing[]) {
-    if (posts.includes("north"))
-        ctx.fillRect(x + tileSize * 0.5 - 2, y, 4, 5);
-    if (posts.includes("south"))
-        ctx.fillRect(x + tileSize * 0.5 - 2, y + tileSize, 4, -5);
-    if (posts.includes("west"))
-        ctx.fillRect(x, y + tileSize * 0.5, tileSize * 0.5, 4);
-    if (posts.includes("east"))
-        ctx.fillRect(x + tileSize, y + tileSize * 0.5, -tileSize * 0.5, 4);
+    for (const box of getBoundingBoxes(data))
+        ctx.fillRect(box.topLeft.x + x, box.topLeft.y + y, box.width, box.height);
 }
 
 function drawGizmos(ctx: CanvasRenderingContext2D) {

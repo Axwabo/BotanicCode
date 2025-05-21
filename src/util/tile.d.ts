@@ -5,6 +5,13 @@ export interface WorldPosition {
     y: number;
 }
 
+export interface BoundingBox {
+    x: number;
+    y: number;
+    width: number;
+    height: number;
+}
+
 export type TileType = "grass" | "dirt" | "gravel" | "air";
 
 export interface Tile {

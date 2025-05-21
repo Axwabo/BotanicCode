@@ -1,7 +1,5 @@
 import { tileSize } from "./tileConstants.js";
-
-/** @type {LineIntersectResult[]} */
-const boxResultsNonAlloc = [];
+import { getBoundingBoxes } from "./world/boundingBoxes.js";
 
 /**
  * @param board {Board}
@@ -44,22 +42,29 @@ export function raycastTile(board, x, y, angle, maxDistanceSquared, padding = 0)
  * @return {RaycastResult | undefined}
  */
 function intersectTile(x, y, deltaX, deltaY, tile) {
-    const topLeftX = tile.x * tileSize;
-    const topLeftY = tile.y * tileSize;
-    const bottomLeftX = topLeftX;
-    const bottomLeftY = topLeftY + tileSize;
-    const topRightX = topLeftX + tileSize;
-    const topRightY = topLeftY;
-    const bottomRightX = topLeftX + tileSize;
-    const bottomRightY = topLeftY + tileSize;
-    boxResultsNonAlloc[0] = intersect(x, y, x + deltaY, y + deltaY, topLeftX, topLeftY, topRightX, topRightY);
-    boxResultsNonAlloc[1] = intersect(x, y, x + deltaX, y + deltaY, topLeftX, topLeftY, bottomLeftX, bottomLeftY);
-    boxResultsNonAlloc[2] = intersect(x, y, x + deltaX, y + deltaY, topRightX, topRightY, bottomRightX, bottomRightY);
-    boxResultsNonAlloc[3] = intersect(x, y, x + deltaY, y + deltaY, bottomLeftX, bottomLeftY, bottomRightX, bottomRightY);
+    const boxes = getBoundingBoxes(tile.data);
+    const tileX = tile.x * tileSize;
+    const tileY = tile.y * tileSize;
+    /** @type {LineIntersectResult[]} */
+    const results = new Array(boxes.length * 4);
+    for (const box of boxes) {
+        const topLeftX = tileX + box.x;
+        const topLeftY = tileY + box.y;
+        const bottomLeftX = topLeftX;
+        const bottomLeftY = topLeftY + box.height;
+        const topRightX = topLeftX + box.width;
+        const topRightY = topLeftY;
+        const bottomRightX = topLeftX + box.width;
+        const bottomRightY = topLeftY + box.height;
+        results.push(intersect(x, y, x + deltaY, y + deltaY, topLeftX, topLeftY, topRightX, topRightY));
+        results.push(intersect(x, y, x + deltaX, y + deltaY, topLeftX, topLeftY, bottomLeftX, bottomLeftY));
+        results.push(intersect(x, y, x + deltaX, y + deltaY, topRightX, topRightY, bottomRightX, bottomRightY));
+        results.push(intersect(x, y, x + deltaY, y + deltaY, bottomLeftX, bottomLeftY, bottomRightX, bottomRightY));
+    }
     let minDistanceSquared = Number.MAX_SAFE_INTEGER;
     /** @type {LineIntersectResult} */
     let hitPoint = false;
-    for (const result of boxResultsNonAlloc) {
+    for (const result of results) {
         if (!result)
             continue;
         const a = x - result.x;
