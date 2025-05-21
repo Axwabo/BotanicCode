@@ -1,6 +1,6 @@
 import type { WorldPosition } from "./tile";
 
-export type Gizmo = GizmoDetails & (RectangleGizmo | PointGizmo);
+export type Gizmo = GizmoDetails & (RectangleGizmo | PointGizmo | LineGizmo);
 
 interface GizmoDetails {
     color: string;
@@ -16,4 +16,10 @@ interface RectangleGizmo {
 interface PointGizmo {
     type: "point";
     radius: number;
+}
+
+interface LineGizmo {
+    type: "line";
+    width: number;
+    points: WorldPosition[];
 }

@@ -103,9 +103,9 @@ function drawFencePosts(ctx: CanvasRenderingContext2D, x: number, y: number, pos
 }
 
 function drawGizmos(ctx: CanvasRenderingContext2D) {
-    ctx.globalAlpha = 0.7;
     for (const gizmo of gizmos) {
         ctx.fillStyle = gizmo.color;
+        ctx.strokeStyle = gizmo.color;
         const { x, y } = gizmo.position;
         switch (gizmo.type) {
             case "point":
@@ -117,7 +117,15 @@ function drawGizmos(ctx: CanvasRenderingContext2D) {
             case "rectangle":
                 ctx.fillRect(x, y, gizmo.width, gizmo.height);
                 break;
+            case "line":
+                ctx.lineWidth = gizmo.width;
+                ctx.beginPath();
+                ctx.moveTo(x, y);
+                for (const { x, y } of gizmo.points)
+                    ctx.lineTo(x, y);
+                ctx.stroke();
+                ctx.closePath();
+                break;
         }
     }
-    ctx.globalAlpha = 1;
 }
