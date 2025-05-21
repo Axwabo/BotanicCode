@@ -1,11 +1,21 @@
 import type { BotRequest, BotResponse } from "../bot/sdk/requests";
 import type { Tile } from "./tile";
+import type { Gizmo } from "./gizmos";
 
-export type WorkerMessage = Ready | BotRequestMessage | Error;
+export type WorkerMessage = Ready | BotRequestMessage | DrawGizmos | ClearGizmos | Error;
 export type GameMessage = Render | BotResponseMessage | World | TileUpdate;
 
 interface Ready {
     type: "ready";
+}
+
+interface DrawGizmos {
+    type: "drawGizmos";
+    gizmos: Gizmo[]
+}
+
+interface ClearGizmos {
+    type: "clearGizmos";
 }
 
 interface BotRequestMessage {

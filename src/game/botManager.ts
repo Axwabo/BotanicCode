@@ -9,6 +9,7 @@ import { validateMove } from "../util/movement";
 import type TileUpdatedEvent from "../util/world/events/tileUpdatedEvent";
 import cloneData from "./cloneData.ts";
 import { reactive } from "vue";
+import AddGizmosEvent from "./events/addGizmosEvent.ts";
 
 export default class BotManager {
     private readonly board: Board;
@@ -43,6 +44,12 @@ export default class BotManager {
                 break;
             case "bot":
                 this.handleRequest(event.data.request, event.data.name);
+                break;
+            case "drawGizmos":
+                editorHandler.dispatchEvent(new AddGizmosEvent(event.data.gizmos));
+                break;
+            case "clearGizmos":
+                editorHandler.dispatchEvent(new Event("cleargizmos"));
                 break;
         }
     }

@@ -2,6 +2,13 @@ import getContext, { canvasToWorld } from "./ctx.ts";
 import { tileSize, worldToChunk } from "../util/tileConstants.js";
 import type { Facing, Tile, WorldPosition } from "../util/tile.d.ts";
 import { isInRange } from "../util/distance";
+import type { Gizmo } from "../util/gizmos";
+import { editorHandler } from "./events/editorHandler.ts";
+
+const gizmos: Gizmo[] = [];
+
+editorHandler.addEventListener("cleargizmos", () => gizmos.length = 0);
+editorHandler.addEventListener("addgizmos", ev => gizmos.push(...ev.gizmos));
 
 export function render() {
     const { ctx, width, height, game, pointerX, pointerY, tool } = getContext();
@@ -42,6 +49,7 @@ export function render() {
         ctx.fillStyle = "rgba(255, 255, 0, 0.3)";
         ctx.fillRect(Math.floor(pointerWorldX / tileSize) * tileSize, Math.floor(pointerWorldY / tileSize) * tileSize, tileSize, tileSize);
     }
+    drawGizmos(ctx);
     ctx.resetTransform();
     ctx.textBaseline = "top";
     ctx.textAlign = "left";
@@ -92,4 +100,24 @@ function drawFencePosts(ctx: CanvasRenderingContext2D, x: number, y: number, pos
         ctx.fillRect(x, y + tileSize * 0.5, tileSize * 0.5, 4);
     if (posts.includes("east"))
         ctx.fillRect(x + tileSize, y + tileSize * 0.5, -tileSize * 0.5, 4);
+}
+
+function drawGizmos(ctx: CanvasRenderingContext2D) {
+    ctx.globalAlpha = 0.7;
+    for (const gizmo of gizmos) {
+        ctx.fillStyle = gizmo.color;
+        const { x, y } = gizmo.position;
+        switch (gizmo.type) {
+            case "point":
+                ctx.beginPath();
+                ctx.arc(x, y, gizmo.radius, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.closePath();
+                break;
+            case "rectangle":
+                ctx.fillRect(x, y, gizmo.width, gizmo.height);
+                break;
+        }
+    }
+    ctx.globalAlpha = 1;
 }

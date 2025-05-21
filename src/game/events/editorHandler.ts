@@ -2,6 +2,7 @@ import type ClickEvent from "./clickEvent.ts";
 import type TerminatingBotEvent from "./terminatingBotEvent.ts";
 import type WorkerErrorEvent from "./workerErrorEvent.ts";
 import type TileUpdatedEvent from "../../util/world/events/tileUpdatedEvent.js";
+import type AddGizmosEvent from "./addGizmosEvent.ts";
 
 interface EventMap {
     render: Event;
@@ -11,6 +12,8 @@ interface EventMap {
     workerready: Event;
     workererror: WorkerErrorEvent;
     terminatingbot: TerminatingBotEvent;
+    addgizmos: AddGizmosEvent;
+    cleargizmos: Event;
 }
 
 class EditorHandler extends EventTarget {
