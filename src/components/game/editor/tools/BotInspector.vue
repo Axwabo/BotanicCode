@@ -40,7 +40,7 @@ onUnmounted(() => editorHandler.removeEventListener("click", handleClick));
     <div id="botInspector">
         <div v-if="selectedBot && bot" class="details">
             <h2 class="bot-name">{{ selectedBot }}</h2>
-            <span>X: {{ bot.x }} Y: {{ bot.y }}</span>
+            <span>X: {{ bot.x.toFixed(2) }} Y: {{ bot.y.toFixed(2) }}</span>
             <button v-on:click="terminateBot">Terminate</button>
         </div>
         <p v-else>Click a bot to inspect</p>
@@ -55,7 +55,7 @@ onUnmounted(() => editorHandler.removeEventListener("click", handleClick));
 #botInspector {
     min-height: 0;
     display: grid;
-    grid-template-columns: 8rem 1fr;
+    grid-template-columns: minmax(10rem, max-content) 1fr;
     gap: 0.5rem;
 }
 
