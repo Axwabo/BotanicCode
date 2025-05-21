@@ -1,6 +1,4 @@
 import { tileSize } from "./tileConstants.js";
-import isWorker from "./environment.js";
-import sendMessage from "../bot/sdk/message.js";
 
 /** @type {LineIntersectResult[]} */
 const boxResultsNonAlloc = [];
@@ -19,22 +17,22 @@ export function raycastTile(board, x, y, angle, maxDistanceSquared, padding = 0)
     const sin = Math.sin(angle);
     const deltaX = cos * tileSize;
     const deltaY = sin * tileSize;
-    let currentX = x + cos * padding;
-    let currentY = y + sin * padding;
+    let offsetX = cos * padding;
+    let offsetY = sin * padding;
     let currentDistanceSquared = 0;
     while (currentDistanceSquared < maxDistanceSquared) {
-        const tile = board.getTileAt(currentX, currentY);
+        const tile = board.getTileAt(x + offsetX, y + offsetY);
         if (tile.data)
-            return intersectTile(currentX, currentY, deltaX, deltaY, tile);
-        currentDistanceSquared += tileSize;
-        currentX += deltaX;
-        currentY += deltaY;
+            return intersectTile(x, y, offsetX, offsetY, tile);
+        offsetX += deltaX;
+        offsetY += deltaY;
+        currentDistanceSquared = offsetX * offsetX + offsetY * offsetY;
     }
-    const tile = board.getTileAt(currentX, currentY);
+    const tile = board.getTileAt(x + offsetX, y + offsetY);
     if (!tile.data)
         return undefined;
-    const result = intersectTile(currentX, currentY, deltaX, deltaY, tile);
-    return result && result.distanceSquared < maxDistanceSquared ? result : undefined;
+    const result = intersectTile(x, y, offsetX, offsetY, tile);
+    return result && result.distanceSquared <= maxDistanceSquared ? result : undefined;
 }
 
 /**
@@ -55,36 +53,9 @@ function intersectTile(x, y, deltaX, deltaY, tile) {
     const bottomRightX = topLeftX + tileSize;
     const bottomRightY = topLeftY + tileSize;
     boxResultsNonAlloc[0] = intersect(x, y, x + deltaY, y + deltaY, topLeftX, topLeftY, topRightX, topRightY);
-    boxResultsNonAlloc[1] = intersect(x, y, x + deltaX, y + deltaX, topLeftX, topLeftY, bottomLeftX, bottomLeftY);
+    boxResultsNonAlloc[1] = intersect(x, y, x + deltaX, y + deltaY, topLeftX, topLeftY, bottomLeftX, bottomLeftY);
     boxResultsNonAlloc[2] = intersect(x, y, x + deltaX, y + deltaY, topRightX, topRightY, bottomRightX, bottomRightY);
-    boxResultsNonAlloc[3] = intersect(x, y, x + deltaY, y + deltaX, bottomLeftX, bottomLeftY, bottomRightX, bottomRightY);
-    if (isWorker) {
-        /** @type {Gizmo[]} */
-        const gizmos = [];
-        gizmos.push({ type: "rectangle", color: "red", position: { x: topLeftX, y: topLeftY }, width: tileSize, height: 1 });
-        gizmos.push({ type: "rectangle", color: "red", position: { x: topLeftX, y: topLeftY }, width: 1, height: tileSize });
-        gizmos.push({ type: "rectangle", color: "red", position: { x: topLeftX, y: topLeftY + tileSize }, width: tileSize, height: 1 });
-        gizmos.push({ type: "rectangle", color: "red", position: { x: topLeftX + tileSize, y: topLeftY }, width: 1, height: tileSize });
-        console.log(x, y, deltaX, deltaY)
-        gizmos.push({
-            type: "line",
-            color: "blue",
-            position: { x, y },
-            width: 3,
-            points: [ { x: x + deltaX, y: y + deltaY } ]
-        });
-        for (const result of boxResultsNonAlloc) {
-            if (result)
-                gizmos.push({
-                    type: "point",
-                    color: "black",
-                    position: result,
-                    radius: 1
-                });
-        }
-        // sendMessage({ type: "clearGizmos" });
-        sendMessage({ type: "drawGizmos", gizmos });
-    }
+    boxResultsNonAlloc[3] = intersect(x, y, x + deltaY, y + deltaY, bottomLeftX, bottomLeftY, bottomRightX, bottomRightY);
     let minDistanceSquared = Number.MAX_SAFE_INTEGER;
     /** @type {LineIntersectResult} */
     let hitPoint = false;
