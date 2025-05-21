@@ -4,7 +4,6 @@ import type { WorldPosition } from "../util/tile";
 import type { BotRequest } from "../bot/sdk/requests";
 import { editorHandler } from "./events/editorHandler.ts";
 import WorkerErrorEvent from "./events/workerErrorEvent.ts";
-import type TerminatingBotEvent from "./events/terminatingBotEvent.ts";
 import { validateMove } from "../util/movement";
 import type TileUpdatedEvent from "../util/world/events/tileUpdatedEvent";
 import cloneData from "./cloneData.ts";
@@ -15,7 +14,6 @@ export default class BotManager {
     private readonly board: Board;
     private readonly worker?: Worker;
     private readonly renderCallback?: () => void;
-    private readonly terminateCallback?: (event: TerminatingBotEvent) => void;
     readonly bots: Map<string, WorldPosition>; // TODO: managed bot instance
 
     constructor(board: Board, entryPoint?: string) {
@@ -26,10 +24,8 @@ export default class BotManager {
             return;
         this.worker = new Worker(`${import.meta.env.BASE_URL}bot/sdk/run.js?t=${Date.now()}&entryPoint=${encodeURI(entryPoint.replace(/^\//, ""))}`, { type: "module" });
         this.renderCallback = () => this.send({ type: "render" });
-        this.terminateCallback = event => this.send({ type: "bot", name: event.name, response: { type: "terminate" } });
         this.worker.addEventListener("message", event => this.handleMessage(event));
         editorHandler.addEventListener("render", this.renderCallback);
-        editorHandler.addEventListener("terminatingbot", this.terminateCallback);
     }
 
     private handleMessage(event: MessageEvent<WorkerMessage>) {
@@ -76,11 +72,13 @@ export default class BotManager {
         }
     }
 
+    deleteBot(name: string) {
+        this.send({ type: "bot", name, response: { type: "terminate" } });
+    }
+
     terminate() {
         if (this.renderCallback)
             editorHandler.removeEventListener("render", this.renderCallback);
-        if (this.terminateCallback)
-            editorHandler.removeEventListener("terminatingbot", this.terminateCallback);
         this.worker?.terminate();
         this.bots.clear();
     }

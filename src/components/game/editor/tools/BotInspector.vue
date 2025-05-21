@@ -7,7 +7,6 @@ import useGameStore from "../../../../gameStore.ts";
 import { tileSize } from "../../../../util/tileConstants";
 import { isInRange } from "../../../../util/distance";
 import { editorHandler } from "../../../../game/events/editorHandler.ts";
-import TerminatingBotEvent from "../../../../game/events/terminatingBotEvent.ts";
 
 const { selectedBot } = storeToRefs(useEditorStore());
 
@@ -29,7 +28,7 @@ function handleClick(event: ClickEvent) {
 }
 
 function terminateBot() {
-    editorHandler.dispatchEvent(new TerminatingBotEvent(selectedBot.value));
+    game.botManager.deleteBot(selectedBot.value);
 }
 
 onMounted(() => editorHandler.addEventListener("click", handleClick));
