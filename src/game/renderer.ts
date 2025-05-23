@@ -89,7 +89,7 @@ function drawTile(ctx: CanvasRenderingContext2D, tile: Tile) {
             break;
     }
     for (const box of getBoundingBoxes(data))
-        ctx.fillRect(box.topLeft.x + x, box.topLeft.y + y, box.width, box.height);
+        ctx.fillRect(box.x + x, box.y + y, box.width, box.height);
 }
 
 function drawGizmos(ctx: CanvasRenderingContext2D) {
