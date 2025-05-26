@@ -1,5 +1,6 @@
 import sendMessage from "./message.js";
 import { validateMove } from "../../util/movement.js";
+import { tileSize } from "../../util/tileConstants.js";
 
 /** @type {Map<string, Bot>} */
 const bots = new Map();
@@ -40,7 +41,7 @@ class Bot {
      * @return {boolean}
      */
     move(deltaX, deltaY) {
-        const { x, y, valid } = validateMove(this.#board, this.position, deltaX, deltaY);
+        const { x, y, valid } = validateMove(this.#board, this.position, deltaX, deltaY, tileSize * 0.5);
         if (valid)
             this.#request({ type: "move", deltaX, deltaY });
         else {

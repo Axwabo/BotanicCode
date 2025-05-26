@@ -1,22 +1,20 @@
 import { raycastTile } from "./raycast.js";
-import { tileSize } from "./tileConstants.js";
-
-const padding = tileSize * 0.5;
 
 /**
  * @param board {Board}
  * @param from {WorldPosition}
  * @param deltaX {number}
  * @param deltaY {number}
+ * @param radius {number}
  */
-export function validateMove(board, from, deltaX, deltaY) {
+export function validateMove(board, from, deltaX, deltaY, radius) {
     const toX = from.x + deltaX;
     const toY = from.y + deltaY;
     const angle = Math.atan2(deltaY, deltaX);
     const maxDistanceSquared = deltaX * deltaX + deltaY * deltaY;
-    const result = raycastTile(board, from.x, from.y, angle, maxDistanceSquared, padding);
+    const result = raycastTile(board, from.x, from.y, angle, maxDistanceSquared, radius);
     if (!result)
         return { x: toX, y: toY, valid: true };
     const { x, y } = result.hitPoint;
-    return { x: x - Math.cos(angle) * padding, y: y - Math.sin(angle) * padding, valid: false };
+    return { x: x - Math.cos(angle) * radius, y: y - Math.sin(angle) * radius, valid: false };
 }
