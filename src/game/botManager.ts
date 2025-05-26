@@ -9,23 +9,45 @@ import cloneData from "./cloneData.ts";
 import { reactive } from "vue";
 import AddGizmosEvent from "./events/addGizmosEvent.ts";
 import { type BotInstance, radius } from "./botInstance.ts";
+import type ManagedBoard from "./managedBoard.ts";
+import type EntityAddedEvent from "../util/world/events/entityAddedEvent";
+import type EntityPositionUpdatedEvent from "../util/world/events/entityPositionUpdatedEvent";
+import type EntityRemovedEvent from "../util/world/events/entityRemovedEvent";
+
+type EventHandler<T> = (event: T) => void;
+
+interface EventHandlers {
+    render: () => void;
+    entityAdded: EventHandler<EntityAddedEvent>;
+    entityPositionUpdated: EventHandler<EntityPositionUpdatedEvent>;
+    entityRemoved: EventHandler<EntityRemovedEvent>;
+}
 
 export default class BotManager {
-    private readonly board: Board;
+    private readonly board: ManagedBoard;
     private readonly worker?: Worker;
-    private readonly renderCallback?: () => void;
+    private readonly handlers?: EventHandlers;
     readonly bots: Map<string, BotInstance>;
 
-    constructor(board: Board, entryPoint?: string) {
+    constructor(board: ManagedBoard, entryPoint?: string) {
         editorHandler.dispatchEvent(new Event("workerinit"));
         this.board = board;
         this.bots = new Map<string, BotInstance>();
         if (!entryPoint)
             return;
         this.worker = new Worker(`${import.meta.env.BASE_URL}bot/sdk/run.js?t=${Date.now()}&entryPoint=${encodeURI(entryPoint.replace(/^\//, ""))}`, { type: "module" });
-        this.renderCallback = () => this.send({ type: "render" });
+        const callbacks: EventHandlers = {
+            render: () => this.send({ type: "render" }),
+            entityAdded: ev => this.sendAdd(ev),
+            entityPositionUpdated: ev => this.sendMove(ev),
+            entityRemoved: ev => this.sendRemove(ev)
+        };
+        this.handlers = callbacks;
         this.worker.addEventListener("message", event => this.handleMessage(event));
-        editorHandler.addEventListener("render", this.renderCallback);
+        editorHandler.addEventListener("render", callbacks.render);
+        board.addEventListener("entityadded", callbacks.entityAdded);
+        board.addEventListener("entitypositionupdated", callbacks.entityPositionUpdated);
+        board.addEventListener("entityremoved", callbacks.entityRemoved);
     }
 
     private handleMessage(event: MessageEvent<WorkerMessage>) {
@@ -81,8 +103,12 @@ export default class BotManager {
     }
 
     terminate() {
-        if (this.renderCallback)
-            editorHandler.removeEventListener("render", this.renderCallback);
+        if (this.handlers) {
+            editorHandler.removeEventListener("render", this.handlers.render);
+            this.board.removeEventListener("entityadded", this.handlers.entityAdded);
+            this.board.removeEventListener("entitypositionupdated", this.handlers.entityPositionUpdated);
+            this.board.removeEventListener("entityremoved", this.handlers.entityRemoved);
+        }
         this.worker?.terminate();
         this.bots.clear();
     }
@@ -97,5 +123,25 @@ export default class BotManager {
 
     private send(message: GameMessage) {
         this.worker?.postMessage(message);
+    }
+
+    private sendAdd(ev: EntityAddedEvent) {
+        this.send({
+            type: "entityAdd",
+            entity: {
+                id: ev.entity.id,
+                type: ev.entity.type,
+                radius: ev.entity.radius,
+                position: ev.entity.position
+            }
+        });
+    }
+
+    private sendMove(ev: EntityPositionUpdatedEvent) {
+        this.send({ type: "entityUpdate", id: ev.id, position: ev.position });
+    }
+
+    private sendRemove(ev: EntityRemovedEvent) {
+        this.send({ type: "entityRemove", id: ev.id });
     }
 }
