@@ -6,6 +6,7 @@ import type { Gizmo } from "../util/gizmos";
 import { editorHandler } from "./events/editorHandler.ts";
 import { getBoundingBoxes } from "../util/world/boundingBoxes";
 import { type BotInstance, radius as botRadius } from "./botInstance.ts";
+import type { Entity } from "../bot/sdk/entities";
 
 const gizmos: Gizmo[] = [];
 
@@ -25,6 +26,12 @@ export function render() {
             for (const row of game.board.getChunk(x, y).rows)
                 for (const tile of row.tiles)
                     drawTile(ctx, tile);
+    for (const entity of game.board.entities) {
+        const chunkX = worldToChunk(entity.position.x);
+        const chunkY = worldToChunk(entity.position.y);
+        if (chunkX >= startX && chunkX <= endX && chunkY >= startY && chunkY <= endY)
+            drawEntity(ctx, entity);
+    }
     ctx.font = "20px monospace";
     ctx.textBaseline = "bottom";
     ctx.textAlign = "center";
@@ -92,6 +99,18 @@ function drawTile(ctx: CanvasRenderingContext2D, tile: Tile) {
     }
     for (const box of getBoundingBoxes(data))
         ctx.fillRect(box.x + x, box.y + y, box.width, box.height);
+}
+
+function drawEntity(ctx: CanvasRenderingContext2D, entity: Entity) {
+    switch (entity.type) {
+        case "cow":
+            ctx.fillStyle = "#933d00";
+            break;
+    }
+    ctx.beginPath();
+    ctx.arc(entity.position.x, entity.position.y, entity.radius, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.closePath();
 }
 
 function drawGizmos(ctx: CanvasRenderingContext2D) {

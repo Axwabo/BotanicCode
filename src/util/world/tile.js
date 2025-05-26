@@ -25,8 +25,6 @@ export class Chunk {
     x;
     /** @type {number} */
     y;
-    /** @type {Set<Entity>} */
-    entities = new Set();
 
     /**
      * @param x {number}

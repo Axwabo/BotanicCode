@@ -5,8 +5,6 @@ import { canvasToWorld } from "./ctx.ts";
 import ClickEvent from "./events/clickEvent.ts";
 import { editorHandler } from "./events/editorHandler.ts";
 import type WorkerErrorEvent from "./events/workerErrorEvent.ts";
-import type TerminatingBotEvent from "./events/terminatingBotEvent.ts";
-import useEditorStore from "../editorStore.ts";
 import type TileUpdatedEvent from "../util/world/events/tileUpdatedEvent";
 
 const {
@@ -17,8 +15,6 @@ const {
     workerReady,
     workerError
 } = storeToRefs(useGameStore());
-
-const { selectedBot } = storeToRefs(useEditorStore());
 
 export default function beginLoop() {
     if (uiEventsRegistered.value)
@@ -34,8 +30,6 @@ export default function beginLoop() {
     editorHandler.addEventListener("workerinit", resetWorkerState);
     editorHandler.addEventListener("workerready", sendBoard);
     editorHandler.addEventListener("workererror", setError);
-
-    editorHandler.addEventListener("terminatingbot", deselectBot);
 
     editorHandler.addEventListener("tileupdated", updateTile);
 
@@ -120,11 +114,6 @@ function sendBoard() {
     workerReady.value = true;
     const { board, botManager } = game.value;
     botManager.sendBoard(board);
-}
-
-function deselectBot(event: TerminatingBotEvent) {
-    if (selectedBot.value === event.name)
-        selectedBot.value = "";
 }
 
 function updateTile(event: TileUpdatedEvent) {

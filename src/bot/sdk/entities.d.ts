@@ -8,7 +8,3 @@ export interface Entity {
     position: WorldPosition;
     radius: number;
 }
-
-export interface Movable {
-    move(deltaX: number, deltaY: number): boolean;
-}

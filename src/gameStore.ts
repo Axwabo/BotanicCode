@@ -1,9 +1,10 @@
 import { defineStore } from "pinia";
 import type { GameState } from "./game/gameState.ts";
-import { Board } from "./util/world/board.js";
 import BotManager from "./game/botManager.ts";
 import useEditorStore from "./editorStore.ts";
 import type { WorldPosition } from "./util/tile";
+import ManagedBoard from "./game/managedBoard.ts";
+import Cow from "./game/entities/cow.ts";
 
 interface Renderer {
     canvas: HTMLCanvasElement;
@@ -21,13 +22,14 @@ interface State {
 }
 
 function createBoard() {
-    const board = new Board();
+    const board = new ManagedBoard();
     board.getTile(-1, 1).type = "gravel";
     board.getTile(0, 1).type = "gravel";
     board.getTile(1, 1).type = "gravel";
     board.getTile(-1, 2).type = "dirt";
     board.getTile(0, 2).type = "dirt";
     board.getTile(1, 2).type = "dirt";
+    board.entities.add(new Cow(board, { x: 20, y: 40 }));
     return board;
 }
 
