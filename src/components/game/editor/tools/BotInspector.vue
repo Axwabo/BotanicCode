@@ -14,11 +14,11 @@ const { game } = useGameStore();
 
 const { workerReady, workerError } = storeToRefs(useGameStore());
 
-const bot = computed(() => game.botManager.bots.get(selectedBot.value));
+const bot = computed(() => game.botManager.bots.get(selectedBot.value)?.position);
 
 function handleClick(event: ClickEvent) {
     const { x, y } = event;
-    for (const [ name, position ] of game.botManager.bots) {
+    for (const { name, position } of game.botManager.bots.values()) {
         if (!isInRange(position.x, position.y, x, y, tileSize * 0.5))
             continue;
         selectedBot.value = name;

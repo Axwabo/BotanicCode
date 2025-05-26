@@ -1,6 +1,5 @@
 import type { Board } from "../util/world/board";
 import type { GameMessage, WorkerMessage } from "../util/messages";
-import type { WorldPosition } from "../util/tile";
 import type { BotRequest } from "../bot/sdk/requests";
 import { editorHandler } from "./events/editorHandler.ts";
 import WorkerErrorEvent from "./events/workerErrorEvent.ts";
@@ -9,18 +8,18 @@ import type TileUpdatedEvent from "../util/world/events/tileUpdatedEvent";
 import cloneData from "./cloneData.ts";
 import { reactive } from "vue";
 import AddGizmosEvent from "./events/addGizmosEvent.ts";
-import { tileSize } from "../util/tileConstants";
+import { type BotInstance, radius } from "./botInstance.ts";
 
 export default class BotManager {
     private readonly board: Board;
     private readonly worker?: Worker;
     private readonly renderCallback?: () => void;
-    readonly bots: Map<string, WorldPosition>; // TODO: managed bot instance
+    readonly bots: Map<string, BotInstance>;
 
     constructor(board: Board, entryPoint?: string) {
         editorHandler.dispatchEvent(new Event("workerinit"));
         this.board = board;
-        this.bots = new Map<string, WorldPosition>();
+        this.bots = new Map<string, BotInstance>();
         if (!entryPoint)
             return;
         this.worker = new Worker(`${import.meta.env.BASE_URL}bot/sdk/run.js?t=${Date.now()}&entryPoint=${encodeURI(entryPoint.replace(/^\//, ""))}`, { type: "module" });
@@ -53,17 +52,21 @@ export default class BotManager {
 
     private handleRequest(request: BotRequest, name: string) {
         if (request.type === "create") {
-            this.bots.set(name, reactive({ x: 0, y: 0 }));
+            this.bots.set(name, {
+                name,
+                position: reactive({ x: 0, y: 0 })
+            });
             return;
         }
         const bot = this.bots.get(name);
         if (!bot)
             return;
+        const position = bot.position;
         switch (request.type) {
             case "move":
-                const { x, y, valid } = validateMove(this.board, bot, request.deltaX, request.deltaY, tileSize * 0.5);
-                bot.x = x;
-                bot.y = y;
+                const { x, y, valid } = validateMove(this.board, position, request.deltaX, request.deltaY, radius);
+                position.x = x;
+                position.y = y;
                 if (!valid)
                     this.send({ type: "bot", name, response: { type: "position", x, y } });
                 break;

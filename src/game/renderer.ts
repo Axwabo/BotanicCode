@@ -1,10 +1,11 @@
 import getContext, { canvasToWorld } from "./ctx.ts";
 import { tileSize, worldToChunk } from "../util/tileConstants.js";
-import type { Tile, WorldPosition } from "../util/tile.d.ts";
+import type { Tile } from "../util/tile.d.ts";
 import { isInRange } from "../util/distance";
 import type { Gizmo } from "../util/gizmos";
 import { editorHandler } from "./events/editorHandler.ts";
 import { getBoundingBoxes } from "../util/world/boundingBoxes";
+import { type BotInstance, radius as botRadius } from "./botInstance.ts";
 
 const gizmos: Gizmo[] = [];
 
@@ -28,23 +29,24 @@ export function render() {
     ctx.textBaseline = "bottom";
     ctx.textAlign = "center";
     const { x: pointerWorldX, y: pointerWorldY } = canvasToWorld(pointerX, pointerY);
-    let highlightedBot: { name: string, position: WorldPosition } | undefined;
-    for (const [ name, position ] of game.botManager.bots) {
-        // TODO: better state presentation
+    let highlightedBot: BotInstance | undefined;
+    for (const bot of game.botManager.bots.values()) {
+        const { x, y } = bot.position;
         ctx.fillStyle = "white";
         ctx.beginPath();
-        ctx.arc(position.x, position.y, tileSize * 0.4, 0, Math.PI * 2);
+        ctx.arc(x, y, botRadius, 0, Math.PI * 2);
         ctx.fill();
         ctx.closePath();
-        if (tool === "Inspector" && isInRange(position.x, position.y, pointerWorldX, pointerWorldY, tileSize * 0.5))
-            highlightedBot = { name, position };
+        if (tool === "Inspector" && isInRange(x, y, pointerWorldX, pointerWorldY, botRadius))
+            highlightedBot = bot;
     }
     if (highlightedBot) {
         ctx.strokeStyle = "black";
         ctx.fillStyle = "white";
         ctx.lineWidth = 3;
-        ctx.strokeText(highlightedBot.name, highlightedBot.position.x, highlightedBot.position.y - tileSize * 0.5);
-        ctx.fillText(highlightedBot.name, highlightedBot.position.x, highlightedBot.position.y - tileSize * 0.5);
+        ctx.lineJoin = "round";
+        ctx.strokeText(highlightedBot.name, highlightedBot.position.x, highlightedBot.position.y - botRadius);
+        ctx.fillText(highlightedBot.name, highlightedBot.position.x, highlightedBot.position.y - botRadius);
     }
     if (tool !== "Inspector" && !isNaN(pointerWorldX) && !isNaN(pointerWorldY)) {
         ctx.fillStyle = "rgba(255, 255, 0, 0.3)";
