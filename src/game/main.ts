@@ -6,6 +6,7 @@ import ClickEvent from "./events/clickEvent.ts";
 import { editorHandler } from "./events/editorHandler.ts";
 import type WorkerErrorEvent from "./events/workerErrorEvent.ts";
 import type TileUpdatedEvent from "../util/world/events/tileUpdatedEvent";
+import tick from "./tick.ts";
 
 const {
     game,
@@ -15,6 +16,8 @@ const {
     workerReady,
     workerError
 } = storeToRefs(useGameStore());
+
+let previousTimestamp = 0;
 
 export default function beginLoop() {
     if (uiEventsRegistered.value)
@@ -33,10 +36,14 @@ export default function beginLoop() {
 
     editorHandler.addEventListener("tileupdated", updateTile);
 
-    loop();
+    previousTimestamp = performance.now();
+    requestAnimationFrame(loop);
 }
 
-function loop() {
+function loop(timestamp: number) {
+    const delta = (timestamp - previousTimestamp) * 0.001;
+    tick(game.value, delta);
+    previousTimestamp = timestamp;
     render();
     requestAnimationFrame(loop);
     editorHandler.dispatchEvent(new Event("render"));

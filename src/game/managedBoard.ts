@@ -1,6 +1,6 @@
 import { Board } from "../util/world/board";
-import type { Entity } from "../bot/sdk/entities";
+import type { ManagedEntity } from "./entities/interfaces.ts";
 
 export default class ManagedBoard extends Board {
-    readonly entities: Set<Entity> = new Set<Entity>();
+    readonly entities: Set<ManagedEntity> = new Set<ManagedEntity>();
 }

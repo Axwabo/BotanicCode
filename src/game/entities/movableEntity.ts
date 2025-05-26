@@ -1,14 +1,16 @@
 import type { WorldPosition } from "../../util/tile";
 import { validateMove } from "../../util/movement";
-import type { Entity, EntityType } from "../../bot/sdk/entities";
-import type ManagedBoard from "../managedBoard.ts";
+import type { EntityType } from "../../bot/sdk/entities";
+import ManagedBoard from "../managedBoard.ts";
+import type { ManagedEntity } from "./interfaces.ts";
 
-export default abstract class MovableEntity<T extends MovableEntity<T>> implements Entity {
+export default abstract class MovableEntity<T extends MovableEntity<T>> implements ManagedEntity {
     readonly id: string = crypto.randomUUID();
     readonly board: ManagedBoard;
     position: WorldPosition;
     abstract readonly type: EntityType;
     abstract radius: number;
+    private lifetime: number = 0;
 
     constructor(board: ManagedBoard, position: WorldPosition) {
         this.board = board;
@@ -21,6 +23,14 @@ export default abstract class MovableEntity<T extends MovableEntity<T>> implemen
         this.position.x = x;
         this.position.y = y;
         return valid;
+    }
+
+    tick(deltaSeconds: number): void {
+        this.lifetime += deltaSeconds;
+    }
+
+    get secondsLived() {
+        return this.lifetime;
     }
 
     remove() {
