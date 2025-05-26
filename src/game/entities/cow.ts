@@ -24,9 +24,14 @@ class CowMovement {
     tick(deltaSeconds: number) {
         if (this.target) {
             const { x, y } = normalize(this.target.x - this.position.x, this.target.y - this.position.y);
-            if (!this.cow.move(x * movementSpeed * deltaSeconds, y * movementSpeed * deltaSeconds)
-                || distanceSquared(this.target.x, this.target.y, this.position.x, this.position.y) < 0.1)
+            if (!this.cow.move(x * movementSpeed * deltaSeconds, y * movementSpeed * deltaSeconds)) {
                 this.target = undefined;
+                return;
+            }
+            if (distanceSquared(this.target.x, this.target.y, this.position.x, this.position.y) > 0.1)
+                return;
+            this.cow.move(this.target.x - this.position.x, this.target.y - this.position.y);
+            this.target = undefined;
             return;
         }
         if ((this.waitTime -= deltaSeconds) > 0)
