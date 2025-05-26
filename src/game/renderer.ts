@@ -111,6 +111,13 @@ function drawEntity(ctx: CanvasRenderingContext2D, entity: Entity) {
     ctx.arc(entity.position.x, entity.position.y, entity.radius, 0, Math.PI * 2);
     ctx.fill();
     ctx.closePath();
+    switch (entity.type) {
+        case "cow":
+            ctx.fillStyle = "#aaa";
+            ctx.fillRect(entity.position.x - 10, entity.position.y - entity.radius * 0.5, 4, -15);
+            ctx.fillRect(entity.position.x + 10, entity.position.y - entity.radius * 0.5, 4, -15);
+            break;
+    }
 }
 
 function drawGizmos(ctx: CanvasRenderingContext2D) {
