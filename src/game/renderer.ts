@@ -29,7 +29,7 @@ export function render() {
     for (const entity of game.board.entities) {
         const chunkX = worldToChunk(entity.position.x);
         const chunkY = worldToChunk(entity.position.y);
-        if (chunkX >= startX && chunkX <= endX && chunkY >= startY && chunkY <= endY)
+        if (chunkX >= startX - 0.5 && chunkX <= endX + 0.5 && chunkY >= startY - 0.5 && chunkY <= endY + 0.5)
             drawEntity(ctx, entity);
     }
     ctx.font = "20px monospace";
