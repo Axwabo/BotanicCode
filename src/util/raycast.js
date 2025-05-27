@@ -1,5 +1,7 @@
 import { tileSize } from "./tileConstants.js";
 import { getBoundingBoxes } from "./world/boundingBoxes.js";
+import isWorker from "./environment.js";
+import sendMessage from "../bot/sdk/message.js";
 
 /**
  * @param board {Board}
@@ -20,6 +22,21 @@ export function raycastTile(board, x, y, angle, maxDistanceSquared, padding = 0)
     let currentDistanceSquared = 0;
     while (currentDistanceSquared < maxDistanceSquared) {
         const tile = board.getTileAt(x + offsetX, y + offsetY);
+        if (isWorker) {
+            sendMessage({
+                type: "drawGizmos",
+                gizmos: [
+                    {
+                        type: "rectangle",
+                        color: "#aaa9",
+                        position: { x: tile.x * tileSize, y: tile.y * tileSize },
+                        width: tileSize,
+                        height: tileSize
+                    },
+
+                ]
+            });
+        }
         if (tile.data)
             return intersectTile(x, y, offsetX, offsetY, tile);
         offsetX += deltaX;
@@ -27,6 +44,21 @@ export function raycastTile(board, x, y, angle, maxDistanceSquared, padding = 0)
         currentDistanceSquared = offsetX * offsetX + offsetY * offsetY;
     }
     const tile = board.getTileAt(x + offsetX, y + offsetY);
+    if (isWorker) {
+        sendMessage({
+            type: "drawGizmos",
+            gizmos: [
+                {
+                    type: "rectangle",
+                    color: "#aaa9",
+                    position: { x: tile.x * tileSize, y: tile.y * tileSize },
+                    width: tileSize,
+                    height: tileSize
+                },
+
+            ]
+        });
+    }
     if (!tile.data)
         return undefined;
     const result = intersectTile(x, y, offsetX, offsetY, tile);
@@ -82,7 +114,24 @@ function intersectTile(x, y, deltaX, deltaY, tile) {
 // Determine the intersection point of two line segments
 // Return FALSE if the lines don't intersect
 function intersect(x1, y1, x2, y2, x3, y3, x4, y4) {
-
+    if (isWorker) {
+        sendMessage({
+            type: "drawGizmos", gizmos: [
+                {
+                    type: "line",
+                    color: "red",
+                    position: { x: x1, y: y1 },
+                    points: [ { x: x2, y: y2 } ]
+                },
+                {
+                    type: "line",
+                    color: "blue",
+                    position: { x: x3, y: y3 },
+                    points: [ { x: x4, y: y4 } ]
+                }
+            ]
+        });
+    }
     // Check if none of the lines are of length 0
     if (x1 === x2 && y1 === y2 || x3 === x4 && y3 === y4) {
         return false;

@@ -21,43 +21,16 @@ export function validateMove(board, from, deltaX, deltaY, radius) {
     }
     const sideOffsetX = Math.sin(angle) * radius;
     const sideOffsetY = -Math.cos(angle) * radius;
+    const halfRadiusSquared = radius * radius * 0.25;
     if (isWorker) {
         sendMessage({ type: "clearGizmos" });
-        sendMessage({
-            type: "drawGizmos",
-            gizmos: [
-                {
-                    type: "point",
-                    color: "black",
-                    position: from,
-                    radius: 2
-                },
-                {
-                    type: "point",
-                    color: "blue",
-                    position: { x: from.x + sideOffsetX, y: from.y + sideOffsetY },
-                    radius: 2
-                },
-                {
-                    type: "point",
-                    color: "red",
-                    position: { x: from.x - sideOffsetX, y: from.y - sideOffsetY },
-                    radius: 2
-                }
-            ]
-        });
     }
-    const halfRadiusSquared = radius * radius * 0.25;
     const right = raycastTile(board, from.x + sideOffsetX, from.y + sideOffsetY, angle, halfRadiusSquared);
-    if (isWorker)
-        console.log(right)
     if (right) {
         const { x, y } = right.hitPoint;
         return { x: x - sideOffsetX, y: y - sideOffsetY, valid: false };
     }
     const left = raycastTile(board, from.x - sideOffsetX, from.y - sideOffsetY, angle, halfRadiusSquared);
-    if (isWorker)
-        console.log(left)
     if (left) {
         const { x, y } = left.hitPoint;
         return { x: x + sideOffsetX, y: y + sideOffsetY, valid: false };
