@@ -138,7 +138,7 @@ export default class BotManager {
     }
 
     private sendMove(ev: EntityPositionUpdatedEvent) {
-        this.send({ type: "entityUpdate", id: ev.id, position: ev.position });
+        this.send({ type: "entityUpdate", id: ev.id, position: { ...ev.position } });
     }
 
     private sendRemove(ev: EntityRemovedEvent) {
