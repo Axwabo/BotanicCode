@@ -5,8 +5,9 @@ import { isInRange } from "../util/distance";
 import type { Gizmo } from "../util/gizmos";
 import { editorHandler } from "./events/editorHandler.ts";
 import { getBoundingBoxes } from "../util/world/boundingBoxes";
-import { type BotInstance, radius as botRadius } from "./botInstance.ts";
+import { type BotInstance } from "./botInstance.ts";
 import type { Entity } from "../bot/sdk/entities";
+import { botRadius } from "../bot/sdk/bot.js";
 
 const gizmos: Gizmo[] = [];
 

@@ -23,13 +23,18 @@ export function validateMove(board, from, deltaX, deltaY, radius) {
     const sideOffsetY = -Math.cos(angle) * radius;
     const halfRadiusSquared = radius * radius * 0.25;
     if (isWorker) {
+        console.log(radius, halfRadiusSquared)
         sendMessage({ type: "clearGizmos" });
+        console.log("right")
     }
+
     const right = raycastTile(board, from.x + sideOffsetX, from.y + sideOffsetY, angle, halfRadiusSquared);
     if (right) {
         const { x, y } = right.hitPoint;
         return { x: x - sideOffsetX, y: y - sideOffsetY, valid: false };
     }
+    if (isWorker)
+        console.log("left")
     const left = raycastTile(board, from.x - sideOffsetX, from.y - sideOffsetY, angle, halfRadiusSquared);
     if (left) {
         const { x, y } = left.hitPoint;

@@ -4,9 +4,9 @@ import useEditorStore from "../../../../editorStore.ts";
 import { computed, onMounted, onUnmounted } from "vue";
 import type ClickEvent from "../../../../game/events/clickEvent.ts";
 import useGameStore from "../../../../gameStore.ts";
-import { tileSize } from "../../../../util/tileConstants";
 import { isInRange } from "../../../../util/distance";
 import { editorHandler } from "../../../../game/events/editorHandler.ts";
+import { botRadius } from "../../../../bot/sdk/bot.js";
 
 const { selectedBot } = storeToRefs(useEditorStore());
 
@@ -19,7 +19,7 @@ const bot = computed(() => game.botManager.bots.get(selectedBot.value)?.position
 function handleClick(event: ClickEvent) {
     const { x, y } = event;
     for (const { name, position } of game.botManager.bots.values()) {
-        if (!isInRange(position.x, position.y, x, y, tileSize * 0.5))
+        if (!isInRange(position.x, position.y, x, y, botRadius))
             continue;
         selectedBot.value = name;
         return;

@@ -8,11 +8,12 @@ import type TileUpdatedEvent from "../util/world/events/tileUpdatedEvent";
 import cloneData from "./cloneData.ts";
 import { reactive } from "vue";
 import AddGizmosEvent from "./events/addGizmosEvent.ts";
-import { type BotInstance, radius } from "./botInstance.ts";
+import { type BotInstance } from "./botInstance.ts";
 import type ManagedBoard from "./managedBoard.ts";
 import type EntityAddedEvent from "../util/world/events/entityAddedEvent";
 import type EntityPositionUpdatedEvent from "../util/world/events/entityPositionUpdatedEvent";
 import type EntityRemovedEvent from "../util/world/events/entityRemovedEvent";
+import { botRadius } from "../bot/sdk/bot.js";
 
 type EventHandler<T> = (event: T) => void;
 
@@ -86,7 +87,7 @@ export default class BotManager {
         const position = bot.position;
         switch (request.type) {
             case "move":
-                const { x, y, valid } = validateMove(this.board, position, request.deltaX, request.deltaY, radius);
+                const { x, y, valid } = validateMove(this.board, position, request.deltaX, request.deltaY, botRadius);
                 position.x = x;
                 position.y = y;
                 if (!valid)

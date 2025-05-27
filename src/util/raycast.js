@@ -38,7 +38,7 @@ export function raycastTile(board, x, y, angle, maxDistanceSquared, padding = 0)
             });
         }
         if (tile.data)
-            return intersectTile(x, y, offsetX, offsetY, tile);
+            return intersectTile(x, y, offsetX, offsetY, tile, maxDistanceSquared);
         offsetX += deltaX;
         offsetY += deltaY;
         currentDistanceSquared = offsetX * offsetX + offsetY * offsetY;
@@ -59,10 +59,7 @@ export function raycastTile(board, x, y, angle, maxDistanceSquared, padding = 0)
             ]
         });
     }
-    if (!tile.data)
-        return undefined;
-    const result = intersectTile(x, y, offsetX, offsetY, tile);
-    return result && result.distanceSquared <= maxDistanceSquared ? result : undefined;
+    return tile.data ? intersectTile(x, y, offsetX, offsetY, tile, maxDistanceSquared) : undefined;
 }
 
 /**
@@ -71,9 +68,10 @@ export function raycastTile(board, x, y, angle, maxDistanceSquared, padding = 0)
  * @param deltaX {number}
  * @param deltaY {number}
  * @param tile {Tile}
+ * @param maxDistanceSquared {number}
  * @return {RaycastResult | undefined}
  */
-function intersectTile(x, y, deltaX, deltaY, tile) {
+function intersectTile(x, y, deltaX, deltaY, tile, maxDistanceSquared) {
     const boxes = getBoundingBoxes(tile.data);
     const tileX = tile.x * tileSize;
     const tileY = tile.y * tileSize;
@@ -102,7 +100,9 @@ function intersectTile(x, y, deltaX, deltaY, tile) {
         const a = x - result.x;
         const b = y - result.y;
         const distanceSquared = a * a + b * b;
-        if (distanceSquared >= minDistanceSquared)
+        if (isWorker)
+            console.log(x, y, result, distanceSquared, maxDistanceSquared)
+        if (distanceSquared > maxDistanceSquared || distanceSquared >= minDistanceSquared)
             continue;
         minDistanceSquared = distanceSquared;
         hitPoint = result;
