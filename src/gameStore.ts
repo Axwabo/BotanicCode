@@ -77,6 +77,7 @@ const useGameStore = defineStore("game", {
             this.game.botManager.terminate();
             this.game.board = createBoard();
             this.game.zoom = 1;
+            this.workerReady = false;
         }
     }
 });
