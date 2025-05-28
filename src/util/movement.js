@@ -23,13 +23,15 @@ export function validateMove(board, from, deltaX, deltaY, radius) {
     const right = rightTile.data ? intersectTile(from.x + sideOffsetX, from.y + sideOffsetY, deltaX, deltaY, rightTile, maxDistanceSquared) : undefined;
     if (right) {
         const { x, y } = right.hitPoint;
-        return { x: x - sideOffsetX, y: y - sideOffsetY, valid: false }; // TODO: fix backtracing
+        const distance = Math.sqrt(right.distanceSquared);
+        return { x: x - sideOffsetX - Math.cos(angle) * distance, y: y - sideOffsetY - Math.sin(angle) * distance, valid: false }; // TODO: fix backtracing
     }
     const leftTile = board.getTileAt(from.x - sideOffsetX, from.y - sideOffsetY);
     const left = leftTile.data ? intersectTile(from.x - sideOffsetX, from.y - sideOffsetY, deltaX, deltaY, leftTile, maxDistanceSquared) : undefined;
     if (left) {
         const { x, y } = left.hitPoint;
-        return { x: x + sideOffsetX, y: y + sideOffsetY, valid: false };
+        const distance = Math.sqrt(left.distanceSquared);
+        return { x: x + sideOffsetX - Math.cos(angle) * distance, y: y + sideOffsetY - Math.sin(angle) * distance, valid: false };
     }
     return { x: toX, y: toY, valid: true };
 }
