@@ -109,7 +109,7 @@ function handleMouseMove(event: MouseEvent) {
 
 function handleWheel(event: WheelEvent) {
     if (!notCanvas(event))
-        game.value.zoom = Math.min(3, Math.max(0.1, game.value.zoom - Math.sign(event.deltaY) * 0.1));
+        game.value.zoom = Math.min(3, Math.max(0.5, game.value.zoom - Math.sign(event.deltaY) * 0.1));
 }
 
 function resetWorkerState() {

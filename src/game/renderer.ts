@@ -22,7 +22,7 @@ export function render() {
     const { x, y } = game.position;
     ctx.translate(-x, -y);
     ctx.scale(game.zoom, game.zoom);
-    const { startX, startY, endX, endY } = viewportChunks(x, y, width, height);
+    const { startX, startY, endX, endY } = viewportChunks(x, y, width, height, game.zoom);
     for (let x = startX; x <= endX; x++)
         for (let y = startY; y <= endY; y++)
             for (const row of game.board.getChunk(x, y).rows)
@@ -68,15 +68,19 @@ export function render() {
     ctx.fillStyle = "white";
     ctx.fillText(`X: ${x} (chunk: ${Math.floor(worldToChunk(x))})`, 5, 5);
     ctx.fillText(`Y: ${y} (chunk: ${Math.floor(worldToChunk(y))})`, 5, 25);
+    ctx.fillText(`Zoom: ${game.zoom.toFixed(1)}x`, 5, 45);
 }
 
-function viewportChunks(x: number, y: number, width: number, height: number) {
+function viewportChunks(x: number, y: number, width: number, height: number, zoom: number) {
+    // TODO: fix zoom
     const chunkX = Math.floor(worldToChunk(x));
     const chunkY = Math.floor(worldToChunk(y));
-    const startX = chunkX - Math.ceil(worldToChunk(width * 0.5));
-    const startY = chunkY - Math.ceil(worldToChunk(height * 0.5));
-    const endX = chunkX + Math.ceil(worldToChunk(width * 0.5));
-    const endY = chunkY + Math.ceil(worldToChunk(height * 0.5));
+    const halfWidth = width / zoom * 0.5;
+    const halfHeight = height / zoom * 0.5;
+    const startX = chunkX - Math.ceil(worldToChunk(halfWidth));
+    const startY = chunkY - Math.ceil(worldToChunk(halfHeight));
+    const endX = chunkX + Math.ceil(worldToChunk(halfWidth));
+    const endY = chunkY + Math.ceil(worldToChunk(halfHeight));
     return { startX, startY, endX, endY };
 }
 
