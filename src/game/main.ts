@@ -1,7 +1,7 @@
 import { render } from "./renderer.ts";
 import { storeToRefs } from "pinia";
 import useGameStore from "../gameStore.ts";
-import getContext, { canvasToWorld } from "./ctx.ts";
+import { canvasToWorld } from "./ctx.ts";
 import ClickEvent from "./events/clickEvent.ts";
 import { editorHandler } from "./events/editorHandler.ts";
 import type WorkerErrorEvent from "./events/workerErrorEvent.ts";
@@ -110,15 +110,12 @@ function handleMouseMove(event: MouseEvent) {
 function handleWheel(event: WheelEvent) {
     if (notCanvas(event))
         return;
-    const { width, height } = getContext();
     const previousWorld = canvasToWorld(event.offsetX, event.offsetY);
-    const zoom = game.value.zoom = Math.min(3, Math.max(0.5, game.value.zoom - Math.sign(event.deltaY) * 0.1));
+    const previousZoom = game.value.zoom;
+    game.value.zoom = Math.min(3, Math.max(0.5, previousZoom - Math.sign(event.deltaY) * 0.1));
     const currentWorld = canvasToWorld(event.offsetX, event.offsetY);
-    const offsetX = currentWorld.x - previousWorld.x;
-    const offsetY = currentWorld.y - previousWorld.y;
-    const center = canvasToWorld(width * 0.5, height * 0.5);
-    game.value.position.x = Math.floor(center.x - offsetX / zoom);
-    game.value.position.y = Math.floor(center.y - offsetY / zoom);
+    game.value.position.x += Math.floor(previousWorld.x - currentWorld.x);
+    game.value.position.y += Math.floor(previousWorld.y - currentWorld.y);
 }
 
 function resetWorkerState() {
