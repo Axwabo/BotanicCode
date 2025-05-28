@@ -114,6 +114,9 @@ function drawEntity(ctx: CanvasRenderingContext2D, entity: Entity) {
         case "pig":
             ctx.fillStyle = "#f99";
             break;
+        case "sheep":
+            ctx.fillStyle = "#ddd";
+            break;
     }
     ctx.beginPath();
     const { x, y } = entity.position;
@@ -122,9 +125,10 @@ function drawEntity(ctx: CanvasRenderingContext2D, entity: Entity) {
     ctx.closePath();
     switch (entity.type) {
         case "cow":
+        case "sheep":
             ctx.fillStyle = "#aaa";
-            ctx.fillRect(x - 10, y - entity.radius * 0.5, 4, -15);
-            ctx.fillRect(x + 10, y - entity.radius * 0.5, 4, -15);
+            ctx.fillRect(x - 12, y - entity.radius * 0.5, 4, -15);
+            ctx.fillRect(x + 8, y - entity.radius * 0.5, 4, -15);
             break;
         case "pig":
             ctx.fillStyle = "#a55";

@@ -1,6 +1,6 @@
 import type { WorldPosition } from "../../util/tile";
 
-export type EntityType = "cow" | "pig";
+export type EntityType = "cow" | "pig" | "sheep";
 
 export interface Updatable {
     tick(deltaSeconds: number): void;
