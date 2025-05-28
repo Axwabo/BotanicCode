@@ -17,12 +17,15 @@ export function raycastTile(board, x, y, angle, maxDistanceSquared, padding = 0)
     const sin = Math.sin(angle);
     const deltaX = cos * tileSize;
     const deltaY = sin * tileSize;
+    if (!padding)
+        padding = Math.sqrt(maxDistanceSquared);
     let offsetX = cos * padding;
     let offsetY = sin * padding;
     let currentDistanceSquared = 0;
     while (currentDistanceSquared < maxDistanceSquared) {
         const tile = board.getTileAt(x + offsetX, y + offsetY);
         if (isWorker) {
+            console.log(tile)
             sendMessage({
                 type: "drawGizmos",
                 gizmos: [
