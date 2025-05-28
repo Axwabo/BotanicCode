@@ -5,5 +5,6 @@ import type ManagedBoard from "./managedBoard.ts";
 export interface GameState {
     board: ManagedBoard;
     position: WorldPosition;
+    zoom: number;
     botManager: BotManager;
 }

@@ -21,6 +21,7 @@ export function render() {
     ctx.translate(Math.floor(width * 0.5), Math.floor(height * 0.5));
     const { x, y } = game.position;
     ctx.translate(-x, -y);
+    ctx.scale(game.zoom, game.zoom);
     const { startX, startY, endX, endY } = viewportChunks(x, y, width, height);
     for (let x = startX; x <= endX; x++)
         for (let y = startY; y <= endY; y++)

@@ -29,6 +29,7 @@ export default function beginLoop() {
     window.addEventListener("mousedown", handleMouseDown);
     window.addEventListener("mouseup", handleMouseUp);
     window.addEventListener("mousemove", handleMouseMove);
+    window.addEventListener("wheel", handleWheel);
 
     editorHandler.addEventListener("workerinit", resetWorkerState);
     editorHandler.addEventListener("workerready", sendBoard);
@@ -104,6 +105,11 @@ function handleMouseMove(event: MouseEvent) {
         return;
     game.value.position.x -= event.movementX;
     game.value.position.y -= event.movementY;
+}
+
+function handleWheel(event: WheelEvent) {
+    if (!notCanvas(event))
+        game.value.zoom = Math.min(3, Math.max(0.1, game.value.zoom - Math.sign(event.deltaY) * 0.1));
 }
 
 function resetWorkerState() {

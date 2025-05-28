@@ -44,6 +44,7 @@ const useGameStore = defineStore("game", {
                     x: 0,
                     y: 0
                 },
+                zoom: 1,
                 botManager: new BotManager(board)
             },
             dragging: false,
@@ -65,6 +66,7 @@ const useGameStore = defineStore("game", {
             useEditorStore().selectedBot = "";
             this.game.botManager.terminate();
             this.game.board = createBoard();
+            this.game.zoom = 1;
         }
     }
 });
