@@ -1,8 +1,6 @@
-import type { Entity } from "../../bot/sdk/entities";
+import type { Entity, Updatable } from "../../bot/sdk/entities";
 
-export interface ManagedEntity extends Entity {
-    tick(deltaSeconds: number): void;
-
+export interface ManagedEntity extends Entity, Updatable {
     get secondsLived(): number;
 
     remove(): void;

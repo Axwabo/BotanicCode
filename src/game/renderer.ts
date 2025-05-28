@@ -101,10 +101,15 @@ function drawTile(ctx: CanvasRenderingContext2D, tile: Tile) {
     switch (data.type) {
         case "fence":
             ctx.fillStyle = "orange";
+            for (const box of getBoundingBoxes(data))
+                ctx.fillRect(box.x + x, box.y + y, box.width, box.height);
+            break;
+        case "wheat":
+            ctx.fillStyle = `hsl(${120 - 60 * data.growthPercentage}, 50%, 50%)`;
+            for (let i = 2; i < tileSize; i += 4)
+                ctx.fillRect(x + i, y + tileSize - 2, 3, -tileSize * 0.5);
             break;
     }
-    for (const box of getBoundingBoxes(data))
-        ctx.fillRect(box.x + x, box.y + y, box.width, box.height);
 }
 
 function drawEntity(ctx: CanvasRenderingContext2D, entity: Entity) {

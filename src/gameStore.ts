@@ -29,6 +29,16 @@ function createBoard() {
     board.getTile(-1, 2).type = "dirt";
     board.getTile(0, 2).type = "dirt";
     board.getTile(1, 2).type = "dirt";
+    board.getTile(0, 2).data = {
+        type: "wheat",
+        ageSeconds: 0,
+        tick(deltaSeconds: number) {
+            this.ageSeconds += deltaSeconds;
+        },
+        get growthPercentage(): number {
+            return Math.min(1, this.ageSeconds / 20);
+        }
+    };
     board.entities.add(new Cow(board, { x: 20, y: 40 }));
     return board;
 }

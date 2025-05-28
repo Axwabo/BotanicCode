@@ -1,4 +1,5 @@
 import type { Chunk } from "./world/tile.js";
+import type { Updatable } from "../bot/sdk/entities";
 
 export interface WorldPosition {
     x: number;
@@ -23,11 +24,21 @@ export interface Tile {
 
 export type Facing = "north" | "east" | "south" | "west";
 
-export type TileData = Fence; // TODO: more tile data types
+export type TileData = Fence | Wheat;
 
 export interface Fence {
     type: "fence";
     posts: Facing[];
+}
+
+export interface GrowingPlant extends Updatable {
+    ageSeconds: number;
+
+    get growthPercentage(): number;
+}
+
+export interface Wheat extends GrowingPlant {
+    type: "wheat";
 }
 
 interface ChunkRow {
