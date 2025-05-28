@@ -78,7 +78,8 @@ export default class BotManager {
             this.bots.set(name, {
                 name,
                 position: reactive({ x: 0, y: 0 }),
-                inventory: new Map()
+                inventory: new Map(),
+                chunkSeconds: new Map()
             });
             return;
         }
