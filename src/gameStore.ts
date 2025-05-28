@@ -5,6 +5,7 @@ import useEditorStore from "./editorStore.ts";
 import type { WorldPosition } from "./util/tile";
 import ManagedBoard from "./game/managedBoard.ts";
 import Cow from "./game/entities/cow.ts";
+import Pig from "./game/entities/pig.ts";
 
 interface Renderer {
     canvas: HTMLCanvasElement;
@@ -40,6 +41,7 @@ function createBoard() {
         }
     };
     board.entities.add(new Cow(board, { x: 20, y: 40 }));
+    board.entities.add(new Pig(board, { x: -20, y: -40 }));
     return board;
 }
 
