@@ -5,6 +5,7 @@ import TileUpdatedEvent from "../../util/world/events/tileUpdatedEvent.js";
 import EntityAddedEvent from "../../util/world/events/entityAddedEvent.js";
 import EntityPositionUpdatedEvent from "../../util/world/events/entityPositionUpdatedEvent.js";
 import EntityRemovedEvent from "../../util/world/events/entityRemovedEvent.js";
+import PickUpEvent from "../../util/world/events/pickUpEvent.js";
 
 addEventListener("message", handleMessage);
 
@@ -58,6 +59,9 @@ function handleResponse(bot, response) {
         case "position":
             bot.position.x = response.x;
             bot.position.y = response.y;
+            break;
+        case "pickUp":
+            dispatchEvent(new PickUpEvent(bot.name, response.item, response.count));
             break;
     }
 }

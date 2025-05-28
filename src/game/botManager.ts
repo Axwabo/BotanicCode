@@ -77,7 +77,8 @@ export default class BotManager {
         if (request.type === "create") {
             this.bots.set(name, {
                 name,
-                position: reactive({ x: 0, y: 0 })
+                position: reactive({ x: 0, y: 0 }),
+                inventory: new Map()
             });
             return;
         }
@@ -95,6 +96,9 @@ export default class BotManager {
                 break;
             case "terminate":
                 this.bots.delete(name);
+                break;
+            case "harvest":
+                // TODO
                 break;
         }
     }

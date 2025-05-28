@@ -6,6 +6,8 @@ export const botRadius = tileSize * 0.4;
 
 /** @type {Map<string, Bot>} */
 const bots = new Map();
+/** @type {Map<string, Inventory>} */
+const inventories = new Map();
 
 class Bot {
     /** @type {string} */
@@ -25,6 +27,7 @@ class Bot {
         this.#board = board;
         this.position = { x: 0, y: 0 };
         bots.set(name, this);
+        inventories.set(name, new Map());
         this.#request({ type: "create" });
     }
 
@@ -59,10 +62,16 @@ class Bot {
     terminate() {
         this.#terminated = true;
         this.#request({ type: "terminate" });
+        inventories.delete(this.name);
     }
 
     get isTerminated() {
         return this.#terminated;
+    }
+
+    /** @returns {Inventory} */
+    get inventory() {
+        return inventories.get(this.name);
     }
 }
 
@@ -84,3 +93,10 @@ export function iterateBots() {
     return bots.values();
 }
 
+addEventListener("pickup", /** @param ev {PickUpEvent} */ev => {
+    const inventory = inventories.get(ev.botName);
+    if (!inventory)
+        return;
+    const current = inventory.get(ev.itemType) ?? 0;
+    inventory.set(ev.itemType, current + ev.count);
+});
