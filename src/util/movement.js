@@ -1,6 +1,4 @@
-import { raycastTile } from "./raycast.js";
-import isWorker from "./environment.js";
-import sendMessage from "../bot/sdk/message.js";
+import { intersectTile, raycastTile } from "./raycast.js";
 
 /**
  * @param board {Board}
@@ -21,20 +19,14 @@ export function validateMove(board, from, deltaX, deltaY, radius) {
     }
     const sideOffsetX = Math.sin(angle) * radius;
     const sideOffsetY = -Math.cos(angle) * radius;
-    const halfRadiusSquared = radius * radius * 0.25;
-    if (isWorker) {
-        sendMessage({ type: "clearGizmos" });
-    }
-    if (isWorker)
-        console.log("right")
-    const right = raycastTile(board, from.x + sideOffsetX, from.y + sideOffsetY, angle, halfRadiusSquared);
+    const rightTile = board.getTileAt(from.x + sideOffsetX, from.y + sideOffsetY);
+    const right = rightTile.data ? intersectTile(from.x + sideOffsetX, from.y + sideOffsetY, deltaX, deltaY, rightTile, maxDistanceSquared) : undefined;
     if (right) {
         const { x, y } = right.hitPoint;
-        return { x: x - sideOffsetX, y: y - sideOffsetY, valid: false };
+        return { x: x - sideOffsetX, y: y - sideOffsetY, valid: false }; // TODO: fix backtracing
     }
-    const left = raycastTile(board, from.x - sideOffsetX, from.y - sideOffsetY, angle, halfRadiusSquared);
-    if (isWorker)
-        console.log("left")
+    const leftTile = board.getTileAt(from.x - sideOffsetX, from.y - sideOffsetY);
+    const left = leftTile.data ? intersectTile(from.x - sideOffsetX, from.y - sideOffsetY, deltaX, deltaY, leftTile, maxDistanceSquared) : undefined;
     if (left) {
         const { x, y } = left.hitPoint;
         return { x: x + sideOffsetX, y: y + sideOffsetY, valid: false };
