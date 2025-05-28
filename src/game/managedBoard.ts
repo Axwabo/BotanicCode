@@ -3,6 +3,7 @@ import type { ManagedEntity } from "./entities/interfaces.ts";
 import type EntityAddedEvent from "../util/world/events/entityAddedEvent.js";
 import type EntityPositionUpdatedEvent from "../util/world/events/entityPositionUpdatedEvent.js";
 import type EntityRemovedEvent from "../util/world/events/entityRemovedEvent";
+import type { Chunk } from "../util/world/tile";
 
 interface EventMap {
     entityadded: EntityAddedEvent;
@@ -13,6 +14,7 @@ interface EventMap {
 export default class ManagedBoard extends Board {
     readonly entities: Set<ManagedEntity> = new Set<ManagedEntity>();
     private target = new EventTarget();
+    readonly loadedChunks: Set<Chunk> = new Set<Chunk>();
 
     addEventListener<E extends keyof EventMap>(type: E, callback: (event: EventMap[E]) => void, options?: AddEventListenerOptions | boolean) {
         this.target.addEventListener(type, <EventListener>callback, options);
