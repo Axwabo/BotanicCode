@@ -49,14 +49,8 @@ export function render() {
         if (tool === "Inspector" && isInRange(x, y, pointerWorldX, pointerWorldY, botRadius))
             highlightedBot = bot;
     }
-    if (highlightedBot) {
-        ctx.strokeStyle = "black";
-        ctx.fillStyle = "white";
-        ctx.lineWidth = 3;
-        ctx.lineJoin = "round";
-        ctx.strokeText(highlightedBot.name, highlightedBot.position.x, highlightedBot.position.y - botRadius);
-        ctx.fillText(highlightedBot.name, highlightedBot.position.x, highlightedBot.position.y - botRadius);
-    }
+    if (highlightedBot)
+        drawHighlighted(ctx, highlightedBot);
     if (tool !== "Inspector" && !isNaN(pointerWorldX) && !isNaN(pointerWorldY)) {
         ctx.fillStyle = "rgba(255, 255, 0, 0.3)";
         ctx.fillRect(Math.floor(pointerWorldX / tileSize) * tileSize, Math.floor(pointerWorldY / tileSize) * tileSize, tileSize, tileSize);
@@ -128,6 +122,24 @@ function drawEntity(ctx: CanvasRenderingContext2D, entity: Entity) {
             ctx.fillRect(entity.position.x - 10, entity.position.y - entity.radius * 0.5, 4, -15);
             ctx.fillRect(entity.position.x + 10, entity.position.y - entity.radius * 0.5, 4, -15);
             break;
+    }
+}
+
+function drawHighlighted(ctx: CanvasRenderingContext2D, highlightedBot: BotInstance) {
+    const { name, position: { x, y } } = highlightedBot;
+    ctx.strokeStyle = "black";
+    ctx.fillStyle = "white";
+    ctx.lineWidth = 3;
+    ctx.lineJoin = "round";
+    ctx.strokeText(name, x, y - botRadius);
+    ctx.fillText(name, x, y - botRadius);
+    ctx.font = "15px Arial";
+    let drawY = y - botRadius - 22;
+    for (const [ type, count ] of highlightedBot.inventory) {
+        const text = `${type} x${count}`;
+        ctx.strokeText(text, x, drawY);
+        ctx.fillText(text, x, drawY);
+        drawY -= 17;
     }
 }
 

@@ -4,7 +4,7 @@ import type { BotRequest } from "../bot/sdk/requests";
 import { editorHandler } from "./events/editorHandler.ts";
 import WorkerErrorEvent from "./events/workerErrorEvent.ts";
 import { validateMove } from "../util/movement";
-import type TileUpdatedEvent from "../util/world/events/tileUpdatedEvent";
+import TileUpdatedEvent from "../util/world/events/tileUpdatedEvent";
 import cloneData from "./cloneData.ts";
 import { reactive } from "vue";
 import AddGizmosEvent from "./events/addGizmosEvent.ts";
@@ -98,7 +98,17 @@ export default class BotManager {
                 this.bots.delete(name);
                 break;
             case "harvest":
-                // TODO
+                const tile = this.board.getTileAt(position.x, position.y);
+                const data = tile.data;
+                if (data?.type !== "wheat")
+                    break;
+                const count = Math.floor(5 * data.growthPercentage);
+                if (count === 0)
+                    break;
+                bot.inventory.set("wheat", (bot.inventory.get("wheat") ?? 0) + count);
+                this.send({ type: "bot", name, response: { type: "pickUp", item: "wheat", count } });
+                tile.data = undefined;
+                editorHandler.dispatchEvent(new TileUpdatedEvent(tile));
                 break;
         }
     }
