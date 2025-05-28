@@ -37,8 +37,11 @@ export function raycastTile(board, x, y, angle, maxDistanceSquared, padding = 0)
                 ]
             });
         }
-        if (tile.data)
-            return intersectTile(x, y, offsetX, offsetY, tile, maxDistanceSquared);
+        if (tile.data) {
+            const result = intersectTile(x, y, offsetX, offsetY, tile, maxDistanceSquared);
+            if (result)
+                return result;
+        }
         offsetX += deltaX;
         offsetY += deltaY;
         currentDistanceSquared = offsetX * offsetX + offsetY * offsetY;
