@@ -17,6 +17,10 @@ function getLoadedChunks(game: GameState, deltaSeconds: number) {
         loadedChunks.add(game.board.getChunk(currentChunk.x - 1, currentChunk.y));
         loadedChunks.add(game.board.getChunk(currentChunk.x, currentChunk.y + 1));
         loadedChunks.add(game.board.getChunk(currentChunk.x, currentChunk.y - 1));
+        loadedChunks.add(game.board.getChunk(currentChunk.x + 1, currentChunk.y + 1));
+        loadedChunks.add(game.board.getChunk(currentChunk.x - 1, currentChunk.y - 1));
+        loadedChunks.add(game.board.getChunk(currentChunk.x + 1, currentChunk.y - 1));
+        loadedChunks.add(game.board.getChunk(currentChunk.x - 1, currentChunk.y + 1));
         for (const [ chunk, seconds ] of bot.chunkSeconds) {
             if (chunk === currentChunk)
                 continue;
