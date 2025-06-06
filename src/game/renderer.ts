@@ -1,5 +1,5 @@
 import getContext, { canvasToWorld } from "./ctx.ts";
-import { tileSize, worldToChunk } from "../util/tileConstants.js";
+import { tileSize, tilesPerChunk, worldToChunk } from "../util/tileConstants.js";
 import type { Tile } from "../util/tile.d.ts";
 import { isInRange } from "../util/distance";
 import type { Gizmo } from "../util/gizmos";
@@ -24,10 +24,16 @@ export function render() {
     ctx.scale(game.zoom, game.zoom);
     const { startX, startY, endX, endY } = viewportChunks(x, y, width, height, game.zoom);
     for (let x = startX; x <= endX; x++)
-        for (let y = startY; y <= endY; y++)
-            for (const row of game.board.getChunk(x, y).rows)
+        for (let y = startY; y <= endY; y++) {
+            const chunk = game.board.getChunk(x, y);
+            for (const row of chunk.rows)
                 for (const tile of row.tiles)
                     drawTile(ctx, tile);
+            if (game.loadedChunks.has(chunk))
+                continue;
+            ctx.fillStyle = "rgba(120, 120, 120, 0.3)";
+            ctx.fillRect(chunk.x * tilesPerChunk * tileSize, chunk.y * tilesPerChunk * tileSize, tilesPerChunk * tileSize, tilesPerChunk * tileSize);
+        }
     for (const entity of game.board.entities) {
         const chunkX = worldToChunk(entity.position.x);
         const chunkY = worldToChunk(entity.position.y);
@@ -57,6 +63,7 @@ export function render() {
     }
     drawGizmos(ctx);
     ctx.resetTransform();
+    ctx.font = "20px monospace";
     ctx.textBaseline = "top";
     ctx.textAlign = "left";
     ctx.fillStyle = "white";

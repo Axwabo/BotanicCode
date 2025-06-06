@@ -15,7 +15,7 @@ export default abstract class MovableEntity<T extends MovableEntity<T>> implemen
     abstract radius: number;
     private lifetime: number = 0;
 
-    constructor(board: ManagedBoard, position: WorldPosition) {
+    protected constructor(board: ManagedBoard, position: WorldPosition) {
         this.board = board;
         this.position = position;
         this.board.entities.add(this);

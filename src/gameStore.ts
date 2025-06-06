@@ -68,7 +68,8 @@ const useGameStore = defineStore("game", {
                     y: 0
                 },
                 zoom: 1,
-                botManager: new BotManager(board)
+                botManager: new BotManager(board),
+                loadedChunks: new Set()
             },
             dragging: false,
             uiEventsRegistered: false,
