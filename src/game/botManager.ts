@@ -104,13 +104,13 @@ export default class BotManager {
             case "harvest": {
                 const tile = this.board.getTileAt(position.x, position.y);
                 const data = tile.data;
-                if (data?.type !== "wheat")
+                if (!data || !("growthPercentage" in data))
                     break;
                 const count = Math.floor(5 * data.growthPercentage);
                 if (count === 0)
                     break;
-                modifyInventory(bot.inventory, "wheat", count);
-                this.send({ type: "bot", name, response: { type: "pickUp", item: "wheat", count } });
+                modifyInventory(bot.inventory, data.type, count);
+                this.send({ type: "bot", name, response: { type: "pickUp", item: data.type, count } });
                 tile.data = undefined;
                 editorHandler.dispatchEvent(new TileUpdatedEvent(tile));
                 break;
