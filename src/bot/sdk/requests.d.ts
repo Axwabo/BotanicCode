@@ -1,6 +1,7 @@
 import type { ItemType } from "./items";
+import type { PlantType } from "../../util/tile";
 
-export type BotRequest = Create | Move | Terminate | Harvest;
+export type BotRequest = Create | Move | Terminate | Harvest | Plant;
 export type BotResponse = Terminate | PositionUpdate | PickUp;
 
 interface Create {
@@ -19,6 +20,11 @@ interface Terminate {
 
 export interface Harvest {
     type: "harvest";
+}
+
+interface Plant {
+    type: "plant";
+    kind: PlantType;
 }
 
 interface PositionUpdate {

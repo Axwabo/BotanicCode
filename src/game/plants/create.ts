@@ -1,8 +1,17 @@
 import type { Board } from "../../util/world/board";
 import type { GrowingPlant, PlantType } from "../../util/tile";
+import { editorHandler } from "../events/editorHandler.ts";
+import TileUpdatedEvent from "../../util/world/events/tileUpdatedEvent";
 
-function plant(board: Board, tileX: number, tileY: number, type: PlantType, maxAge: number) {
+const ages: Record<PlantType, number> = {
+    carrot: 20,
+    wheat: 30,
+    potato: 35
+};
+
+export function plant(board: Board, tileX: number, tileY: number, type: PlantType) {
     const tile = board.getTile(tileX, tileY);
+    const maxAge = ages[type];
     const plant: GrowingPlant = {
         type,
         ageSeconds: 0,
@@ -14,17 +23,6 @@ function plant(board: Board, tileX: number, tileY: number, type: PlantType, maxA
         }
     };
     tile.data = plant;
+    editorHandler.dispatchEvent(new TileUpdatedEvent(tile));
     return plant;
-}
-
-export function plantWheat(board: Board, tileX: number, tileY: number) {
-    return plant(board, tileX, tileY, "wheat", 30);
-}
-
-export function plantCarrot(board: Board, tileX: number, tileY: number) {
-    return plant(board, tileX, tileY, "carrot", 20);
-}
-
-export function plantPotato(board: Board, tileX: number, tileY: number) {
-    return plant(board, tileX, tileY, "potato", 20);
 }

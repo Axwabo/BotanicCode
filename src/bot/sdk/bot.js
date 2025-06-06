@@ -1,6 +1,7 @@
 import sendMessage from "./message.js";
 import { validateMove } from "../../util/movement.js";
 import { tileSize } from "../../util/tileConstants.js";
+import { modifyInventory } from "../../util/inventoryHelper.js";
 
 export const botRadius = tileSize * 0.4;
 
@@ -95,8 +96,6 @@ export function iterateBots() {
 
 addEventListener("pickup", /** @param ev {PickUpEvent} */ev => {
     const inventory = inventories.get(ev.botName);
-    if (!inventory)
-        return;
-    const current = inventory.get(ev.itemType) ?? 0;
-    inventory.set(ev.itemType, current + ev.count);
+    if (inventory)
+        modifyInventory(inventory, ev.itemType, ev.count);
 });

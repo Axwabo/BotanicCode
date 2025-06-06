@@ -14,6 +14,9 @@ import type EntityAddedEvent from "../util/world/events/entityAddedEvent";
 import type EntityPositionUpdatedEvent from "../util/world/events/entityPositionUpdatedEvent";
 import type EntityRemovedEvent from "../util/world/events/entityRemovedEvent";
 import { botRadius } from "../bot/sdk/bot.js";
+import { plant } from "./plants/create.ts";
+import { worldToTile } from "../util/tileConstants";
+import { modifyInventory } from "../util/inventoryHelper";
 
 type EventHandler<T> = (event: T) => void;
 
@@ -98,7 +101,7 @@ export default class BotManager {
             case "terminate":
                 this.bots.delete(name);
                 break;
-            case "harvest":
+            case "harvest": {
                 const tile = this.board.getTileAt(position.x, position.y);
                 const data = tile.data;
                 if (data?.type !== "wheat")
@@ -106,11 +109,21 @@ export default class BotManager {
                 const count = Math.floor(5 * data.growthPercentage);
                 if (count === 0)
                     break;
-                bot.inventory.set("wheat", (bot.inventory.get("wheat") ?? 0) + count);
+                modifyInventory(bot.inventory, "wheat", count);
                 this.send({ type: "bot", name, response: { type: "pickUp", item: "wheat", count } });
                 tile.data = undefined;
                 editorHandler.dispatchEvent(new TileUpdatedEvent(tile));
                 break;
+            }
+            case "plant": {
+                const amount = bot.inventory.get(request.kind) ?? 0;
+                if (amount <= 0)
+                    break;
+                modifyInventory(bot.inventory, request.kind, -1);
+                this.send({ type: "bot", name, response: { type: "pickUp", item: request.kind, count: -1 } });
+                plant(this.board, Math.floor(worldToTile(position.x)), Math.floor(worldToTile(position.y)), request.kind);
+                break;
+            }
         }
     }
 
