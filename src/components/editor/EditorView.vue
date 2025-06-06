@@ -1,14 +1,13 @@
 <script setup lang="ts">
-import { defineAsyncComponent, ref, watch } from "vue";
+import { defineAsyncComponent, watch } from "vue";
 import useFileStore from "../../fileStore.ts";
 import { storeToRefs } from "pinia";
 import Loading from "./Loading.vue";
 import EditorList from "./EditorList.vue";
+import EditorTitleBar from "./EditorTitleBar.vue";
 
 const { currentFile } = storeToRefs(useFileStore());
-const { navigate, editors, get, save } = useFileStore();
-
-const saving = ref(false);
+const { navigate, editors, get } = useFileStore();
 
 const monaco = defineAsyncComponent({
     delay: 0,
@@ -18,23 +17,6 @@ const monaco = defineAsyncComponent({
         return await import("./MonacoEditor.vue");
     }
 });
-
-async function saveChanges() {
-    saving.value = true;
-    try {
-        const path = currentFile.value;
-        await save(path, editors.get(path)!.contents());
-    } finally {
-        saving.value = false;
-    }
-}
-
-function handleSave(event: KeyboardEvent) {
-    if (!event.ctrlKey || event.key !== "s")
-        return;
-    saveChanges();
-    event.preventDefault();
-}
 
 watch(currentFile, async value => {
     if (!value)
@@ -50,10 +32,9 @@ watch(currentFile, async value => {
 
 <template>
     <div class="view-title-bar">
-        <span class="view-label">Editor</span>
-        <button v-on:click="saveChanges();" v-bind:disabled="saving">Save Changes</button>
+        <EditorTitleBar/>
     </div>
-    <div id="editorContainer" v-on:keydown="handleSave">
+    <div id="editorContainer">
         <EditorList/>
         <div id="currentEditor">
             <monaco v-if="editors.size" v-for="file in editors.keys()" v-show="file === currentFile" :key="file" :path="file"/>

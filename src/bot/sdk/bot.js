@@ -1,8 +1,14 @@
 import sendMessage from "./message.js";
 import { validateMove } from "../../util/movement.js";
+import { tileSize } from "../../util/tileConstants.js";
+import { modifyInventory } from "../../util/inventoryHelper.js";
+
+export const botRadius = tileSize * 0.4;
 
 /** @type {Map<string, Bot>} */
 const bots = new Map();
+/** @type {Map<string, Inventory>} */
+const inventories = new Map();
 
 class Bot {
     /** @type {string} */
@@ -22,6 +28,7 @@ class Bot {
         this.#board = board;
         this.position = { x: 0, y: 0 };
         bots.set(name, this);
+        inventories.set(name, new Map());
         this.#request({ type: "create" });
     }
 
@@ -40,7 +47,7 @@ class Bot {
      * @return {boolean}
      */
     move(deltaX, deltaY) {
-        const { x, y, valid } = validateMove(this.#board, this.position, deltaX, deltaY);
+        const { x, y, valid } = validateMove(this.#board, this.position, deltaX, deltaY, botRadius);
         if (valid)
             this.#request({ type: "move", deltaX, deltaY });
         else {
@@ -53,13 +60,28 @@ class Bot {
         return valid;
     }
 
+    harvest() {
+        this.#request({ type: "harvest" });
+    }
+
+    /** @param plantType {PlantType} */
+    plant(plantType) {
+        this.#request({ type: "plant", kind: plantType });
+    }
+
     terminate() {
         this.#terminated = true;
         this.#request({ type: "terminate" });
+        inventories.delete(this.name);
     }
 
     get isTerminated() {
         return this.#terminated;
+    }
+
+    /** @returns {Inventory} */
+    get inventory() {
+        return inventories.get(this.name);
     }
 }
 
@@ -81,3 +103,8 @@ export function iterateBots() {
     return bots.values();
 }
 
+addEventListener("pickup", /** @param ev {PickUpEvent} */ev => {
+    const inventory = inventories.get(ev.botName);
+    if (inventory)
+        modifyInventory(inventory, ev.itemType, ev.count);
+});

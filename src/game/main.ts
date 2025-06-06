@@ -5,9 +5,8 @@ import { canvasToWorld } from "./ctx.ts";
 import ClickEvent from "./events/clickEvent.ts";
 import { editorHandler } from "./events/editorHandler.ts";
 import type WorkerErrorEvent from "./events/workerErrorEvent.ts";
-import type TerminatingBotEvent from "./events/terminatingBotEvent.ts";
-import useEditorStore from "../editorStore.ts";
 import type TileUpdatedEvent from "../util/world/events/tileUpdatedEvent";
+import tick from "./tick.ts";
 
 const {
     game,
@@ -18,7 +17,7 @@ const {
     workerError
 } = storeToRefs(useGameStore());
 
-const { selectedBot } = storeToRefs(useEditorStore());
+let previousTimestamp = 0;
 
 export default function beginLoop() {
     if (uiEventsRegistered.value)
@@ -30,19 +29,22 @@ export default function beginLoop() {
     window.addEventListener("mousedown", handleMouseDown);
     window.addEventListener("mouseup", handleMouseUp);
     window.addEventListener("mousemove", handleMouseMove);
+    window.addEventListener("wheel", handleWheel);
 
     editorHandler.addEventListener("workerinit", resetWorkerState);
     editorHandler.addEventListener("workerready", sendBoard);
     editorHandler.addEventListener("workererror", setError);
 
-    editorHandler.addEventListener("terminatingbot", deselectBot);
-
     editorHandler.addEventListener("tileupdated", updateTile);
 
-    loop();
+    previousTimestamp = performance.now();
+    requestAnimationFrame(loop);
 }
 
-function loop() {
+function loop(timestamp: number) {
+    const delta = (timestamp - previousTimestamp) * 0.001;
+    tick(game.value, delta);
+    previousTimestamp = timestamp;
     render();
     requestAnimationFrame(loop);
     editorHandler.dispatchEvent(new Event("render"));
@@ -105,6 +107,17 @@ function handleMouseMove(event: MouseEvent) {
     game.value.position.y -= event.movementY;
 }
 
+function handleWheel(event: WheelEvent) {
+    if (notCanvas(event))
+        return;
+    const previousWorld = canvasToWorld(event.offsetX, event.offsetY);
+    const previousZoom = game.value.zoom;
+    game.value.zoom = Math.min(3, Math.max(0.5, previousZoom - Math.sign(event.deltaY) * 0.1));
+    const currentWorld = canvasToWorld(event.offsetX, event.offsetY);
+    game.value.position.x += Math.floor(previousWorld.x - currentWorld.x);
+    game.value.position.y += Math.floor(previousWorld.y - currentWorld.y);
+}
+
 function resetWorkerState() {
     workerReady.value = false;
     workerError.value = undefined;
@@ -120,11 +133,6 @@ function sendBoard() {
     workerReady.value = true;
     const { board, botManager } = game.value;
     botManager.sendBoard(board);
-}
-
-function deselectBot(event: TerminatingBotEvent) {
-    if (selectedBot.value === event.name)
-        selectedBot.value = "";
 }
 
 function updateTile(event: TileUpdatedEvent) {

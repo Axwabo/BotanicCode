@@ -21,3 +21,8 @@ export function distanceSquared(sx, sy, ex, ey) {
     const y = sy - ey;
     return x * x + y * y;
 }
+
+export function normalize(deltaX, deltaY) {
+    const length = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+    return { x: deltaX / length, y: deltaY / length };
+}

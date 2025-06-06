@@ -1,31 +1,31 @@
 <script setup lang="ts">
 import { ref } from "vue";
+import { storeToRefs } from "pinia";
+import useFileStore from "../../fileStore.ts";
 
-const total = ref(0);
-const current = ref(0);
+const caching = ref(false);
 const hidden = ref(false);
 
 const channel = new BroadcastChannel("BotanicCodePrecache");
 
 channel.addEventListener("message", handlePrecaching);
 
+const { swActivated } = storeToRefs(useFileStore());
+
 function handlePrecaching(ev: MessageEvent) {
-    if (ev.data?.type !== "precaching")
-        return;
-    current.value = ev.data.current;
-    if (ev.data.total)
-        total.value = ev.data.total;
+    if (ev.data?.type === "precaching")
+        caching.value = true;
 }
 </script>
 
 <template>
-    <div id="precacheProgress" v-if="total && !hidden">
+    <div id="precacheProgress" v-if="caching && !hidden">
         <div>
             <button v-on:click="hidden = true" class="close">X</button>
-            <span v-if="current === total">Precaching completed</span>
-            <span v-else>Precaching: {{ current }}/{{ total }}</span>
+            <span v-if="swActivated">Precaching completed</span>
+            <span v-else>Precaching...</span>
         </div>
-        <progress :value="current" :max="total" class="progressbar"></progress>
+        <progress :value="swActivated ? 1 : undefined" class="progressbar"></progress>
     </div>
 </template>
 

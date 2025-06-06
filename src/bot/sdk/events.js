@@ -2,6 +2,10 @@ import WorldLoadedEvent from "../../util/world/events/worldLoadedEvent.js";
 import createBoardFromJson from "../../util/world/worldDeserializer.js";
 import { getBot } from "./bot.js";
 import TileUpdatedEvent from "../../util/world/events/tileUpdatedEvent.js";
+import EntityAddedEvent from "../../util/world/events/entityAddedEvent.js";
+import EntityPositionUpdatedEvent from "../../util/world/events/entityPositionUpdatedEvent.js";
+import EntityRemovedEvent from "../../util/world/events/entityRemovedEvent.js";
+import PickUpEvent from "../../util/world/events/pickUpEvent.js";
 
 addEventListener("message", handleMessage);
 
@@ -30,6 +34,16 @@ function handleMessage(ev) {
             const bot = getBot(ev.data.name);
             if (bot)
                 handleResponse(bot, ev.data.response);
+            break;
+        case "entityAdd":
+            dispatchEvent(new EntityAddedEvent(ev.data.entity));
+            break;
+        case "entityUpdate":
+            dispatchEvent(new EntityPositionUpdatedEvent(ev.data.id, ev.data.position));
+            break;
+        case "entityRemove":
+            dispatchEvent(new EntityRemovedEvent(ev.data.id));
+            break;
     }
 }
 
@@ -45,6 +59,9 @@ function handleResponse(bot, response) {
         case "position":
             bot.position.x = response.x;
             bot.position.y = response.y;
+            break;
+        case "pickUp":
+            dispatchEvent(new PickUpEvent(bot.name, response.item, response.count));
             break;
     }
 }

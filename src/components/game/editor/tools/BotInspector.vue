@@ -4,10 +4,9 @@ import useEditorStore from "../../../../editorStore.ts";
 import { computed, onMounted, onUnmounted } from "vue";
 import type ClickEvent from "../../../../game/events/clickEvent.ts";
 import useGameStore from "../../../../gameStore.ts";
-import { tileSize } from "../../../../util/tileConstants";
 import { isInRange } from "../../../../util/distance";
 import { editorHandler } from "../../../../game/events/editorHandler.ts";
-import TerminatingBotEvent from "../../../../game/events/terminatingBotEvent.ts";
+import { botRadius } from "../../../../bot/sdk/bot.js";
 
 const { selectedBot } = storeToRefs(useEditorStore());
 
@@ -15,12 +14,12 @@ const { game } = useGameStore();
 
 const { workerReady, workerError } = storeToRefs(useGameStore());
 
-const bot = computed(() => game.botManager.bots.get(selectedBot.value));
+const bot = computed(() => game.botManager.bots.get(selectedBot.value)?.position);
 
 function handleClick(event: ClickEvent) {
     const { x, y } = event;
-    for (const [ name, position ] of game.botManager.bots) {
-        if (!isInRange(position.x, position.y, x, y, tileSize * 0.5))
+    for (const { name, position } of game.botManager.bots.values()) {
+        if (!isInRange(position.x, position.y, x, y, botRadius))
             continue;
         selectedBot.value = name;
         return;
@@ -29,7 +28,7 @@ function handleClick(event: ClickEvent) {
 }
 
 function terminateBot() {
-    editorHandler.dispatchEvent(new TerminatingBotEvent(selectedBot.value));
+    game.botManager.deleteBot(selectedBot.value);
 }
 
 onMounted(() => editorHandler.addEventListener("click", handleClick));
@@ -40,7 +39,7 @@ onUnmounted(() => editorHandler.removeEventListener("click", handleClick));
     <div id="botInspector">
         <div v-if="selectedBot && bot" class="details">
             <h2 class="bot-name">{{ selectedBot }}</h2>
-            <span>X: {{ bot.x }} Y: {{ bot.y }}</span>
+            <span>X: {{ bot.x.toFixed(2) }} Y: {{ bot.y.toFixed(2) }}</span>
             <button v-on:click="terminateBot">Terminate</button>
         </div>
         <p v-else>Click a bot to inspect</p>
@@ -55,7 +54,7 @@ onUnmounted(() => editorHandler.removeEventListener("click", handleClick));
 #botInspector {
     min-height: 0;
     display: grid;
-    grid-template-columns: 8rem 1fr;
+    grid-template-columns: minmax(10rem, max-content) 1fr;
     gap: 0.5rem;
 }
 

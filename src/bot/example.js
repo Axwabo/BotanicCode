@@ -17,6 +17,5 @@ while (!bot.isTerminated) {
         continue;
     const { x, y } = bot.position;
     console.log(`Changed direction in chunk ${Math.floor(worldToChunk(x))} ${Math.floor(worldToChunk(y))}`);
-    bot.move(-moveX, -moveY);
     moveIndex++;
 }

@@ -3,7 +3,7 @@ import { storeToRefs } from "pinia";
 import useFileStore from "../../fileStore.ts";
 import { ref, watch } from "vue";
 
-const { files, close } = useFileStore();
+const { delete: remove } = useFileStore();
 
 const { deleteConfirmation } = storeToRefs(useFileStore());
 
@@ -23,9 +23,7 @@ async function deleteFile() {
     deleting.value = true;
     try {
         const file = deleteConfirmation.value;
-        await fetch(file, { method: "DELETE" });
-        close(file);
-        files.delete(file);
+        await remove(file);
         deleteConfirmation.value = "";
     } finally {
         deleting.value = false;
