@@ -51,7 +51,6 @@ export function render() {
         ctx.beginPath();
         ctx.arc(x, y, botRadius, 0, Math.PI * 2);
         ctx.fill();
-        ctx.closePath();
         if (tool === "Inspector" && isInRange(x, y, pointerWorldX, pointerWorldY, botRadius))
             highlightedBot = bot;
     }
@@ -116,7 +115,6 @@ function drawTile(ctx: CanvasRenderingContext2D, tile: Tile) {
             ctx.moveTo(x + tileSize * 0.5, y + tileSize * 0.9);
             ctx.lineTo(x + tileSize * (0.5 - (data.growthPercentage + 0.1) * 0.2), y + tileSize * (0.9 - (data.growthPercentage + 0.1) * 0.5));
             ctx.lineTo(x + tileSize * (0.5 + (data.growthPercentage + 0.1) * 0.2), y + tileSize * (0.9 - (data.growthPercentage + 0.1) * 0.5));
-            ctx.closePath();
             ctx.fill();
             break;
     }
@@ -133,12 +131,14 @@ function drawEntity(ctx: CanvasRenderingContext2D, entity: Entity) {
         case "sheep":
             ctx.fillStyle = "#ddd";
             break;
+        case "chicken":
+            ctx.fillStyle = "#dc862a";
+            break;
     }
     ctx.beginPath();
     const { x, y } = entity.position;
     ctx.arc(x, y, entity.radius, 0, Math.PI * 2);
     ctx.fill();
-    ctx.closePath();
     switch (entity.type) {
         case "cow":
         case "sheep":
@@ -152,7 +152,24 @@ function drawEntity(ctx: CanvasRenderingContext2D, entity: Entity) {
             ctx.arc(x - 7, y, 4, 0, Math.PI * 2);
             ctx.arc(x + 7, y, 4, 0, Math.PI * 2);
             ctx.fill();
+            break;
+        case "chicken":
+            ctx.fillStyle = "#e8d29d";
+            ctx.beginPath();
+            ctx.moveTo(x - 3, y);
+            ctx.lineTo(x + 3, y);
+            ctx.lineTo(x, y + 3);
             ctx.closePath();
+            ctx.fill();
+            ctx.fillStyle = "#f00";
+            ctx.beginPath();
+            ctx.moveTo(x, y - entity.radius);
+            ctx.lineTo(x, y - entity.radius - 4);
+            ctx.lineTo(x - 3, y - entity.radius + 2);
+            ctx.lineTo(x - 3, y - entity.radius - 4);
+            ctx.lineTo(x - 6, y - entity.radius + 4);
+            ctx.closePath();
+            ctx.fill();
             break;
     }
 }
@@ -185,7 +202,6 @@ function drawGizmos(ctx: CanvasRenderingContext2D) {
                 ctx.beginPath();
                 ctx.arc(x, y, gizmo.radius, 0, Math.PI * 2);
                 ctx.fill();
-                ctx.closePath();
                 break;
             case "rectangle":
                 ctx.fillRect(x, y, gizmo.width, gizmo.height);
@@ -197,7 +213,6 @@ function drawGizmos(ctx: CanvasRenderingContext2D) {
                 for (const { x, y } of gizmo.points)
                     ctx.lineTo(x, y);
                 ctx.stroke();
-                ctx.closePath();
                 break;
         }
     }

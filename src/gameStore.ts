@@ -4,8 +4,7 @@ import BotManager from "./game/botManager.ts";
 import useEditorStore from "./editorStore.ts";
 import type { WorldPosition } from "./util/tile";
 import ManagedBoard from "./game/managedBoard.ts";
-import IdlingEntity from "./game/entities/idlingEntity.ts";
-import { tileSize } from "./util/tileConstants";
+import { createChicken, createCow, createPig, createSheep } from "./game/entities/create.ts";
 
 interface Renderer {
     canvas: HTMLCanvasElement;
@@ -50,9 +49,10 @@ function createBoard() {
             return Math.min(1, this.ageSeconds / 20);
         }
     };
-    board.entities.add(new IdlingEntity(board, { x: 20, y: 40 }, "cow", tileSize * 0.8, tileSize * 0.5));
-    board.entities.add(new IdlingEntity(board, { x: -20, y: -40 }, "pig", tileSize * 0.6, tileSize * 0.6));
-    board.entities.add(new IdlingEntity(board, { x: 20, y: -40 }, "sheep", tileSize * 0.5, tileSize * 0.6));
+    createCow(board, { x: 20, y: 40 });
+    createPig(board, { x: -20, y: -40 });
+    createSheep(board, { x: 20, y: -40 });
+    createChicken(board, { x: -20, y: 40 });
     return board;
 }
 
