@@ -31,7 +31,10 @@ export interface Fence {
     posts: Facing[];
 }
 
+export type PlantType = Extract<TileData, GrowingPlant>["type"];
+
 export interface GrowingPlant extends Updatable {
+    type: PlantType;
     ageSeconds: number;
 
     get growthPercentage(): number;
