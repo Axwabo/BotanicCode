@@ -6,7 +6,9 @@ import TileUpdatedEvent from "../../util/world/events/tileUpdatedEvent";
 const ages: Record<PlantType, number> = {
     carrot: 20,
     wheat: 30,
-    potato: 35
+    potato: 35,
+    tomato: 25,
+    strawberry: 20
 };
 
 export function plant(board: Board, tileX: number, tileY: number, type: PlantType) {

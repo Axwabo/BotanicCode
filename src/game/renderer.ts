@@ -131,6 +131,20 @@ function drawTile(ctx: CanvasRenderingContext2D, tile: Tile) {
             );
             ctx.fill();
             break;
+        case "tomato":
+            ctx.fillStyle = "#ff2f00";
+            ctx.beginPath();
+            ctx.arc(x + tileSize * 0.5, y + tileSize * 0.7, (data.growthPercentage * 0.1 + 0.1) * tileSize, 0, Math.PI * 2);
+            ctx.fill();
+            break;
+        case "strawberry":
+            ctx.fillStyle = "#bd0a39";
+            ctx.beginPath();
+            ctx.moveTo(x + tileSize * 0.5, y + tileSize * 0.8);
+            ctx.lineTo(x + tileSize * (0.5 - (data.growthPercentage + 0.1) * 0.2), y + tileSize * (0.8 - (data.growthPercentage + 0.1) * 0.15));
+            ctx.lineTo(x + tileSize * (0.5 + (data.growthPercentage + 0.1) * 0.2), y + tileSize * (0.8 - (data.growthPercentage + 0.1) * 0.15));
+            ctx.fill();
+            break;
     }
 }
 

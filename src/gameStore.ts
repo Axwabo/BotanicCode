@@ -33,6 +33,8 @@ function createBoard() {
     plant(board, 0, 2, "wheat");
     plant(board, 1, 2, "carrot");
     plant(board, 2, 2, "potato");
+    plant(board, 3, 2, "tomato");
+    plant(board, 4, 2, "strawberry");
     createCow(board, { x: 20, y: 40 });
     createPig(board, { x: -20, y: -40 });
     createSheep(board, { x: 20, y: -40 });
