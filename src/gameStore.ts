@@ -5,7 +5,7 @@ import useEditorStore from "./editorStore.ts";
 import type { WorldPosition } from "./util/tile";
 import ManagedBoard from "./game/managedBoard.ts";
 import { createChicken, createCow, createPig, createSheep } from "./game/entities/create.ts";
-import { plantCarrot, plantWheat } from "./game/plants/create.ts";
+import { plantCarrot, plantPotato, plantWheat } from "./game/plants/create.ts";
 
 interface Renderer {
     canvas: HTMLCanvasElement;
@@ -32,6 +32,7 @@ function createBoard() {
     board.getTile(1, 2).type = "dirt";
     plantWheat(board, 0, 2);
     plantCarrot(board, 1, 2);
+    plantPotato(board, 2, 2);
     createCow(board, { x: 20, y: 40 });
     createPig(board, { x: -20, y: -40 });
     createSheep(board, { x: 20, y: -40 });

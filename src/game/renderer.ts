@@ -117,6 +117,20 @@ function drawTile(ctx: CanvasRenderingContext2D, tile: Tile) {
             ctx.lineTo(x + tileSize * (0.5 + (data.growthPercentage + 0.1) * 0.2), y + tileSize * (0.9 - (data.growthPercentage + 0.1) * 0.5));
             ctx.fill();
             break;
+        case "potato":
+            ctx.fillStyle = "#a17d42";
+            ctx.beginPath();
+            ctx.ellipse(
+                x + tileSize * 0.5,
+                y + tileSize * 0.7,
+                (data.growthPercentage * 0.2 + 0.05) * tileSize,
+                (data.growthPercentage * 0.1 + 0.05) * tileSize,
+                0,
+                0,
+                Math.PI * 2
+            );
+            ctx.fill();
+            break;
     }
 }
 

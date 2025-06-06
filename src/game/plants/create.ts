@@ -24,3 +24,7 @@ export function plantWheat(board: Board, tileX: number, tileY: number) {
 export function plantCarrot(board: Board, tileX: number, tileY: number) {
     return plant(board, tileX, tileY, "carrot", 20);
 }
+
+export function plantPotato(board: Board, tileX: number, tileY: number) {
+    return plant(board, tileX, tileY, "potato", 20);
+}
