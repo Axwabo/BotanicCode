@@ -107,8 +107,8 @@ function drawTile(ctx: CanvasRenderingContext2D, tile: Tile) {
             ctx.fillStyle = "#f50";
             ctx.beginPath();
             ctx.moveTo(x + tileSize * 0.5, y + tileSize * 0.9);
-            ctx.lineTo(x + tileSize * (0.5 - data.growthPercentage * 0.25), y + tileSize * (0.9 - data.growthPercentage * 0.5));
-            ctx.lineTo(x + tileSize * (0.5 + data.growthPercentage * 0.25), y + tileSize * (0.9 - data.growthPercentage * 0.5));
+            ctx.lineTo(x + tileSize * (0.5 - (data.growthPercentage + 0.1) * 0.2), y + tileSize * (0.9 - (data.growthPercentage + 0.1) * 0.5));
+            ctx.lineTo(x + tileSize * (0.5 + (data.growthPercentage + 0.1) * 0.2), y + tileSize * (0.9 - (data.growthPercentage + 0.1) * 0.5));
             ctx.closePath();
             ctx.fill();
             break;
