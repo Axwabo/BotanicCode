@@ -24,7 +24,7 @@ export interface Tile {
 
 export type Facing = "north" | "east" | "south" | "west";
 
-export type TileData = Fence | Wheat;
+export type TileData = Fence | Wheat | Carrot;
 
 export interface Fence {
     type: "fence";
@@ -39,6 +39,10 @@ export interface GrowingPlant extends Updatable {
 
 export interface Wheat extends GrowingPlant {
     type: "wheat";
+}
+
+export interface Carrot extends GrowingPlant {
+    type: "carrot";
 }
 
 interface ChunkRow {

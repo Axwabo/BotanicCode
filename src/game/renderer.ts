@@ -103,6 +103,15 @@ function drawTile(ctx: CanvasRenderingContext2D, tile: Tile) {
             for (let i = 2; i < tileSize; i += 4)
                 ctx.fillRect(x + i, y + tileSize - 2, 3, -tileSize * 0.5);
             break;
+        case "carrot":
+            ctx.fillStyle = "#f50";
+            ctx.beginPath();
+            ctx.moveTo(x + tileSize * 0.5, y + tileSize * 0.9);
+            ctx.lineTo(x + tileSize * (0.5 - data.growthPercentage * 0.25), y + tileSize * (0.9 - data.growthPercentage * 0.5));
+            ctx.lineTo(x + tileSize * (0.5 + data.growthPercentage * 0.25), y + tileSize * (0.9 - data.growthPercentage * 0.5));
+            ctx.closePath();
+            ctx.fill();
+            break;
     }
 }
 

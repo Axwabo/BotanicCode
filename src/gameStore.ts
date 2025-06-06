@@ -40,6 +40,16 @@ function createBoard() {
             return Math.min(1, this.ageSeconds / 20);
         }
     };
+    board.getTile(1, 2).data = {
+        type: "carrot",
+        ageSeconds: 0,
+        tick(deltaSeconds: number) {
+            this.ageSeconds += deltaSeconds;
+        },
+        get growthPercentage(): number {
+            return Math.min(1, this.ageSeconds / 20);
+        }
+    };
     board.entities.add(new IdlingEntity(board, { x: 20, y: 40 }, "cow", tileSize * 0.8, tileSize * 0.5));
     board.entities.add(new IdlingEntity(board, { x: -20, y: -40 }, "pig", tileSize * 0.6, tileSize * 0.6));
     board.entities.add(new IdlingEntity(board, { x: 20, y: -40 }, "sheep", tileSize * 0.5, tileSize * 0.6));
