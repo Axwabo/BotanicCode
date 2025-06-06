@@ -60,6 +60,15 @@ class Bot {
         return valid;
     }
 
+    harvest() {
+        this.#request({ type: "harvest" });
+    }
+
+    /** @param plantType {PlantType} */
+    plant(plantType) {
+        this.#request({ type: "plant", kind: plantType });
+    }
+
     terminate() {
         this.#terminated = true;
         this.#request({ type: "terminate" });

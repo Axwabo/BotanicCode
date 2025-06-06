@@ -117,11 +117,10 @@ export default class BotManager {
             }
             case "plant": {
                 const amount = bot.inventory.get(request.kind) ?? 0;
-                if (amount <= 0)
+                if (amount <= 0 || !plant(this.board, Math.floor(worldToTile(position.x)), Math.floor(worldToTile(position.y)), request.kind))
                     break;
                 modifyInventory(bot.inventory, request.kind, -1);
                 this.send({ type: "bot", name, response: { type: "pickUp", item: request.kind, count: -1 } });
-                plant(this.board, Math.floor(worldToTile(position.x)), Math.floor(worldToTile(position.y)), request.kind);
                 break;
             }
         }

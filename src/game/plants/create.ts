@@ -11,6 +11,8 @@ const ages: Record<PlantType, number> = {
 
 export function plant(board: Board, tileX: number, tileY: number, type: PlantType) {
     const tile = board.getTile(tileX, tileY);
+    if (tile.data)
+        return;
     const maxAge = ages[type];
     const plant: GrowingPlant = {
         type,
