@@ -6,6 +6,7 @@ import EntityAddedEvent from "../../util/world/events/entityAdded.js";
 import EntityPositionUpdatedEvent from "../../util/world/events/entityPosition.js";
 import EntityRemovedEvent from "../../util/world/events/entityRemoved.js";
 import PickUpEvent from "../../util/world/events/pickUp.js";
+import { EnergyDepletionEvent } from "../../util/world/events/energyDepletion.js";
 
 addEventListener("message", handleMessage);
 
@@ -62,6 +63,9 @@ function handleResponse(bot, response) {
             break;
         case "pickUp":
             dispatchEvent(new PickUpEvent(bot.name, response.item, response.count));
+            break;
+        case "energy":
+            dispatchEvent(new EnergyDepletionEvent(bot.name, response.amount));
             break;
     }
 }

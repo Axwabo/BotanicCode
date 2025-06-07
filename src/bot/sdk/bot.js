@@ -9,6 +9,8 @@ export const botRadius = tileSize * 0.4;
 const bots = new Map();
 /** @type {Map<string, Inventory>} */
 const inventories = new Map();
+/** @type {Map<string, number>} */
+const energy = new Map();
 
 class Bot {
     /** @type {string} */
@@ -29,6 +31,7 @@ class Bot {
         this.position = { x: 0, y: 0 };
         bots.set(name, this);
         inventories.set(name, new Map());
+        energy.set(name, 1);
         this.#request({ type: "create" });
     }
 
@@ -73,6 +76,7 @@ class Bot {
         this.#terminated = true;
         this.#request({ type: "terminate" });
         inventories.delete(this.name);
+        energy.delete(this.name);
     }
 
     get isTerminated() {
@@ -83,12 +87,17 @@ class Bot {
     get inventory() {
         return inventories.get(this.name);
     }
+
+    /** @returns {number} */
+    get energy() {
+        return energy.get(this.name) ?? 0;
+    }
 }
 
 /**
  * @param board {Board}
  * @param name {string}
- * @return {Bot}
+ * @returns {Bot}
  */
 export function createBot(board, name) {
     return bots.get(name) ?? new Bot(name, board);
@@ -107,4 +116,9 @@ addEventListener("pickup", /** @param ev {PickUpEvent} */ev => {
     const inventory = inventories.get(ev.botName);
     if (inventory)
         modifyInventory(inventory, ev.itemType, ev.count);
+});
+
+addEventListener("energydepletion", /** @param ev {EnergyDepletionEvent}*/ev => {
+    const current = energy.get(ev.botName) ?? 0;
+    energy.set(ev.botName, Math.max(0, current - ev.amount));
 });

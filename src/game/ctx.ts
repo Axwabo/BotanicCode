@@ -6,7 +6,7 @@ import type { Tool } from "./editor/editorTypes.ts";
 
 const { renderer, game, pointer } = storeToRefs(useGameStore());
 
-const { tool } = storeToRefs(useEditorStore());
+const { tool, selectedBot } = storeToRefs(useEditorStore());
 
 interface ContextAttributes {
     ctx: CanvasRenderingContext2D;
@@ -16,6 +16,7 @@ interface ContextAttributes {
     pointerX: number;
     pointerY: number;
     tool: Tool;
+    selectedBot: string;
 }
 
 export default function getContext(): ContextAttributes {
@@ -30,7 +31,8 @@ export default function getContext(): ContextAttributes {
         game: game.value,
         pointerX: x,
         pointerY: y,
-        tool: tool.value
+        tool: tool.value,
+        selectedBot: selectedBot.value
     };
 }
 

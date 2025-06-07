@@ -1,4 +1,4 @@
-import type { Board } from "../util/world/board";
+import { type Board } from "../util/world/board";
 import type { GameMessage, WorkerMessage } from "../util/messages";
 import type { BotRequest } from "../bot/sdk/requests";
 import { editorHandler } from "./events/editorHandler.ts";
@@ -9,14 +9,15 @@ import cloneData from "./cloneData.ts";
 import { reactive } from "vue";
 import AddGizmosEvent from "./events/addGizmosEvent.ts";
 import { type BotInstance } from "./botInstance.ts";
-import type ManagedBoard from "./managedBoard.ts";
-import type EntityAddedEvent from "../util/world/events/entityAdded";
-import type EntityPositionUpdatedEvent from "../util/world/events/entityPosition";
-import type EntityRemovedEvent from "../util/world/events/entityRemoved";
+import ManagedBoard from "./managedBoard.ts";
+import EntityAddedEvent from "../util/world/events/entityAdded";
+import EntityPositionUpdatedEvent from "../util/world/events/entityPosition";
+import EntityRemovedEvent from "../util/world/events/entityRemoved";
 import { botRadius } from "../bot/sdk/bot.js";
 import { plant } from "./plants/create.ts";
 import { worldToTile } from "../util/tileConstants";
 import { modifyInventory } from "../util/inventoryHelper";
+import type { Updatable } from "../bot/sdk/entities";
 
 type EventHandler<T> = (event: T) => void;
 
@@ -27,7 +28,7 @@ interface EventHandlers {
     entityRemoved: EventHandler<EntityRemovedEvent>;
 }
 
-export default class BotManager {
+export default class BotManager implements Updatable {
     private readonly board: ManagedBoard;
     private readonly worker?: Worker;
     private readonly handlers?: EventHandlers;
@@ -109,7 +110,7 @@ export default class BotManager {
                 if (!data || !("growthPercentage" in data))
                     break;
                 const count = Math.floor(5 * data.growthPercentage);
-                if (count === 0)
+                if (count === 0 || !this.depleteEnergy(bot, 0.01))
                     break;
                 modifyInventory(bot.inventory, data.type, count);
                 this.send({ type: "bot", name, response: { type: "pickUp", item: data.type, count } });
@@ -119,7 +120,9 @@ export default class BotManager {
             }
             case "plant": {
                 const amount = bot.inventory.get(request.kind) ?? 0;
-                if (amount <= 0 || !plant(this.board, Math.floor(worldToTile(position.x)), Math.floor(worldToTile(position.y)), request.kind))
+                if (amount <= 0
+                    || !this.depleteEnergy(bot, 0.005)
+                    || !plant(this.board, Math.floor(worldToTile(position.x)), Math.floor(worldToTile(position.y)), request.kind))
                     break;
                 modifyInventory(bot.inventory, request.kind, -1);
                 this.send({ type: "bot", name, response: { type: "pickUp", item: request.kind, count: -1 } });
@@ -173,5 +176,18 @@ export default class BotManager {
 
     private sendRemove(ev: EntityRemovedEvent) {
         this.send({ type: "entityRemove", id: ev.id });
+    }
+
+    tick(deltaSeconds: number): void {
+        for (const bot of this.bots.values())
+            this.depleteEnergy(bot, deltaSeconds * 0.001);
+    }
+
+    private depleteEnergy(bot: BotInstance, amount: number) {
+        if (!bot.energy || bot.energy < amount)
+            return false;
+        bot.energy = Math.max(0, bot.energy - amount);
+        this.send({ type: "bot", name: bot.name, response: { type: "energy", amount } });
+        return true;
     }
 }

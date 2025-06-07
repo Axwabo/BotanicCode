@@ -15,7 +15,7 @@ editorHandler.addEventListener("cleargizmos", () => gizmos.length = 0);
 editorHandler.addEventListener("addgizmos", ev => gizmos.push(...ev.gizmos));
 
 export function render() {
-    const { ctx, width, height, game, pointerX, pointerY, tool } = getContext();
+    const { ctx, width, height, game, pointerX, pointerY, tool, selectedBot } = getContext();
     ctx.resetTransform();
     ctx.clearRect(0, 0, width, height);
     ctx.translate(Math.floor(width * 0.5), Math.floor(height * 0.5));
@@ -44,7 +44,7 @@ export function render() {
     ctx.textBaseline = "bottom";
     ctx.textAlign = "center";
     const { x: pointerWorldX, y: pointerWorldY } = canvasToWorld(pointerX, pointerY);
-    let highlightedBot: BotInstance | undefined;
+    let highlightedBot: BotInstance | undefined = game.botManager.bots.get(selectedBot);
     for (const bot of game.botManager.bots.values()) {
         const { x, y } = bot.position;
         ctx.fillStyle = "white";
@@ -234,7 +234,7 @@ function drawHighlighted(ctx: CanvasRenderingContext2D, highlightedBot: BotInsta
     drawLightning(ctx, x - 30, y + botRadius + 10);
     ctx.fillStyle = `rgba(0, 0, 0, 0.2)`;
     ctx.fillRect(x - 20, y + botRadius + 5, 50, 5);
-    ctx.fillStyle = `hsl(${highlightedBot.energy * 120}, 50%, 50%)`;
+    ctx.fillStyle = `hsl(${highlightedBot.energy * 120}, 100%, 50%)`;
     ctx.fillRect(x - 20, y + botRadius + 5, highlightedBot.energy * 50, 5);
 }
 
