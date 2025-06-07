@@ -7,4 +7,5 @@ export interface BotInstance {
     position: WorldPosition;
     inventory: Inventory;
     chunkSeconds: Map<Chunk, number>;
+    energy: number;
 }

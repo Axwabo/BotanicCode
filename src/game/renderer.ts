@@ -202,6 +202,19 @@ function drawEntity(ctx: CanvasRenderingContext2D, entity: Entity) {
     }
 }
 
+function drawLightning(ctx: CanvasRenderingContext2D, x: number, y: number) {
+    ctx.fillStyle = "#ffaf00";
+    ctx.beginPath();
+    ctx.moveTo(x + 5, y - 10);
+    ctx.lineTo(x - 5, y);
+    ctx.lineTo(x - 1, y + 2);
+    ctx.lineTo(x - 5, y + 10);
+    ctx.lineTo(x + 5, y - 2);
+    ctx.lineTo(x + 1, y - 2);
+    ctx.closePath();
+    ctx.fill();
+}
+
 function drawHighlighted(ctx: CanvasRenderingContext2D, highlightedBot: BotInstance) {
     const { name, position: { x, y } } = highlightedBot;
     ctx.strokeStyle = "black";
@@ -218,6 +231,11 @@ function drawHighlighted(ctx: CanvasRenderingContext2D, highlightedBot: BotInsta
         ctx.fillText(text, x, drawY);
         drawY -= 17;
     }
+    drawLightning(ctx, x - 30, y + botRadius + 10);
+    ctx.fillStyle = `rgba(0, 0, 0, 0.2)`;
+    ctx.fillRect(x - 20, y + botRadius + 5, 50, 5);
+    ctx.fillStyle = `hsl(${highlightedBot.energy * 120}, 50%, 50%)`;
+    ctx.fillRect(x - 20, y + botRadius + 5, highlightedBot.energy * 50, 5);
 }
 
 function drawGizmos(ctx: CanvasRenderingContext2D) {

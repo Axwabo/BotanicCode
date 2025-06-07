@@ -82,8 +82,13 @@ export default class BotManager {
                 name,
                 position: reactive({ x: 0, y: 0 }),
                 inventory: new Map(),
-                chunkSeconds: new Map()
+                chunkSeconds: new Map(),
+                energy: 1
             });
+            return;
+        }
+        if (request.type === "terminate") {
+            this.bots.delete(name);
             return;
         }
         const bot = this.bots.get(name);
@@ -97,9 +102,6 @@ export default class BotManager {
                 position.y = y;
                 if (!valid)
                     this.send({ type: "bot", name, response: { type: "position", x, y } });
-                break;
-            case "terminate":
-                this.bots.delete(name);
                 break;
             case "harvest": {
                 const tile = this.board.getTileAt(position.x, position.y);

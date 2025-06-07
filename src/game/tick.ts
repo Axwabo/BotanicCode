@@ -48,6 +48,8 @@ export default function tick(game: GameState, deltaSeconds: number) {
         if (game.loadedChunks.has(chunk))
             entity.tick(deltaSeconds);
     }
+    for (const bot of game.botManager.bots.values())
+        bot.energy = Math.max(0, bot.energy - deltaSeconds * 0.001);
     for (const chunk of game.loadedChunks)
         for (let x = 0; x < tilesPerChunk; x++)
             for (let y = 0; y < tilesPerChunk; y++) {
