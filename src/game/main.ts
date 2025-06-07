@@ -5,7 +5,7 @@ import { canvasToWorld } from "./ctx.ts";
 import ClickEvent from "./events/clickEvent.ts";
 import { editorHandler } from "./events/editorHandler.ts";
 import type WorkerErrorEvent from "./events/workerErrorEvent.ts";
-import type TileUpdatedEvent from "../util/world/events/tileUpdatedEvent";
+import type TileUpdatedEvent from "../util/world/events/tileUpdated";
 import tick from "./tick.ts";
 
 const {

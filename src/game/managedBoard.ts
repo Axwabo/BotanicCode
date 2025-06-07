@@ -1,8 +1,8 @@
 import { Board } from "../util/world/board";
 import type { ManagedEntity } from "./entities/interfaces.ts";
-import type EntityAddedEvent from "../util/world/events/entityAddedEvent.js";
-import type EntityPositionUpdatedEvent from "../util/world/events/entityPositionUpdatedEvent.js";
-import type EntityRemovedEvent from "../util/world/events/entityRemovedEvent";
+import type EntityAddedEvent from "../util/world/events/entityAdded.js";
+import type EntityPositionUpdatedEvent from "../util/world/events/entityPosition.js";
+import type EntityRemovedEvent from "../util/world/events/entityRemoved";
 
 interface EventMap {
     entityadded: EntityAddedEvent;

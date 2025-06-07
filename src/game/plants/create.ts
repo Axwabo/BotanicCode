@@ -1,7 +1,7 @@
 import type { Board } from "../../util/world/board";
 import type { GrowingPlant, PlantType } from "../../util/tile";
 import { editorHandler } from "../events/editorHandler.ts";
-import TileUpdatedEvent from "../../util/world/events/tileUpdatedEvent";
+import TileUpdatedEvent from "../../util/world/events/tileUpdated";
 
 const ages: Record<PlantType, number> = {
     carrot: 20,

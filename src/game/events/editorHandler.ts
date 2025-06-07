@@ -1,6 +1,6 @@
 import type ClickEvent from "./clickEvent.ts";
 import type WorkerErrorEvent from "./workerErrorEvent.ts";
-import type TileUpdatedEvent from "../../util/world/events/tileUpdatedEvent.js";
+import type TileUpdatedEvent from "../../util/world/events/tileUpdated.js";
 import type AddGizmosEvent from "./addGizmosEvent.ts";
 
 interface EventMap {

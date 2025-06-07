@@ -1,11 +1,11 @@
-import WorldLoadedEvent from "../../util/world/events/worldLoadedEvent.js";
+import WorldLoadedEvent from "../../util/world/events/worldLoaded.js";
 import createBoardFromJson from "../../util/world/worldDeserializer.js";
 import { getBot } from "./bot.js";
-import TileUpdatedEvent from "../../util/world/events/tileUpdatedEvent.js";
-import EntityAddedEvent from "../../util/world/events/entityAddedEvent.js";
-import EntityPositionUpdatedEvent from "../../util/world/events/entityPositionUpdatedEvent.js";
-import EntityRemovedEvent from "../../util/world/events/entityRemovedEvent.js";
-import PickUpEvent from "../../util/world/events/pickUpEvent.js";
+import TileUpdatedEvent from "../../util/world/events/tileUpdated.js";
+import EntityAddedEvent from "../../util/world/events/entityAdded.js";
+import EntityPositionUpdatedEvent from "../../util/world/events/entityPosition.js";
+import EntityRemovedEvent from "../../util/world/events/entityRemoved.js";
+import PickUpEvent from "../../util/world/events/pickUp.js";
 
 addEventListener("message", handleMessage);
 

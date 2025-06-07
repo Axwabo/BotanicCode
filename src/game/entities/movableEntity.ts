@@ -3,9 +3,9 @@ import { validateMove } from "../../util/movement";
 import type { EntityType } from "../../bot/sdk/entities";
 import ManagedBoard from "../managedBoard.ts";
 import type { ManagedEntity } from "./interfaces.ts";
-import EntityAddedEvent from "../../util/world/events/entityAddedEvent";
-import EntityPositionUpdatedEvent from "../../util/world/events/entityPositionUpdatedEvent";
-import EntityRemovedEvent from "../../util/world/events/entityRemovedEvent";
+import EntityAddedEvent from "../../util/world/events/entityAdded";
+import EntityPositionUpdatedEvent from "../../util/world/events/entityPosition";
+import EntityRemovedEvent from "../../util/world/events/entityRemoved";
 
 export default abstract class MovableEntity<T extends MovableEntity<T>> implements ManagedEntity {
     readonly id: string = crypto.randomUUID();
