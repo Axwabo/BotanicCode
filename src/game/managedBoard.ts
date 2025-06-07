@@ -12,7 +12,7 @@ interface EventMap {
 
 export default class ManagedBoard extends Board {
     readonly entities: Set<ManagedEntity> = new Set<ManagedEntity>();
-    private target = new EventTarget();
+    private readonly target = new EventTarget();
 
     addEventListener<E extends keyof EventMap>(type: E, callback: (event: EventMap[E]) => void, options?: AddEventListenerOptions | boolean) {
         this.target.addEventListener(type, <EventListener>callback, options);

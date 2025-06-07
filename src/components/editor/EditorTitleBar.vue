@@ -4,6 +4,7 @@ import useFileStore from "../../fileStore.ts";
 import { storeToRefs } from "pinia";
 import useGameStore from "../../gameStore.ts";
 import BotManager from "../../game/botManager.ts";
+import type ManagedBoard from "../../game/managedBoard.ts";
 
 const { files, editors, save } = useFileStore();
 
@@ -44,7 +45,7 @@ function stop() {
 
 function run() {
     stop();
-    game.botManager = new BotManager(game.board, currentFile.value);
+    game.botManager = new BotManager(<ManagedBoard>game.board, currentFile.value);
 }
 
 onMounted(() => window.addEventListener("keydown", handleSave));
