@@ -80,6 +80,14 @@ const useGameStore = defineStore("game", {
             this.game.board = createBoard();
             this.game.zoom = 1;
             this.workerReady = false;
+        },
+        stop() {
+            this.workerReady = false;
+            this.game.botManager.terminate();
+        },
+        run(file: string) {
+            this.stop();
+            this.game.botManager = new BotManager(<ManagedBoard>this.game.board, file, <BotManager>this.game.botManager);
         }
     }
 });

@@ -7,7 +7,6 @@ interface State {
     files: Map<string, FileStatus>;
     currentFile: string;
     editors: Map<string, EditorInstance>;
-    deleteConfirmation: string;
     swActivated: boolean;
     cache?: Cache;
 }
@@ -37,7 +36,7 @@ function findIndex(editorPaths: Map<string, EditorInstance>, current: string) {
 }
 
 const useFileStore = defineStore("projectFiles", {
-    state: (): State => ({ files: reactiveMap(), currentFile: "", editors: reactiveMap(), deleteConfirmation: "", swActivated: false }),
+    state: (): State => ({ files: reactiveMap(), currentFile: "", editors: reactiveMap(), swActivated: false }),
     getters: {
         canRun(state: State) {
             const status = state.files.get(state.currentFile);
