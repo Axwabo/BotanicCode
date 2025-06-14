@@ -30,6 +30,7 @@ function createBoard() {
     board.getTile(-1, 2).type = "dirt";
     board.getTile(0, 2).type = "dirt";
     board.getTile(1, 2).type = "dirt";
+    board.getTile(10, 10).data = { type: "chargingStation" };
     plant(board, 0, 2, "wheat");
     plant(board, 1, 2, "carrot");
     plant(board, 2, 2, "potato");

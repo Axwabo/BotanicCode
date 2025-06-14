@@ -120,5 +120,5 @@ addEventListener("pickup", /** @param ev {PickUpEvent} */ev => {
 
 addEventListener("energydepletion", /** @param ev {EnergyDepletionEvent}*/ev => {
     const current = energy.get(ev.botName) ?? 0;
-    energy.set(ev.botName, Math.max(0, current - ev.amount));
+    energy.set(ev.botName, Math.max(0, Math.min(1, current - ev.amount)));
 });

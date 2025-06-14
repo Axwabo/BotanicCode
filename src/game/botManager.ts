@@ -179,14 +179,16 @@ export default class BotManager implements Updatable {
     }
 
     tick(deltaSeconds: number): void {
-        for (const bot of this.bots.values())
-            this.depleteEnergy(bot, deltaSeconds * 0.001);
+        for (const bot of this.bots.values()) {
+            const tile = this.board.getTileAt(bot.position.x, bot.position.y);
+            this.depleteEnergy(bot, deltaSeconds * (tile.data?.type === "chargingStation" ? -0.01 : 0.001));
+        }
     }
 
     private depleteEnergy(bot: BotInstance, amount: number) {
-        if (!bot.energy || bot.energy < amount)
+        if (!bot.energy && amount > 0 || bot.energy < amount)
             return false;
-        bot.energy = Math.max(0, bot.energy - amount);
+        bot.energy = Math.max(0, Math.min(1, bot.energy - amount));
         this.send({ type: "bot", name: bot.name, response: { type: "energy", amount } });
         return true;
     }

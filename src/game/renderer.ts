@@ -104,6 +104,13 @@ function drawTile(ctx: CanvasRenderingContext2D, tile: Tile) {
             for (const box of getBoundingBoxes(data))
                 ctx.fillRect(box.x + x, box.y + y, box.width, box.height);
             break;
+        case "chargingStation":
+            ctx.fillStyle = "#89d6ff";
+            ctx.beginPath();
+            ctx.arc(x + tileSize * 0.5, y + tileSize * 0.5, tileSize * 0.3, 0, Math.PI * 2);
+            ctx.fill();
+            drawLightning(ctx, x + tileSize * 0.5, y + tileSize * 0.5);
+            break;
         case "wheat":
             ctx.fillStyle = `hsl(${120 - 60 * data.growthPercentage}, 50%, 50%)`;
             for (let i = 2; i < tileSize; i += 4)

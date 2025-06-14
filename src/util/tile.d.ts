@@ -24,11 +24,15 @@ export interface Tile {
 
 export type Facing = "north" | "east" | "south" | "west";
 
-export type TileData = Fence | Wheat | Carrot | Potato | Tomato | Strawberry;
+export type TileData = Fence | ChargingStation | Wheat | Carrot | Potato | Tomato | Strawberry;
 
 export interface Fence {
     type: "fence";
     posts: Facing[];
+}
+
+export interface ChargingStation {
+    type: "chargingStation";
 }
 
 export type PlantType = Extract<TileData, GrowingPlant>["type"];
