@@ -12,7 +12,10 @@ const inventories = new Map();
 /** @type {Map<string, number>} */
 const energy = new Map();
 
+let initial = false;
+
 class Bot {
+
     /** @type {string} */
     #name;
     /** @type {WorldPosition} */
@@ -32,7 +35,9 @@ class Bot {
         bots.set(name, this);
         inventories.set(name, new Map());
         energy.set(name, 1);
-        this.#request({ type: "create" });
+        if (!initial)
+            this.#request({ type: "create" });
+        initial = false;
     }
 
     get name() {
@@ -121,4 +126,15 @@ addEventListener("pickup", /** @param ev {PickUpEvent} */ev => {
 addEventListener("energydepletion", /** @param ev {EnergyDepletionEvent}*/ev => {
     const current = energy.get(ev.botName) ?? 0;
     energy.set(ev.botName, Math.max(0, Math.min(1, current - ev.amount)));
+});
+
+addEventListener("worldloaded", /** @param ev {WorldLoadedEvent}*/ev => {
+    for (const bot of ev.bots) {
+        initial = true;
+        const instance = new Bot(bot.name, ev.board);
+        instance.position = bot.position;
+        bots.set(bot.name, instance);
+        inventories.set(bot.name, new Map(bot.inventory));
+        energy.set(bot.name, bot.energy);
+    }
 });

@@ -76,6 +76,7 @@ const useGameStore = defineStore("game", {
         resetBoard() {
             useEditorStore().selectedBot = "";
             this.game.botManager.terminate();
+            this.game.botManager.bots.clear();
             this.game.board = createBoard();
             this.game.zoom = 1;
             this.workerReady = false;

@@ -26,7 +26,7 @@ function handleMessage(ev) {
                 tile.type = type;
                 tile.data = data;
             });
-            dispatchEvent(new WorldLoadedEvent(board));
+            dispatchEvent(new WorldLoadedEvent(board, ev.data.bots));
             break;
         case "tile":
             dispatchEvent(new TileUpdatedEvent(ev.data.tile));

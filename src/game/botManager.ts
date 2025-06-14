@@ -1,5 +1,5 @@
 import { type Board } from "../util/world/board";
-import type { GameMessage, WorkerMessage } from "../util/messages";
+import type { GameMessage, InitialBotData, WorkerMessage } from "../util/messages";
 import type { BotRequest } from "../bot/sdk/requests";
 import { editorHandler } from "./events/editorHandler.ts";
 import WorkerErrorEvent from "./events/workerErrorEvent.ts";
@@ -34,10 +34,10 @@ export default class BotManager implements Updatable {
     private readonly handlers?: EventHandlers;
     readonly bots: Map<string, BotInstance>;
 
-    constructor(board: ManagedBoard, entryPoint?: string) {
+    constructor(board: ManagedBoard, entryPoint?: string, previous?: BotManager) {
         editorHandler.dispatchEvent(new Event("workerinit"));
         this.board = board;
-        this.bots = new Map<string, BotInstance>();
+        this.bots = previous?.bots ?? new Map<string, BotInstance>();
         if (!entryPoint)
             return;
         this.worker = new Worker(`${import.meta.env.BASE_URL}bot/sdk/run.js?t=${Date.now()}&entryPoint=${encodeURI(entryPoint.replace(/^\//, ""))}`, { type: "module" });
@@ -143,11 +143,10 @@ export default class BotManager implements Updatable {
             this.board.removeEventListener("entityremoved", this.handlers.entityRemoved);
         }
         this.worker?.terminate();
-        this.bots.clear();
     }
 
     sendBoard(board: Board) {
-        this.send({ type: "world", board: JSON.stringify(board.chunkStore) });
+        this.send({ type: "world", board: JSON.stringify(board.chunkStore), bots: Array.from(this.bots.values()).map(toInitialData) });
     }
 
     sendTileUpdate(event: TileUpdatedEvent) {
@@ -192,4 +191,13 @@ export default class BotManager implements Updatable {
         this.send({ type: "bot", name: bot.name, response: { type: "energy", amount } });
         return true;
     }
+}
+
+function toInitialData(bot: BotInstance): InitialBotData {
+    return {
+        name: bot.name,
+        position: { ...bot.position },
+        inventory: Array.from(bot.inventory.entries()),
+        energy: bot.energy
+    };
 }

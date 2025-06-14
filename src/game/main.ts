@@ -43,7 +43,8 @@ export default function beginLoop() {
 
 function loop(timestamp: number) {
     const delta = (timestamp - previousTimestamp) * 0.001;
-    tick(game.value, delta);
+    if (workerReady.value)
+        tick(game.value, delta);
     previousTimestamp = timestamp;
     render();
     requestAnimationFrame(loop);

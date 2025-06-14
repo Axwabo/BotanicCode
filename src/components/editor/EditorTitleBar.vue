@@ -45,7 +45,7 @@ function stop() {
 
 function run() {
     stop();
-    game.botManager = new BotManager(<ManagedBoard>game.board, currentFile.value);
+    game.botManager = new BotManager(<ManagedBoard>game.board, currentFile.value, game.botManager);
 }
 
 onMounted(() => window.addEventListener("keydown", handleSave));
