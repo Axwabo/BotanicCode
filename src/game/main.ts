@@ -7,6 +7,7 @@ import { editorHandler } from "./events/editorHandler.ts";
 import type WorkerErrorEvent from "./events/workerErrorEvent.ts";
 import type TileUpdatedEvent from "../util/world/events/tileUpdated";
 import tick from "./tick.ts";
+import RenderEvent from "../util/world/events/render";
 
 const {
     game,
@@ -49,7 +50,7 @@ function loop(timestamp: number) {
     previousTimestamp = timestamp;
     render();
     requestAnimationFrame(loop);
-    editorHandler.dispatchEvent(new Event("render"));
+    editorHandler.dispatchEvent(new RenderEvent(delta));
 }
 
 function handleKey(event: KeyboardEvent) {

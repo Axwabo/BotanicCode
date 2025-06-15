@@ -10,6 +10,7 @@ export function loadWorld() {
     ));
 }
 
+/** @returns {Promise<number>} */
 export function nextFrame() {
-    return new Promise(resolve => addEventListener("render", resolve, true));
+    return new Promise(resolve => addEventListener("render", /**@param e {RenderEvent} */e => resolve(e.deltaTime), true));
 }

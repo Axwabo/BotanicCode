@@ -33,6 +33,7 @@ interface Error {
 
 interface Render {
     type: "render";
+    delta: number;
 }
 
 export interface InitialBotData {

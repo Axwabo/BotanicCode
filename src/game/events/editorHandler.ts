@@ -2,9 +2,10 @@ import type ClickEvent from "./clickEvent.ts";
 import type WorkerErrorEvent from "./workerErrorEvent.ts";
 import type TileUpdatedEvent from "../../util/world/events/tileUpdated.js";
 import type AddGizmosEvent from "./addGizmosEvent.ts";
+import type RenderEvent from "../../util/world/events/render.js";
 
 interface EventMap {
-    render: Event;
+    render: RenderEvent;
     click: ClickEvent;
     tileupdated: TileUpdatedEvent;
     workerinit: Event;

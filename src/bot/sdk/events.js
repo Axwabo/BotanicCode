@@ -7,6 +7,7 @@ import EntityPositionUpdatedEvent from "../../util/world/events/entityPosition.j
 import EntityRemovedEvent from "../../util/world/events/entityRemoved.js";
 import PickUpEvent from "../../util/world/events/pickUp.js";
 import { EnergyDepletionEvent } from "../../util/world/events/energyDepletion.js";
+import RenderEvent from "../../util/world/events/render.js";
 
 addEventListener("message", handleMessage);
 
@@ -16,7 +17,7 @@ function handleMessage(ev) {
         return;
     switch (ev.data.type) {
         case "render":
-            dispatchEvent(new Event("render"));
+            dispatchEvent(new RenderEvent(ev.data.delta));
             break;
         case "world":
             const board = createBoardFromJson(ev.data.board);
