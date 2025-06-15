@@ -21,7 +21,6 @@ const offsets = [
 
 function refreshLoadedChunks(game: GameState, deltaSeconds: number) {
     const loadedChunks = game.loadedChunks;
-    loadedChunks.clear();
     for (const bot of game.botManager.bots.values()) {
         const currentChunk = getChunk(game, bot.position);
         for (const [ chunk, seconds ] of bot.chunkSeconds) {
