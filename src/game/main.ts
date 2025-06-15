@@ -32,6 +32,10 @@ export default function beginLoop() {
     window.addEventListener("mousemove", handleMouseMove);
     window.addEventListener("wheel", handleWheel);
 
+    window.addEventListener("touchstart", handleTouchStart);
+    window.addEventListener("touchmove", handleTouchMove);
+    window.addEventListener("touchend", handleTouchEnd);
+
     editorHandler.addEventListener("workerinit", resetWorkerState);
     editorHandler.addEventListener("workerready", sendBoard);
     editorHandler.addEventListener("workererror", setError);
@@ -77,15 +81,20 @@ function handleKey(event: KeyboardEvent) {
     }
 }
 
-function notCanvas(event: MouseEvent) {
-    return (event.target as HTMLCanvasElement)?.id !== "gameCanvas";
+function notCanvas(target: EventTarget | null) {
+    return (target as HTMLCanvasElement)?.id !== "gameCanvas";
 }
 
+type MoveEvent = { target: EventTarget | null, offsetX: number; offsetY: number; };
+
 function handleMouseDown(event: MouseEvent) {
-    if (notCanvas(event))
+    if (notCanvas(event.target))
         return;
-    if (event.button === 1)
+    if (event.button === 1) {
+        pointer.value.x = event.offsetX;
+        pointer.value.y = event.offsetY;
         dragging.value = true;
+    }
     if (event.button !== 0)
         return;
     const { x, y } = canvasToWorld(event.offsetX, event.offsetY);
@@ -97,8 +106,9 @@ function handleMouseUp(event: MouseEvent) {
         dragging.value = false;
 }
 
-function handleMouseMove(event: MouseEvent) {
-    if (notCanvas(event))
+function handleMouseMove(event: MoveEvent) {
+    const { x, y } = pointer.value;
+    if (notCanvas(event.target))
         pointer.value.x = pointer.value.y = NaN;
     else {
         pointer.value.x = event.offsetX;
@@ -106,19 +116,49 @@ function handleMouseMove(event: MouseEvent) {
     }
     if (!dragging.value)
         return;
-    game.value.position.x -= event.movementX;
-    game.value.position.y -= event.movementY;
+    game.value.position.x -= isNaN(x) ? 0 : event.offsetX - x;
+    game.value.position.y -= isNaN(y) ? 0 : event.offsetY - y;
 }
 
 function handleWheel(event: WheelEvent) {
-    if (notCanvas(event))
+    if (notCanvas(event.target))
         return;
+    event.preventDefault();
+    event.stopPropagation();
     const previousWorld = canvasToWorld(event.offsetX, event.offsetY);
     const previousZoom = game.value.zoom;
     game.value.zoom = Math.min(3, Math.max(0.5, previousZoom - Math.sign(event.deltaY) * 0.1));
     const currentWorld = canvasToWorld(event.offsetX, event.offsetY);
     game.value.position.x += Math.floor(previousWorld.x - currentWorld.x);
     game.value.position.y += Math.floor(previousWorld.y - currentWorld.y);
+}
+
+function relative(event: TouchEvent) {
+    const canvas = document.getElementById("gameCanvas");
+    if (!canvas || event.target !== canvas)
+        return;
+    const { x, y } = canvas.getBoundingClientRect();
+    const { pageX, pageY, target } = event.changedTouches.item(0)!;
+    return { target, offsetX: pageX - x, offsetY: pageY - y };
+}
+
+function handleTouchStart(event: TouchEvent) {
+    const transformed = relative(event);
+    if (!transformed)
+        return;
+    dragging.value = true;
+    pointer.value.x = transformed.offsetX;
+    pointer.value.y = transformed.offsetY;
+}
+
+function handleTouchMove(event: TouchEvent) {
+    const transformed = relative(event);
+    if (transformed)
+        handleMouseMove(transformed);
+}
+
+function handleTouchEnd() {
+    dragging.value = false;
 }
 
 function resetWorkerState() {

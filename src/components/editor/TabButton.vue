@@ -67,4 +67,10 @@ function handleClick(event: MouseEvent) {
 .highlighted {
     border-bottom: 2px solid aqua;
 }
+
+@media (pointer: coarse) {
+    .close {
+        opacity: 1;
+    }
+}
 </style>
