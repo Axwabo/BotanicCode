@@ -23,6 +23,7 @@ export function render() {
     ctx.translate(-x, -y);
     ctx.scale(game.zoom, game.zoom);
     const { startX, startY, endX, endY } = viewportChunks(x, y, width, height, game.zoom);
+    const { x: pointerWorldX, y: pointerWorldY } = canvasToWorld(pointerX, pointerY);
     for (let x = startX; x <= endX; x++)
         for (let y = startY; y <= endY; y++) {
             const chunk = game.board.getChunk(x, y);
@@ -38,12 +39,11 @@ export function render() {
         const chunkX = worldToChunk(entity.position.x);
         const chunkY = worldToChunk(entity.position.y);
         if (chunkX >= startX - 0.5 && chunkX <= endX + 0.5 && chunkY >= startY - 0.5 && chunkY <= endY + 0.5)
-            drawEntity(ctx, entity);
+            drawEntity(ctx, entity, pointerWorldX, pointerWorldY, tool === "Inspector");
     }
     ctx.font = "20px monospace";
     ctx.textBaseline = "bottom";
     ctx.textAlign = "center";
-    const { x: pointerWorldX, y: pointerWorldY } = canvasToWorld(pointerX, pointerY);
     let highlightedBot: BotInstance | undefined = game.botManager.bots.get(selectedBot);
     for (const bot of game.botManager.bots.values()) {
         const { x, y } = bot.position;
@@ -155,7 +155,7 @@ function drawTile(ctx: CanvasRenderingContext2D, tile: Tile) {
     }
 }
 
-function drawEntity(ctx: CanvasRenderingContext2D, entity: Entity) {
+function drawEntity(ctx: CanvasRenderingContext2D, entity: Entity, pointerWorldX: number, pointerWorldY: number, overlay: boolean) {
     switch (entity.type) {
         case "cow":
             ctx.fillStyle = "#933d00";
@@ -207,6 +207,13 @@ function drawEntity(ctx: CanvasRenderingContext2D, entity: Entity) {
             ctx.fill();
             break;
     }
+    if (!overlay || !isInRange(x, y, pointerWorldX, pointerWorldY, entity.radius))
+        return;
+    drawLightning(ctx, x - 30, y + entity.radius + 10);
+    ctx.fillStyle = `rgba(0, 0, 0, 0.2)`;
+    ctx.fillRect(x - 20, y + entity.radius + 5, 50, 5);
+    ctx.fillStyle = `hsl(${(1 - entity.hunger) * 120}, 100%, 50%)`;
+    ctx.fillRect(x - 20, y + entity.radius + 5, (1 - entity.hunger) * 50, 5);
 }
 
 function drawLightning(ctx: CanvasRenderingContext2D, x: number, y: number) {
