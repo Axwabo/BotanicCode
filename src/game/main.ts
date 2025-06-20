@@ -8,6 +8,7 @@ import type WorkerErrorEvent from "./events/workerErrorEvent.ts";
 import type TileUpdatedEvent from "../util/world/events/tileUpdated";
 import tick from "./tick.ts";
 import RenderEvent from "../util/world/events/render";
+import { distance } from "../util/distance";
 
 const {
     game,
@@ -19,6 +20,7 @@ const {
 } = storeToRefs(useGameStore());
 
 let previousTimestamp = 0;
+let pinch = 0;
 
 export default function beginLoop() {
     if (uiEventsRegistered.value)
@@ -120,14 +122,18 @@ function handleMouseMove(event: MoveEvent) {
     game.value.position.y -= isNaN(y) ? 0 : event.offsetY - y;
 }
 
+function zoom(delta: number) {
+    const previousZoom = game.value.zoom;
+    game.value.zoom = Math.min(3, Math.max(0.5, previousZoom - Math.sign(delta) * 0.1));
+}
+
 function handleWheel(event: WheelEvent) {
     if (notCanvas(event.target))
         return;
     event.preventDefault();
     event.stopPropagation();
     const previousWorld = canvasToWorld(event.offsetX, event.offsetY);
-    const previousZoom = game.value.zoom;
-    game.value.zoom = Math.min(3, Math.max(0.5, previousZoom - Math.sign(event.deltaY) * 0.1));
+    zoom(event.deltaY);
     const currentWorld = canvasToWorld(event.offsetX, event.offsetY);
     game.value.position.x += Math.floor(previousWorld.x - currentWorld.x);
     game.value.position.y += Math.floor(previousWorld.y - currentWorld.y);
@@ -139,13 +145,23 @@ function relative(event: TouchEvent) {
         return;
     const { x, y } = canvas.getBoundingClientRect();
     const { pageX, pageY, target } = event.changedTouches.item(0)!;
-    return { target, offsetX: pageX - x, offsetY: pageY - y };
+    return { target, offsetX: Math.round(pageX - x), offsetY: Math.round(pageY - y) };
+}
+
+function getDistance(touches: TouchList) {
+    const start = touches.item(0)!;
+    const end = touches.item(1)!;
+    return distance(start.clientX, start.clientY, end.clientX, end.clientY);
 }
 
 function handleTouchStart(event: TouchEvent) {
     const transformed = relative(event);
     if (!transformed)
         return;
+    if (event.touches.length > 1) {
+        pinch = getDistance(event.touches);
+        return;
+    }
     dragging.value = true;
     pointer.value.x = transformed.offsetX;
     pointer.value.y = transformed.offsetY;
@@ -153,8 +169,15 @@ function handleTouchStart(event: TouchEvent) {
 
 function handleTouchMove(event: TouchEvent) {
     const transformed = relative(event);
-    if (transformed)
+    if (!transformed)
+        return;
+    if (event.touches.length === 1) {
         handleMouseMove(transformed);
+        return;
+    }
+    const currentPinch = getDistance(event.touches);
+    zoom(pinch - currentPinch);
+    pinch = currentPinch;
 }
 
 function handleTouchEnd() {
