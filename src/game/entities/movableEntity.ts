@@ -35,7 +35,7 @@ export default abstract class MovableEntity<T extends MovableEntity<T>> implemen
     tick(deltaSeconds: number): void {
         this.lifetime += deltaSeconds;
         this.depleteEnergy(deltaSeconds * 0.002);
-        if (this.energy === 1)
+        if (this.energy === 0)
             this.remove();
     }
 
