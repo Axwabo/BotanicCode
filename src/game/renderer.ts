@@ -212,8 +212,8 @@ function drawEntity(ctx: CanvasRenderingContext2D, entity: Entity, pointerWorldX
     drawLightning(ctx, x - 30, y + entity.radius + 10);
     ctx.fillStyle = `rgba(0, 0, 0, 0.2)`;
     ctx.fillRect(x - 20, y + entity.radius + 5, 50, 5);
-    ctx.fillStyle = `hsl(${(1 - entity.hunger) * 120}, 100%, 50%)`;
-    ctx.fillRect(x - 20, y + entity.radius + 5, (1 - entity.hunger) * 50, 5);
+    ctx.fillStyle = `hsl(${entity.energy * 120}, 100%, 50%)`;
+    ctx.fillRect(x - 20, y + entity.radius + 5, entity.energy * 50, 5);
 }
 
 function drawLightning(ctx: CanvasRenderingContext2D, x: number, y: number) {

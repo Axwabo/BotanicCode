@@ -11,5 +11,5 @@ export interface Entity {
     type: EntityType;
     position: WorldPosition;
     radius: number;
-    hunger: number;
+    energy: number;
 }

@@ -3,12 +3,12 @@ import type { ManagedEntity } from "./entities/interfaces.ts";
 import type EntityAddedEvent from "../util/world/events/entityAdded.js";
 import type EntityPositionUpdatedEvent from "../util/world/events/entityPosition.js";
 import type EntityRemovedEvent from "../util/world/events/entityRemoved";
-import type EntityHungerUpdatedEvent from "../util/world/events/entityHungerUpdated";
+import type EntityEnergyUpdatedEvent from "../util/world/events/entityEnergyUpdated";
 
 interface EventMap {
     entityadded: EntityAddedEvent;
     entitypositionupdated: EntityPositionUpdatedEvent;
-    entityhungerupdated: EntityHungerUpdatedEvent;
+    entityenergyupdated: EntityEnergyUpdatedEvent;
     entityremoved: EntityRemovedEvent;
 }
 

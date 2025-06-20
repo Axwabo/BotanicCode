@@ -19,7 +19,7 @@ import { worldToTile } from "../util/tileConstants";
 import { modifyInventory } from "../util/inventoryHelper";
 import type { Updatable } from "../bot/sdk/entities";
 import type RenderEvent from "../util/world/events/render";
-import type EntityHungerUpdatedEvent from "../util/world/events/entityHungerUpdated";
+import type EntityEnergyUpdatedEvent from "../util/world/events/entityEnergyUpdated";
 
 type EventHandler<T> = (event: T) => void;
 
@@ -27,7 +27,7 @@ interface EventHandlers {
     render: EventHandler<RenderEvent>;
     entityAdded: EventHandler<EntityAddedEvent>;
     entityPositionUpdated: EventHandler<EntityPositionUpdatedEvent>;
-    entityHungerUpdated: EventHandler<EntityHungerUpdatedEvent>;
+    entityEnergyUpdated: EventHandler<EntityEnergyUpdatedEvent>;
     entityRemoved: EventHandler<EntityRemovedEvent>;
 }
 
@@ -49,7 +49,7 @@ export default class BotManager implements Updatable {
             render: ev => this.send({ type: "render", delta: ev.deltaTime }),
             entityAdded: ev => this.sendAdd(ev),
             entityPositionUpdated: ev => this.sendMove(ev),
-            entityHungerUpdated: ev => this.sendHunger(ev),
+            entityEnergyUpdated: ev => this.sendEnergy(ev),
             entityRemoved: ev => this.sendRemove(ev)
         };
         this.handlers = callbacks;
@@ -57,7 +57,7 @@ export default class BotManager implements Updatable {
         editorHandler.addEventListener("render", callbacks.render);
         board.addEventListener("entityadded", callbacks.entityAdded);
         board.addEventListener("entitypositionupdated", callbacks.entityPositionUpdated);
-        board.addEventListener("entityhungerupdated", callbacks.entityHungerUpdated);
+        board.addEventListener("entityenergyupdated", callbacks.entityEnergyUpdated);
         board.addEventListener("entityremoved", callbacks.entityRemoved);
     }
 
@@ -147,7 +147,7 @@ export default class BotManager implements Updatable {
             this.board.removeEventListener("entityadded", this.handlers.entityAdded);
             this.board.removeEventListener("entitypositionupdated", this.handlers.entityPositionUpdated);
             this.board.removeEventListener("entityremoved", this.handlers.entityRemoved);
-            this.board.removeEventListener("entityhungerupdated", this.handlers.entityHungerUpdated);
+            this.board.removeEventListener("entityenergyupdated", this.handlers.entityEnergyUpdated);
         }
         this.worker?.terminate();
     }
@@ -172,7 +172,7 @@ export default class BotManager implements Updatable {
                 type: ev.entity.type,
                 radius: ev.entity.radius,
                 position: ev.entity.position,
-                hunger: ev.entity.hunger
+                energy: ev.entity.energy
             }
         });
     }
@@ -181,8 +181,8 @@ export default class BotManager implements Updatable {
         this.send({ type: "entityPositionUpdate", id: ev.id, position: { ...ev.position } });
     }
 
-    private sendHunger(ev: EntityHungerUpdatedEvent) {
-        this.send({ type: "entityHungerUpdate", id: ev.id, hunger: ev.hunger });
+    private sendEnergy(ev: EntityEnergyUpdatedEvent) {
+        this.send({ type: "entityEnergyUpdate", id: ev.id, energy: ev.energy });
     }
 
     private sendRemove(ev: EntityRemovedEvent) {
