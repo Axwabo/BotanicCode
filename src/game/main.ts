@@ -1,4 +1,4 @@
-import { render } from "./renderer.ts";
+import { render } from "./rendering/renderer.ts";
 import { storeToRefs } from "pinia";
 import useGameStore from "../gameStore.ts";
 import { canvasToWorld } from "./ctx.ts";
