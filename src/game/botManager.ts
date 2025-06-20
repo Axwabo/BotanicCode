@@ -18,11 +18,12 @@ import { plant } from "./plants/create.ts";
 import { worldToTile } from "../util/tileConstants";
 import { modifyInventory } from "../util/inventoryHelper";
 import type { Updatable } from "../bot/sdk/entities";
+import type RenderEvent from "../util/world/events/render";
 
 type EventHandler<T> = (event: T) => void;
 
 interface EventHandlers {
-    render: () => void;
+    render: EventHandler<RenderEvent>;
     entityAdded: EventHandler<EntityAddedEvent>;
     entityPositionUpdated: EventHandler<EntityPositionUpdatedEvent>;
     entityRemoved: EventHandler<EntityRemovedEvent>;
@@ -42,7 +43,7 @@ export default class BotManager implements Updatable {
             return;
         this.worker = new Worker(`${import.meta.env.BASE_URL}bot/sdk/run.js?t=${Date.now()}&entryPoint=${encodeURI(entryPoint.replace(/^\//, ""))}`, { type: "module" });
         const callbacks: EventHandlers = {
-            render: () => this.send({ type: "render" }),
+            render: ev => this.send({ type: "render", delta: ev.deltaTime }),
             entityAdded: ev => this.sendAdd(ev),
             entityPositionUpdated: ev => this.sendMove(ev),
             entityRemoved: ev => this.sendRemove(ev)
