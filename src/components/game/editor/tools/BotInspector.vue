@@ -14,7 +14,7 @@ const { game } = useGameStore();
 
 const { workerReady, workerError } = storeToRefs(useGameStore());
 
-const bot = computed(() => game.botManager.bots.get(selectedBot.value)?.position);
+const bot = computed(() => game.botManager.bots.get(selectedBot.value));
 
 function handleClick(event: ClickEvent) {
     const { x, y } = event;
@@ -39,7 +39,8 @@ onUnmounted(() => editorHandler.removeEventListener("click", handleClick));
     <div id="botInspector">
         <div v-if="selectedBot && bot" class="details">
             <h2 class="bot-name">{{ selectedBot }}</h2>
-            <span>X: {{ bot.x.toFixed(2) }} Y: {{ bot.y.toFixed(2) }}</span>
+            <span>X: {{ bot.position.x.toFixed(2) }} Y: {{ bot.position.y.toFixed(2) }}</span>
+            <span>Energy: {{ (bot.energy * 100).toFixed(2) }}%</span>
             <button v-on:click="terminateBot">Terminate</button>
         </div>
         <p v-else>Click a bot to inspect</p>
@@ -61,7 +62,6 @@ onUnmounted(() => editorHandler.removeEventListener("click", handleClick));
 .details {
     display: flex;
     flex-direction: column;
-    gap: 0.5rem;
 }
 
 .bot-name, .ready, .error {
