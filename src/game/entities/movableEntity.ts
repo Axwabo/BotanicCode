@@ -6,6 +6,7 @@ import type { ManagedEntity } from "./interfaces.ts";
 import EntityAddedEvent from "../../util/world/events/entityAdded";
 import EntityPositionUpdatedEvent from "../../util/world/events/entityPosition";
 import EntityRemovedEvent from "../../util/world/events/entityRemoved";
+import EntityHungerUpdatedEvent from "../../util/world/events/entityHungerUpdated";
 
 export default abstract class MovableEntity<T extends MovableEntity<T>> implements ManagedEntity {
     readonly id: string = crypto.randomUUID();
@@ -14,6 +15,7 @@ export default abstract class MovableEntity<T extends MovableEntity<T>> implemen
     abstract readonly type: EntityType;
     abstract radius: number;
     private lifetime: number = 0;
+    hunger: number = 0;
 
     protected constructor(board: ManagedBoard, position: WorldPosition) {
         this.board = board;
@@ -32,6 +34,7 @@ export default abstract class MovableEntity<T extends MovableEntity<T>> implemen
 
     tick(deltaSeconds: number): void {
         this.lifetime += deltaSeconds;
+        this.increaseHunger(deltaSeconds * 0.001);
     }
 
     get secondsLived() {
@@ -41,5 +44,10 @@ export default abstract class MovableEntity<T extends MovableEntity<T>> implemen
     remove() {
         this.board.entities.delete(this);
         this.board.dispatchEvent(new EntityRemovedEvent(this.id));
+    }
+
+    increaseHunger(delta: number) {
+        this.hunger = Math.max(0, Math.min(1, this.hunger + delta));
+        this.board.dispatchEvent(new EntityHungerUpdatedEvent(this.id, this.hunger));
     }
 }

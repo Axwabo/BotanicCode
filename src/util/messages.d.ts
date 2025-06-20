@@ -5,7 +5,7 @@ import type { Entity } from "../bot/sdk/entities";
 import type { ItemType } from "../bot/sdk/items";
 
 export type WorkerMessage = Ready | BotRequestMessage | DrawGizmos | ClearGizmos | Error;
-export type GameMessage = Render | BotResponseMessage | World | TileUpdate | EntityAdd | EntityUpdate | EntityRemove;
+export type GameMessage = Render | BotResponseMessage | World | TileUpdate | EntityAdd | EntityPositionUpdate | EntityHungerUpdate | EntityRemove;
 
 interface Ready {
     type: "ready";
@@ -65,10 +65,16 @@ interface EntityAdd {
     entity: Entity;
 }
 
-interface EntityUpdate {
-    type: "entityUpdate";
+interface EntityPositionUpdate {
+    type: "entityPositionUpdate";
     id: string;
     position: WorldPosition;
+}
+
+interface EntityHungerUpdate {
+    type: "entityHungerUpdate";
+    id: string;
+    hunger: number;
 }
 
 interface EntityRemove {
