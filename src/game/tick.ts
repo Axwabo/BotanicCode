@@ -42,7 +42,7 @@ function refreshLoadedChunks(game: GameState, deltaSeconds: number) {
 
 export default function tick(game: GameState, deltaSeconds: number) {
     refreshLoadedChunks(game, deltaSeconds);
-    for (const entity of game.board.entities) {
+    for (const entity of Array.from(game.board.entities)) {
         const chunk = getChunk(game, entity.position);
         if (game.loadedChunks.has(chunk))
             entity.tick(deltaSeconds);
