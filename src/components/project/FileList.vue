@@ -23,30 +23,25 @@ const sorted = computed(() => {
 });
 
 function process(statuses: { path: string, status: FileStatus }[], list: ListItem[]) {
-    let previousSlash = 0;
-    let root = "/";
+    let previousDirectory = "/";
+    let upperDirectory = "/";
     for (let i = 0; i < statuses.length; i++) {
         const { path, status } = statuses[i];
         const slash = path.lastIndexOf("/");
-        if (slash > previousSlash && path.startsWith(root)) {
-            root = path.substring(0, slash);
-            let previousIndent = previousSlash;
-            let indentSlash = previousSlash;
-            while (true) {
-                indentSlash = path.indexOf("/", indentSlash + 1);
-                if (indentSlash === -1 || indentSlash > slash)
-                    break;
-                const depth = path.substring(0, indentSlash).split("/").length - 2;
-                const directory: ListItem = { path, depth, display: path.substring(previousIndent + 1, indentSlash) };
-                if (status === "hidden")
-                    directory.status = "hidden";
-                list.push(directory);
-                previousIndent = indentSlash;
+        const directory = path.substring(0, slash);
+        if (directory !== previousDirectory) {
+            if (directory.startsWith(previousDirectory)) {
+                let index = slash;
+                let previous = 1;
+                while (index !== -1) {
+                    list.push({ path: path.substring(0, index), depth: path.substring(0, index).split("/").length - 2, display: path.substring(previous, index) });
+                    previous = index;
+                    index = path.indexOf("/", index + 1);
+                }
             }
-        } else if (slash !== previousSlash)
-            root = path.substring(0, slash);
+        }
         list.push({ path, status, depth: path.split("/").length - 2, display: path.substring(slash + 1) });
-        previousSlash = slash;
+        previousDirectory = directory;
     }
 }
 </script>
