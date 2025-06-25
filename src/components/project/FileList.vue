@@ -22,6 +22,15 @@ const sorted = computed(() => {
     return listing;
 });
 
+function getUpperDirectory(directory: string, previous: string) {
+    const directorySplit = directory.split("/");
+    const previousSplit = previous.split("/");
+    let common = 0;
+    while (directorySplit.slice(0, common).join("/") === previousSplit.slice(0, common).join("/"))
+        common++;
+    return directorySplit.slice(0, common - 1).join("/");
+}
+
 function process(statuses: { path: string, status: FileStatus }[], list: ListItem[]) {
     let previousDirectory = "/";
     let upperDirectory = "";
@@ -30,19 +39,15 @@ function process(statuses: { path: string, status: FileStatus }[], list: ListIte
         const slash = path.lastIndexOf("/");
         const directory = path.substring(0, slash);
         if (directory !== previousDirectory) {
-            if (!directory.startsWith(previousDirectory)) {
-                let common = 0;
-                while (previousDirectory.substring(0, common) === directory.substring(0, common))
-                    common++;
-                upperDirectory = directory.substring(0, common - 1);
-                console.log(directory, previousDirectory, upperDirectory)
-            }
+            if (!directory.startsWith(previousDirectory))
+                upperDirectory = getUpperDirectory(directory, previousDirectory);
             let index = directory.indexOf("/", upperDirectory.length);
             let previous = upperDirectory.length;
             while (index !== -1) {
-                upperDirectory = directory.substring(previous - 1, index);
-                if (upperDirectory)
-                    list.push({ depth: directory.substring(0, index).split("/").length - 2, display: upperDirectory.substring(1) });
+                upperDirectory = directory.substring(0, index);
+                const display = directory.substring(previous, index);
+                if (display)
+                    list.push({ depth: directory.substring(0, index).split("/").length - 2, display });
                 previous = index + 1;
                 index = path.indexOf("/", previous);
             }
