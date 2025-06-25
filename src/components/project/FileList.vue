@@ -8,7 +8,7 @@ const { files, init } = useFileStore();
 await init();
 
 interface ListItem {
-    path: string;
+    path?: string;
     status?: FileStatus;
     display: string;
     depth: number;
@@ -24,20 +24,27 @@ const sorted = computed(() => {
 
 function process(statuses: { path: string, status: FileStatus }[], list: ListItem[]) {
     let previousDirectory = "/";
-    let upperDirectory = "/";
+    let upperDirectory = "";
     for (let i = 0; i < statuses.length; i++) {
         const { path, status } = statuses[i];
         const slash = path.lastIndexOf("/");
         const directory = path.substring(0, slash);
         if (directory !== previousDirectory) {
-            if (directory.startsWith(previousDirectory)) {
-                let index = slash;
-                let previous = 1;
-                while (index !== -1) {
-                    list.push({ path: path.substring(0, index), depth: path.substring(0, index).split("/").length - 2, display: path.substring(previous, index) });
-                    previous = index;
-                    index = path.indexOf("/", index + 1);
-                }
+            if (!directory.startsWith(previousDirectory)) {
+                let common = 0;
+                while (previousDirectory.substring(0, common) === directory.substring(0, common))
+                    common++;
+                upperDirectory = directory.substring(0, common - 1);
+                console.log(directory, previousDirectory, upperDirectory)
+            }
+            let index = directory.indexOf("/", upperDirectory.length);
+            let previous = upperDirectory.length;
+            while (index !== -1) {
+                upperDirectory = directory.substring(previous - 1, index);
+                if (upperDirectory)
+                    list.push({ depth: directory.substring(0, index).split("/").length - 2, display: upperDirectory.substring(1) });
+                previous = index + 1;
+                index = path.indexOf("/", previous);
             }
         }
         list.push({ path, status, depth: path.split("/").length - 2, display: path.substring(slash + 1) });
@@ -51,7 +58,7 @@ function process(statuses: { path: string, status: FileStatus }[], list: ListIte
     <div class="file-list">
         <template v-for="{path, display, status, depth} in sorted" :key="path">
             <template v-if="status !== 'hidden'">
-                <File v-if="status" :key="path" :path="path" :filename="display" :status="status" :style="`margin-left: ${depth}rem`"/>
+                <File v-if="status && path" :key="path" :path="path" :filename="display" :status="status" :style="`margin-left: ${depth}rem`"/>
                 <span v-else :style="`margin-left: ${depth}rem`">{{ display }}</span>
             </template>
         </template>
