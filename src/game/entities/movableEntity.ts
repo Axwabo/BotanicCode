@@ -6,7 +6,7 @@ import type { ManagedEntity } from "./interfaces.ts";
 import EntityAddedEvent from "../../util/world/events/entityAdded";
 import EntityPositionUpdatedEvent from "../../util/world/events/entityPosition";
 import EntityRemovedEvent from "../../util/world/events/entityRemoved";
-import EntityEnergyUpdatedEvent from "../../util/world/events/entityEnergyUpdated";
+import EntityEnergyUpdatedEvent from "../../util/world/events/energyUpdated";
 
 export default abstract class MovableEntity<T extends MovableEntity<T>> implements ManagedEntity {
     readonly id: string = crypto.randomUUID();

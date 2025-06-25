@@ -19,7 +19,7 @@ import { worldToTile } from "../util/tileConstants";
 import { modifyInventory } from "../util/inventoryHelper";
 import type { Updatable } from "../bot/sdk/entities";
 import type RenderEvent from "../util/world/events/render";
-import type EntityEnergyUpdatedEvent from "../util/world/events/entityEnergyUpdated";
+import type EntityEnergyUpdatedEvent from "../util/world/events/energyUpdated";
 
 type EventHandler<T> = (event: T) => void;
 
