@@ -79,6 +79,7 @@ const useFileStore = defineStore("projectFiles", {
             const cache = await this.cacheAsync;
             await cache.delete(path);
             this.files.delete(path);
+            this.close(path);
         },
         navigate(path: string, content?: string) {
             if (!this.files.get(path))
