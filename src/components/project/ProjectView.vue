@@ -42,8 +42,9 @@ function createFile() {
 
 <style scoped>
 #projectContainer {
-    display: grid;
-    grid-template-rows: auto 1fr auto;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
 }
 
 .create-container {
