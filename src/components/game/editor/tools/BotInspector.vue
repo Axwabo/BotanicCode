@@ -28,7 +28,10 @@ function handleClick(event: ClickEvent) {
 }
 
 function terminateBot() {
-    game.botManager.deleteBot(selectedBot.value);
+    if (workerReady.value)
+        game.botManager.deleteBot(selectedBot.value);
+    else
+        game.botManager.bots.delete(selectedBot.value);
 }
 
 onMounted(() => editorHandler.addEventListener("click", handleClick));
