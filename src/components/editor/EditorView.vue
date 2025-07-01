@@ -13,8 +13,7 @@ const monaco = defineAsyncComponent({
     delay: 0,
     loadingComponent: Loading,
     loader: async () => {
-        const env = await import("../../game/editor/environment.ts");
-        await env.default();
+        await new Promise(resolve => setTimeout(resolve, 1000));
         return await import("./MonacoEditor.vue");
     }
 });
