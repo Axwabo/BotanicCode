@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from "vue";
+import { ref, watch } from "vue";
 import { storeToRefs } from "pinia";
 import useFileStore from "../../fileStore.ts";
 
@@ -10,12 +10,19 @@ const channel = new BroadcastChannel("BotanicCodePrecache");
 
 channel.addEventListener("message", handlePrecaching);
 
+const { init } = useFileStore();
+
 const { swActivated } = storeToRefs(useFileStore());
 
 function handlePrecaching(ev: MessageEvent) {
     if (ev.data?.type === "precaching")
         caching.value = true;
 }
+
+watch(swActivated, value => {
+    if (caching.value && value)
+        init();
+});
 </script>
 
 <template>

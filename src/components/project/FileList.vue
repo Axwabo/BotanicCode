@@ -36,6 +36,8 @@ function process(statuses: { path: string, status: FileStatus }[], list: ListIte
     let upperDirectory = "";
     for (let i = 0; i < statuses.length; i++) {
         const { path, status } = statuses[i];
+        if (status === "hidden")
+            continue;
         const slash = path.lastIndexOf("/");
         const directory = path.substring(0, slash);
         if (directory !== previousDirectory) {
