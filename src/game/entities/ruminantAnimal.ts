@@ -12,6 +12,6 @@ export default class RuminantAnimal extends IdlingEntity {
             return;
         tile.type = "dirt";
         editorHandler.dispatchEvent(new TileUpdatedEvent(tile));
-        this.depleteEnergy(-0.01);
+        this.depleteEnergy(-0.03);
     }
 }
