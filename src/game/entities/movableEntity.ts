@@ -49,7 +49,7 @@ export default abstract class MovableEntity<T extends MovableEntity<T>> implemen
     }
 
     depleteEnergy(delta: number) {
-        this.energy = Math.max(0, Math.min(1, this.energy + delta));
+        this.energy = Math.max(0, Math.min(1, this.energy - delta));
         this.board.dispatchEvent(new EntityEnergyUpdatedEvent(this.id, this.energy));
     }
 }

@@ -7,7 +7,7 @@ import IdleMovement from "./idleMovement.ts";
 export default class IdlingEntity extends MovableEntity<IdlingEntity> {
     radius: number;
     readonly type: EntityType;
-    private readonly movement: IdleMovement<IdlingEntity>;
+    protected readonly movement: IdleMovement<IdlingEntity>;
 
     constructor(board: ManagedBoard, position: WorldPosition, type: EntityType, radius: number, speed: number) {
         super(board, position);
