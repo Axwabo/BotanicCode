@@ -4,6 +4,10 @@ export function signalReady() {
     sendMessage({ type: "ready" });
 }
 
-export function signalError(error) {
-    sendMessage({ type: "error", error });
+/**
+ * @param error {any}
+ * @param fatal {boolean}
+ */
+export function signalError(error, fatal = true) {
+    sendMessage({ type: "error", error, fatal });
 }

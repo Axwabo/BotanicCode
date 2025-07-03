@@ -19,6 +19,8 @@ const {
     workerError
 } = storeToRefs(useGameStore());
 
+const { stop } = useGameStore();
+
 let previousTimestamp = 0;
 let pinch = 0;
 
@@ -191,6 +193,8 @@ function resetWorkerState() {
 
 function setError(event: WorkerErrorEvent) {
     workerError.value = event.error;
+    if (event.fatal)
+        stop();
 }
 
 function sendBoard() {

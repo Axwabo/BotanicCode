@@ -29,6 +29,7 @@ interface BotRequestMessage {
 interface Error {
     type: "error";
     error: any;
+    fatal: boolean;
 }
 
 interface Render {

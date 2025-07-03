@@ -8,8 +8,12 @@ import EntityRemovedEvent from "../../util/world/events/entityRemoved.js";
 import PickUpEvent from "../../util/world/events/pickUp.js";
 import { EnergyDepletionEvent } from "../../util/world/events/energyDepletion.js";
 import RenderEvent from "../../util/world/events/render.js";
+import EntityEnergyUpdatedEvent from "../../util/world/events/energyUpdated.js";
+import { signalError } from "./ready.js";
 
 addEventListener("message", handleMessage);
+
+addEventListener("error", handleError);
 
 /** @param ev {MessageEvent<GameMessage>} */
 function handleMessage(ev) {
@@ -40,11 +44,14 @@ function handleMessage(ev) {
         case "entityAdd":
             dispatchEvent(new EntityAddedEvent(ev.data.entity));
             break;
-        case "entityUpdate":
+        case "entityPositionUpdate":
             dispatchEvent(new EntityPositionUpdatedEvent(ev.data.id, ev.data.position));
             break;
         case "entityRemove":
             dispatchEvent(new EntityRemovedEvent(ev.data.id));
+            break;
+        case "entityEnergyUpdate":
+            dispatchEvent(new EntityEnergyUpdatedEvent(ev.data.id, ev.data.energy));
             break;
     }
 }
@@ -70,3 +77,14 @@ function handleResponse(bot, response) {
             break;
     }
 }
+
+/** @param ev {ErrorEvent} */
+function handleError(ev) {
+    signalError(ev);
+}
+
+const originalError = console.error;
+console.error = function(e) {
+    originalError(e);
+    signalError(e, false);
+};

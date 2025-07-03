@@ -66,7 +66,7 @@ export default class BotManager implements Updatable {
             return;
         switch (event.data.type) {
             case "error":
-                editorHandler.dispatchEvent(new WorkerErrorEvent(event.data.error));
+                editorHandler.dispatchEvent(new WorkerErrorEvent(event.data.error, event.data.fatal));
                 break;
             case "ready":
                 editorHandler.dispatchEvent(new Event("workerready"));
