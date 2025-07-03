@@ -4,7 +4,7 @@ import ManagedBoard from "../managedBoard.ts";
 import type { WorldPosition } from "../../util/tile";
 import IdleMovement from "./idleMovement.ts";
 
-export default class IdlingEntity extends MovableEntity<IdlingEntity> {
+export default class IdlingEntity extends MovableEntity {
     radius: number;
     readonly type: EntityType;
     protected readonly movement: IdleMovement<IdlingEntity>;

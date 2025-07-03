@@ -8,7 +8,7 @@ import EntityPositionUpdatedEvent from "../../util/world/events/entityPosition";
 import EntityRemovedEvent from "../../util/world/events/entityRemoved";
 import EntityEnergyUpdatedEvent from "../../util/world/events/energyUpdated";
 
-export default abstract class MovableEntity<T extends MovableEntity<T>> implements ManagedEntity {
+export default abstract class MovableEntity implements ManagedEntity {
     readonly id: string = crypto.randomUUID();
     readonly board: ManagedBoard;
     position: WorldPosition;
