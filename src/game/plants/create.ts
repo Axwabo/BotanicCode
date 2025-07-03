@@ -21,6 +21,7 @@ export function plant(board: Board, tileX: number, tileY: number, type: PlantTyp
         ageSeconds: 0,
         tick(deltaSeconds: number) {
             this.ageSeconds += deltaSeconds;
+            return this.ageSeconds - deltaSeconds < maxAge;
         },
         get growthPercentage(): number {
             return Math.min(1, this.ageSeconds / maxAge);

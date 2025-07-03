@@ -49,7 +49,7 @@ export default function beginLoop() {
 }
 
 function loop(timestamp: number) {
-    const delta = (timestamp - previousTimestamp) * 0.001;
+    const delta = Math.min(0.5, (timestamp - previousTimestamp) * 0.001);
     game.value.loadedChunks.clear();
     if (workerReady.value)
         tick(game.value, delta);

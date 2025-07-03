@@ -1,6 +1,8 @@
 import type { GameState } from "./gameState.ts";
 import { tilesPerChunk, worldToChunk } from "../util/tileConstants";
-import type { WorldPosition } from "../util/tile";
+import type { Tile, WorldPosition } from "../util/tile";
+import { editorHandler } from "./events/editorHandler.ts";
+import TileUpdatedEvent from "../util/world/events/tileUpdated";
 
 function getChunk(game: GameState, position: WorldPosition) {
     return game.board.getChunk(Math.floor(worldToChunk(position.x)), Math.floor(worldToChunk(position.y)));
@@ -40,6 +42,18 @@ function refreshLoadedChunks(game: GameState, deltaSeconds: number) {
     }
 }
 
+function updateDirt(game: GameState, tile: Tile, deltaSeconds: number) {
+    const left = game.board.getTile(tile.x - 1, tile.y).type === "grass";
+    const right = game.board.getTile(tile.x + 1, tile.y).type === "grass";
+    const up = game.board.getTile(tile.x, tile.y - 1).type === "grass";
+    const down = game.board.getTile(tile.x - 1, tile.y + 1).type === "grass";
+    const chance = (+left + +right + +up + +down) * 0.01 * deltaSeconds;
+    if (Math.random() >= chance)
+        return false;
+    tile.type = "grass";
+    return true;
+}
+
 export default function tick(game: GameState, deltaSeconds: number) {
     refreshLoadedChunks(game, deltaSeconds);
     for (const entity of Array.from(game.board.entities)) {
@@ -52,7 +66,13 @@ export default function tick(game: GameState, deltaSeconds: number) {
         for (let x = 0; x < tilesPerChunk; x++)
             for (let y = 0; y < tilesPerChunk; y++) {
                 const tile = chunk.getTile(x, y);
+                let updated = false;
                 if (tile.data && "tick" in tile.data)
-                    tile.data.tick(deltaSeconds);
+                    updated ||= !!tile.data.tick(deltaSeconds);
+                else if (tile.type === "dirt")
+                    updated ||= updateDirt(game, tile, deltaSeconds);
+                if (updated)
+                    editorHandler.dispatchEvent(new TileUpdatedEvent(tile));
             }
+
 }

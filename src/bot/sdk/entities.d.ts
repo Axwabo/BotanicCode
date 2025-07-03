@@ -3,7 +3,7 @@ import type { WorldPosition } from "../../util/tile";
 export type EntityType = "cow" | "pig" | "sheep" | "chicken";
 
 export interface Updatable {
-    tick(deltaSeconds: number): void;
+    tick(deltaSeconds: number): boolean | void;
 }
 
 export interface Entity {
