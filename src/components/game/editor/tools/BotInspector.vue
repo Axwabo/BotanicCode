@@ -1,18 +1,21 @@
 <script setup lang="ts">
 import { storeToRefs } from "pinia";
 import useEditorStore from "../../../../editorStore.ts";
-import { computed, onMounted, onUnmounted } from "vue";
+import { computed, onMounted, onUnmounted, ref } from "vue";
 import type ClickEvent from "../../../../game/events/clickEvent.ts";
 import useGameStore from "../../../../gameStore.ts";
 import { isInRange } from "../../../../util/distance";
 import { editorHandler } from "../../../../game/events/editorHandler.ts";
 import { botRadius } from "../../../../bot/sdk/bot.js";
+import { requestErrorChannel } from "../../../../worker/channels.ts";
 
 const { selectedBot } = storeToRefs(useEditorStore());
 
 const { game } = useGameStore();
 
 const { workerReady, workerError } = storeToRefs(useGameStore());
+
+const requestError = ref("");
 
 const bot = computed(() => game.botManager.bots.get(selectedBot.value));
 
@@ -34,8 +37,18 @@ function terminateBot() {
         game.botManager.bots.delete(selectedBot.value);
 }
 
-onMounted(() => editorHandler.addEventListener("click", handleClick));
-onUnmounted(() => editorHandler.removeEventListener("click", handleClick));
+function handleRequestError(event: MessageEvent) {
+    requestError.value = "\n" + (event.data as string);
+}
+
+onMounted(() => {
+    editorHandler.addEventListener("click", handleClick);
+    requestErrorChannel.addEventListener("message", handleRequestError);
+});
+onUnmounted(() => {
+    editorHandler.removeEventListener("click", handleClick);
+    requestErrorChannel.removeEventListener("message", handleRequestError);
+});
 </script>
 
 <template>
@@ -49,7 +62,7 @@ onUnmounted(() => editorHandler.removeEventListener("click", handleClick));
         <p v-else>Click a bot to inspect</p>
         <div class="bot-status">
             <p class="ready" v-if="workerReady">Ready</p>
-            <pre class="error" v-if="workerError">{{ workerError instanceof Error ? workerError.stack : workerError }}</pre>
+            <pre class="error" v-if="workerError">{{ workerError instanceof Error ? workerError.stack : workerError }}{{ requestError }}</pre>
         </div>
     </div>
 </template>

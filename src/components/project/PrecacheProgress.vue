@@ -2,20 +2,19 @@
 import { ref, watch } from "vue";
 import { storeToRefs } from "pinia";
 import useFileStore from "../../fileStore.ts";
+import { precacheChannel } from "../../worker/channels.ts";
 
 const caching = ref(false);
 const hidden = ref(false);
 
-const channel = new BroadcastChannel("BotanicCodePrecache");
-
-channel.addEventListener("message", handlePrecaching);
+precacheChannel.addEventListener("message", handlePrecaching);
 
 const { init } = useFileStore();
 
 const { swActivated } = storeToRefs(useFileStore());
 
 function handlePrecaching(ev: MessageEvent) {
-    if (ev.data?.type === "precaching")
+    if (ev.data === "precaching")
         caching.value = true;
 }
 
