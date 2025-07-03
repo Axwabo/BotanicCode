@@ -1,6 +1,7 @@
 /// <reference lib="webworker" />
 import { addPlugins, cleanupOutdatedCaches, createHandlerBoundToURL, precacheAndRoute } from "workbox-precaching"
 import { NavigationRoute, registerRoute } from "workbox-routing";
+import type { RouteMatchCallback } from "workbox-core";
 
 declare let self: ServiceWorkerGlobalScope;
 
@@ -58,14 +59,21 @@ const plainInit = {
     }
 };
 
-registerRoute(/\/file-list\/static/, async () => {
+registerRoute(isPath(/^file-list$/i), async () => {
     return new Response(manifest.map(e => typeof e === "string" ? e : e.url)
     .filter(e => e.startsWith("util/") || e.startsWith("bot/"))
     .map(e => `/${e}`)
     .join("\n"), plainInit);
 });
 
-registerRoute(/\/bot\/sdk\/run*/, async options => {
+function isPath(match: RegExp): RouteMatchCallback {
+    return ({ url }) => {
+        console.log(url)
+        return url.origin !== self.location.origin && match.test(url.pathname.substring(import.meta.env.BASE_URL.length));
+    };
+}
+
+registerRoute(isPath(/^bot\/sdk\/run\.js/i), async options => {
     const entry = options.url.searchParams.get("entryPoint");
     if (!entry)
         return new Response(null, { status: 401 });
@@ -109,7 +117,7 @@ cleanupOutdatedCaches();
 let allowlist;
 // in dev mode, we disable precaching to avoid caching issues
 if (import.meta.env.DEV)
-    allowlist = [ /^\/$/ ];
+    allowlist = [ /^\/BotanicCode\/$/ ];
 
 addPlugins([ {
     cacheWillUpdate: async ({ response }) => {
