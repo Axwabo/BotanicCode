@@ -2,7 +2,8 @@
 import { addPlugins, cleanupOutdatedCaches, createHandlerBoundToURL, precacheAndRoute } from "workbox-precaching"
 import { NavigationRoute, registerRoute } from "workbox-routing";
 import { precacheChannel, requestErrorChannel } from "./worker/channels";
-import { addJsHeader, generateEntryPoint } from "./worker/transforms.ts";
+import { addJsHeader, generateEntryPoint, ImportRewriteError, rewriteImports } from "./worker/transforms.ts";
+import { badRequest, illegalFetch, illegalImport, illegalImportsContained, jsSuccess, notFound, plainInit, serverError } from "./worker/ini.ts";
 
 declare let self: ServiceWorkerGlobalScope;
 
@@ -24,14 +25,7 @@ self.addEventListener("message", event => {
         void self.skipWaiting();
 });
 
-const headers = {
-    "Content-Type": "text/javascript",
-    "Content-Security-Policy": "script-src 'strict-dynamic'"
-};
-
 const botDirectory = new RegExp(`^${import.meta.env.BASE_URL.replace("/", "\\/")}bot\\/(?!sdk\\/)`);
-
-const illegalFetch = "Cannot fetch resources outside `/bot/` or `/util/` from a bot module.";
 
 self.addEventListener("fetch", event => {
     const path = new URL(event.request.url).pathname;
@@ -44,17 +38,9 @@ self.addEventListener("fetch", event => {
         || path.startsWith(import.meta.env.BASE_URL + "util/"))
         return;
     requestErrorChannel.postMessage(`${illegalFetch}\nRequested resource: ${event.request.url}`);
-    event.respondWith(new Response(illegalFetch, {
-        status: 403,
-        statusText: "Illegal Import"
-    }));
-});
 
-const plainInit = {
-    headers: {
-        "Content-Type": "text/plain"
-    }
-};
+    event.respondWith(new Response(illegalFetch, illegalImport));
+});
 
 registerRoute(/\/file-list\/static/, async () => {
     return new Response(manifest.map(e => typeof e === "string" ? e : e.url)
@@ -66,10 +52,10 @@ registerRoute(/\/file-list\/static/, async () => {
 registerRoute(/\/bot\/sdk\/run*/, async options => {
     const entry = options.url.searchParams.get("entryPoint");
     if (!entry)
-        return new Response(null, { status: 401 });
+        return new Response(null, badRequest);
     // TODO: sanitize input
     lastRun = Date.now();
-    return new Response(generateEntryPoint(entry, lastRun), { status: 200, headers });
+    return new Response(generateEntryPoint(entry, lastRun), jsSuccess);
 });
 
 registerRoute(/\/bot\/(?!sdk\/)/i, async ({ url }) => {
@@ -78,22 +64,18 @@ registerRoute(/\/bot\/(?!sdk\/)/i, async ({ url }) => {
     const cached = await fileCache.match(file);
     if (!cached) {
         requestErrorChannel.postMessage(`File not found: ${file}`);
-        return new Response(null, { status: 404, statusText: "File Not Found" });
+        return new Response(null, notFound);
     }
     const text = await cached.text();
-    // TODO: prevent importing from parent directory
-    return new Response(
-        text.replace(/(?:^|\w)import([\s\S]+?)from\s*["'](.+?)["']/g, (_, members, file) => `import ${members} from "${transformFile(file)}"`)
-        .replace(/(?:^|\w)import\s["'](.+?)["']*/, (_, file) => `import "${import.meta.env.BASE_URL}bot/${file}?t=${lastRun}"`),
-        { status: 200, headers }
-    );
+    let rewritten: string;
+    try {
+        rewritten = rewriteImports(text, lastRun);
+        return new Response(rewritten, jsSuccess);
+    } catch (e) {
+        requestErrorChannel.postMessage(e instanceof ImportRewriteError ? `An illegal import was detected in the requested file: ${file}` : "" + e);
+        return new Response(null, e instanceof ImportRewriteError ? illegalImportsContained : serverError);
+    }
 });
-
-const staticAssets = /^(?:\.\.\/util\/|\/util\/|\.\/sdk\/|sdk\/|\/bot\/sdk\/)/;
-
-function transformFile(file: string) {
-    return file.match(staticAssets) ? file : `${import.meta.env.BASE_URL}bot/${file}?t=${lastRun}`;
-}
 
 precacheAndRoute(manifest);
 

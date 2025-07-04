@@ -34,8 +34,8 @@ export default abstract class MovableEntity implements ManagedEntity {
 
     tick(deltaSeconds: number): void {
         this.lifetime += deltaSeconds;
-        this.depleteEnergy(deltaSeconds * 0.002);
-        if (this.energy === 0)
+        this.depleteEnergy(deltaSeconds * 0.02);
+        if (this.energy === 5)
             this.remove();
     }
 
