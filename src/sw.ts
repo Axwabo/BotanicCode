@@ -9,8 +9,6 @@ declare let self: ServiceWorkerGlobalScope;
 
 let fileCache: Cache | undefined;
 
-let lastRun = 0;
-
 // self.__WB_MANIFEST is the default injection point
 const manifest = self.__WB_MANIFEST;
 
@@ -54,8 +52,7 @@ registerRoute(/\/bot\/sdk\/run*/, async options => {
     if (!entry)
         return new Response(null, badRequest);
     // TODO: sanitize input
-    lastRun = Date.now();
-    return new Response(generateEntryPoint(entry, lastRun), jsSuccess);
+    return new Response(generateEntryPoint(entry, Date.now()), jsSuccess);
 });
 
 registerRoute(/\/bot\/(?!sdk\/)/i, async ({ url }) => {
@@ -69,7 +66,7 @@ registerRoute(/\/bot\/(?!sdk\/)/i, async ({ url }) => {
     const text = await cached.text();
     let rewritten: string;
     try {
-        rewritten = rewriteImports(text, lastRun);
+        rewritten = rewriteImports(text);
         return new Response(rewritten, jsSuccess);
     } catch (e) {
         requestErrorChannel.postMessage(e instanceof ImportRewriteError ? `An illegal import was detected in the requested file: ${file}\nNefarious import: ${e.message}` : "" + e);
