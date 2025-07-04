@@ -72,7 +72,7 @@ registerRoute(/\/bot\/(?!sdk\/)/i, async ({ url }) => {
         rewritten = rewriteImports(text, lastRun);
         return new Response(rewritten, jsSuccess);
     } catch (e) {
-        requestErrorChannel.postMessage(e instanceof ImportRewriteError ? `An illegal import was detected in the requested file: ${file}` : "" + e);
+        requestErrorChannel.postMessage(e instanceof ImportRewriteError ? `An illegal import was detected in the requested file: ${file}\nNefarious import: ${e.message}` : "" + e);
         return new Response(null, e instanceof ImportRewriteError ? illegalImportsContained : serverError);
     }
 });

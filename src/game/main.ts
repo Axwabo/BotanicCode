@@ -132,7 +132,6 @@ function zoom(delta: number) {
 function handleWheel(event: WheelEvent) {
     if (notCanvas(event.target))
         return;
-    event.preventDefault();
     event.stopPropagation();
     const previousWorld = canvasToWorld(event.offsetX, event.offsetY);
     zoom(event.deltaY);

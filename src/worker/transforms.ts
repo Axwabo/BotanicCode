@@ -12,13 +12,22 @@ export function generateEntryPoint(entry: string, run: number) {
 }
 
 export function rewriteImports(text: string, run: number) {
+    // TODO: matchAll, detect & print bad import locations
+    // TODO: use js-tokens package in the future?
     return text.replace(/(?:^|\w)import([\s\S]+?)from\s*["'](.+?)["']/g, (_, members, file) => `import ${members} from "${transformFile(file, run)}"`)
-    .replace(/(?:^|\w)import\s["'](.+?)["']*/, (_, file) => `import "${import.meta.env.BASE_URL}bot/${file}?t=${run}"`);
+    .replace(/(?:^|\w)import\s["'](.+?)["']/, (_, file) => `import "${transformFile(file, run)}"`);
 }
 
 function transformFile(file: string, run: number) {
     // TODO
+    if (file.startsWith("/")) {
+        throw new ImportRewriteError(file);
+    }
+    return `${file}?t=${run}`;
 }
 
 export class ImportRewriteError extends Error {
+    constructor(message: string) {
+        super(message);
+    }
 }
