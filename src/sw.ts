@@ -2,8 +2,8 @@
 import { addPlugins, cleanupOutdatedCaches, createHandlerBoundToURL, precacheAndRoute } from "workbox-precaching"
 import { NavigationRoute, registerRoute } from "workbox-routing";
 import { precacheChannel, requestErrorChannel } from "./worker/channels";
-import { addJsHeader, generateEntryPoint, ImportRewriteError, rewriteImports } from "./worker/transforms.ts";
-import { badRequest, illegalFetch, illegalImport, illegalImportsContained, jsSuccess, notFound, plainInit, serverError } from "./worker/ini.ts";
+import { addJsHeader, generateEntryPoint, rewriteImports } from "./worker/transforms.ts";
+import { badRequest, illegalFetch, illegalImport, illegalImportsContained, jsSuccess, notFound, plainInit } from "./worker/ini.ts";
 
 declare let self: ServiceWorkerGlobalScope;
 
@@ -63,15 +63,12 @@ registerRoute(/\/bot\/(?!sdk\/)/i, async ({ url }) => {
         requestErrorChannel.postMessage(`File not found: ${file}`);
         return new Response(null, notFound);
     }
-    const text = await cached.text();
-    let rewritten: string;
-    try {
-        rewritten = rewriteImports(text);
-        return new Response(rewritten, jsSuccess);
-    } catch (e) {
-        requestErrorChannel.postMessage(e instanceof ImportRewriteError ? `An illegal import was detected in the requested file: ${file}\nNefarious import: ${e.message}` : "" + e);
-        return new Response(null, e instanceof ImportRewriteError ? illegalImportsContained : serverError);
-    }
+    const raw = await cached.text();
+    const { text, error } = rewriteImports(raw);
+    if (!error)
+        return new Response(text, jsSuccess);
+    requestErrorChannel.postMessage(`An illegal import was detected in the requested file: ${file}\nNefarious import: ${error}`);
+    return new Response(null, illegalImportsContained);
 });
 
 precacheAndRoute(manifest);
