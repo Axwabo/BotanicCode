@@ -7,14 +7,14 @@ function randomOffset() {
     return Math.round((Math.random() * 6 - 3) * tileSize);
 }
 
-export default class IdleMovement<T extends MovableEntity<T>> {
-    private readonly entity: T;
+export default class IdleMovement {
+    private readonly entity: MovableEntity;
     private readonly movementSpeed: number;
 
     target?: WorldPosition;
     waitTime: number = 0;
 
-    constructor(entity: T, movementSpeed: number) {
+    constructor(entity: MovableEntity, movementSpeed: number) {
         this.entity = entity;
         this.movementSpeed = movementSpeed;
     }
