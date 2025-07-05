@@ -2,8 +2,9 @@
 import { addPlugins, cleanupOutdatedCaches, createHandlerBoundToURL, precacheAndRoute } from "workbox-precaching"
 import { NavigationRoute, registerRoute } from "workbox-routing";
 import { precacheChannel, requestErrorChannel } from "./worker/channels";
-import { addJsHeader, generateEntryPoint, rewriteImports } from "./worker/transforms.ts";
+import { addJsHeader, generateEntryPoint } from "./worker/transforms.ts";
 import { badRequest, illegalFetch, illegalImport, illegalImportsContained, jsSuccess, notFound, plainInit } from "./worker/ini.ts";
+import validateImports from "./worker/importValidator.ts";
 
 declare let self: ServiceWorkerGlobalScope;
 
@@ -64,10 +65,10 @@ registerRoute(/\/bot\/(?!sdk\/)/i, async ({ url }) => {
         return new Response(null, notFound);
     }
     const raw = await cached.text();
-    const { text, error } = rewriteImports(raw);
+    const { text, error } = validateImports(raw);
     if (!error)
         return new Response(text, jsSuccess);
-    requestErrorChannel.postMessage(`An illegal import was detected in the requested file: ${file}\nNefarious import: ${error}`);
+    requestErrorChannel.postMessage(`An illegal import was detected in the requested file: ${file}\n${error}`);
     return new Response(null, illegalImportsContained);
 });
 

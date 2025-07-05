@@ -16,5 +16,3 @@ export const illegalImport: ResponseInit = { status: 403, statusText: "Illegal I
 export const notFound: ResponseInit = { status: 404, statusText: "File Not Found" } as const;
 
 export const illegalImportsContained: ResponseInit = { status: 451, statusText: "Illegal Imports Contained" } as const;
-
-export const serverError: ResponseInit = { status: 500 } as const;
