@@ -29,40 +29,42 @@ export default function validateImports(text: string): ImportValidationResult {
         }
         if (token.type === "Punctuator" && token.value === "(")
             return { text: "", error: `Dynamic imports are not allowed. Line ${line} column ${column}` };
-        if (token.type === "Punctuator" && token.value === "{") {
-            inner: while (true) {
-                if (!next())
-                    return end();
-                switch (token.type) {
-                    case "WhiteSpace":
-                    case "IdentifierName":
-                        break;
-                    case "Punctuator":
-                        if (token.value === ",")
-                            break;
-                        if (token.value !== "}")
-                            return end(); // syntax error
-                        if (!skipWhitespaces())
-                            return end();
-                        break inner;
-                    default:
-                        return end(); // syntax error
-                }
-            }
-        } else if (token.type === "IdentifierName") {
+        const onlyAlias = asteriskAlias();
+        if (onlyAlias === undefined) // successful validation
+            continue;
+        if (onlyAlias) // syntax error or illegal import
+            return onlyAlias;
+        if (token.type === "IdentifierName") {
+            // default export
             if (!skipWhitespaces())
                 break;
+            if (token.type === "Punctuator" && token.value === ",") {
+                // default export followed by an aliased default export
+                if (!skipWhitespaces())
+                    break;
+                const asterisk = asteriskAlias();
+                if (asterisk === undefined)
+                    continue;
+                if (asterisk)
+                    return asterisk;
+            } else {
+                // only default export
+                const failure = from();
+                if (failure)
+                    return failure;
+            }
+            if (!skipWhitespaces())
+                break;
+        }
+        if (token.type === "Punctuator" && token.value === "{") {
+            const named = endNamed();
+            if (named)
+                return named;
         } else
-            return end(); // syntax error
-        if (token.type !== "IdentifierName" && token.value !== "from")
             return end();
-        if (!skipWhitespaces())
-            break;
-        if (token.type !== "StringLiteral")
-            return end();
-        const file = token.value.match(extractString)[1];
-        if (!validateFile(file))
-            return fail(file);
+        const failure = from();
+        if (failure)
+            return failure;
     }
 
     return { text: builder };
@@ -84,7 +86,7 @@ export default function validateImports(text: string): ImportValidationResult {
     function skipWhitespaces() {
         do if (!next())
             return false;
-        while (token.type === "WhiteSpace");
+        while (token.type === "WhiteSpace" || token.type === "SingleLineComment" || token.type === "MultiLineComment" || token.type === "HashbangComment" || token.type === "LineTerminatorSequence");
         return true;
     }
 
@@ -95,7 +97,58 @@ export default function validateImports(text: string): ImportValidationResult {
     }
 
     function fail(file: string): ImportValidationResult {
-        return { text: "", error: `Nefarious import at line ${line} column ${column - token.value.length}: ${file}` };
+        return { text: "", error: `Nefarious import at line ${line} column ${column - token.value.length + 1}: ${file}` };
+    }
+
+    function from(): ImportValidationResult | undefined {
+        if (token.type !== "IdentifierName" || token.value !== "from" || !skipWhitespaces() || token.type !== "StringLiteral")
+            return end(); // syntax error, must be: from "./file.js"
+        const file = token.value.match(extractString)[1];
+        return validateFile(file) ? undefined : fail(file);
+    }
+
+    function asteriskAlias(): ImportValidationResult | false | undefined {
+        if (token.type !== "Punctuator" || token.value !== "*")
+            return false;
+        if (!skipWhitespaces())
+            return { text: builder };
+        if (token.type !== "IdentifierName" || token.value !== "as")
+            return end(); // syntax error, must be: * as name
+        if (!skipWhitespaces())
+            return { text: builder };
+        if (token.type !== "IdentifierName")
+            return end();
+        return skipWhitespaces() ? from() : { text: builder };
+    }
+
+    function endNamed(): ImportValidationResult | undefined {
+        while (true) {
+            if (!next())
+                return end();
+            switch (token.type) {
+                case "StringLiteral":
+                    // alias
+                    // noinspection DuplicateConditionJS
+                    if (!skipWhitespaces() || token.type !== "IdentifierName" || token.value !== "as" || !skipWhitespaces() || token.type !== "IdentifierName")
+                        return end();
+                    break;
+                case "IdentifierName":
+                case "WhiteSpace":
+                case "LineTerminatorSequence":
+                case "SingleLineComment":
+                case "MultiLineComment":
+                case "HashbangComment":
+                    break;
+                case "Punctuator":
+                    if (token.value === ",")
+                        break;
+                    if (token.value !== "}" || !skipWhitespaces())
+                        return end();
+                    return undefined;
+                default:
+                    return end();
+            }
+        }
     }
 }
 

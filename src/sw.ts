@@ -65,16 +65,11 @@ registerRoute(/\/bot\/(?!sdk\/)/i, async ({ url }) => {
         return new Response(null, notFound);
     }
     const raw = await cached.text();
-    try {
-        const { text, error } = validateImports(raw);
-        if (!error)
-            return new Response(text, jsSuccess);
-        requestErrorChannel.postMessage(`An illegal import was detected in the requested file: ${file}\n${error}`);
-        return new Response(null, illegalImportsContained);
-    } catch (e) {
-        requestErrorChannel.postMessage((e || "").toString());
-        return new Response(null, { status: 500 });
-    }
+    const { text, error } = validateImports(raw);
+    if (!error)
+        return new Response(text, jsSuccess);
+    requestErrorChannel.postMessage(`An illegal import was detected in the requested file: ${file}\n${error}`);
+    return new Response(null, illegalImportsContained);
 });
 
 precacheAndRoute(manifest);
