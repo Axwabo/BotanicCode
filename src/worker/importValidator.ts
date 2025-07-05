@@ -52,9 +52,9 @@ export default function validateImports(text: string): ImportValidationResult {
                 const failure = from();
                 if (failure)
                     return failure;
+                if (!skipWhitespaces())
+                    break;
             }
-            if (!skipWhitespaces())
-                break;
         }
         if (token.type === "Punctuator" && token.value === "{") {
             const named = endNamed();
