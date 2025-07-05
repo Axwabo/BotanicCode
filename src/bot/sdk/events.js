@@ -82,9 +82,3 @@ function handleResponse(bot, response) {
 function handleError(ev) {
     signalError(ev);
 }
-
-const originalError = console.error;
-console.error = function(e) {
-    originalError(e);
-    signalError(e, false);
-};
