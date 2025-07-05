@@ -20,6 +20,7 @@ import { modifyInventory } from "../util/inventoryHelper";
 import type { Updatable } from "../bot/sdk/entities";
 import type RenderEvent from "../util/world/events/render";
 import type EntityEnergyUpdatedEvent from "../util/world/events/energyUpdated";
+import WorkerLogEvent from "./events/workerLogEvent.ts";
 
 type EventHandler<T> = (event: T) => void;
 
@@ -65,8 +66,10 @@ export default class BotManager implements Updatable {
         if (!event.data)
             return;
         switch (event.data.type) {
-            case "error":
-                editorHandler.dispatchEvent(new WorkerErrorEvent(event.data.error, event.data.fatal));
+            case "log":
+                if (event.data.logType === "error" || event.data.logType === "fatal")
+                    editorHandler.dispatchEvent(new WorkerErrorEvent(event.data.content, event.data.logType === "fatal"));
+                editorHandler.dispatchEvent(new WorkerLogEvent(event.data.content, event.data.logType));
                 break;
             case "ready":
                 editorHandler.dispatchEvent(new Event("workerready"));

@@ -4,8 +4,10 @@ import type { Gizmo } from "./gizmos";
 import type { Entity } from "../bot/sdk/entities";
 import type { ItemType } from "../bot/sdk/items";
 
-export type WorkerMessage = Ready | BotRequestMessage | DrawGizmos | ClearGizmos | Error;
+export type WorkerMessage = Ready | BotRequestMessage | DrawGizmos | ClearGizmos | Log;
 export type GameMessage = Render | BotResponseMessage | World | TileUpdate | EntityAdd | EntityPositionUpdate | EntityEnergyUpdate | EntityRemove;
+
+export type LogType = "debug" | "info" | "warn" | "error" | "fatal";
 
 interface Ready {
     type: "ready";
@@ -26,10 +28,10 @@ interface BotRequestMessage {
     request: BotRequest;
 }
 
-interface Error {
-    type: "error";
-    error: any;
-    fatal: boolean;
+interface Log {
+    type: "log";
+    content: any;
+    logType: LogType;
 }
 
 interface Render {

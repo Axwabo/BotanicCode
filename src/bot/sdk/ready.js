@@ -9,5 +9,5 @@ export function signalReady() {
  * @param fatal {boolean}
  */
 export function signalError(error, fatal = true) {
-    sendMessage({ type: "error", error, fatal });
+    sendMessage({ type: "log", content: error, logType: fatal ? "fatal" : "error" });
 }
