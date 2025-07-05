@@ -35,26 +35,11 @@ export default function validateImports(text: string): ImportValidationResult {
         if (onlyAlias) // syntax error or illegal import
             return onlyAlias;
         if (token.type === "IdentifierName") {
-            // default export
-            if (!skipWhitespaces())
-                break;
-            if (token.type === "Punctuator" && token.value === ",") {
-                // default export followed by an aliased default export
-                if (!skipWhitespaces())
-                    break;
-                const asterisk = asteriskAlias();
-                if (asterisk === undefined)
-                    continue;
-                if (asterisk)
-                    return asterisk;
-            } else {
-                // only default export
-                const failure = from();
-                if (failure)
-                    return failure;
-                if (!skipWhitespaces())
-                    break;
-            }
+            const defaultExport = endDefault();
+            if (defaultExport === undefined)
+                continue;
+            if (defaultExport)
+                return defaultExport;
         }
         if (token.type === "Punctuator" && token.value === "{") {
             const named = endNamed();
@@ -119,6 +104,28 @@ export default function validateImports(text: string): ImportValidationResult {
         if (token.type !== "IdentifierName")
             return end();
         return skipWhitespaces() ? from() : { text: builder };
+    }
+
+    function endDefault(): ImportValidationResult | undefined {
+        if (!skipWhitespaces())
+            return end();
+        if (token.type === "Punctuator" && token.value === ",") {
+            // default export followed by an aliased default export
+            if (!skipWhitespaces())
+                return end();
+            const asterisk = asteriskAlias();
+            if (asterisk === undefined)
+                return undefined;
+            if (asterisk)
+                return asterisk;
+        } else {
+            // only default export
+            const failure = from();
+            if (failure)
+                return failure;
+            if (!skipWhitespaces())
+                return end();
+        }
     }
 
     function endNamed(): ImportValidationResult | undefined {
