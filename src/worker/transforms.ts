@@ -1,4 +1,4 @@
-import jsTokens from "js-tokens";
+import jsTokens, { type Token } from "js-tokens";
 
 export interface ImportRewriteResult {
     text: string;
@@ -22,48 +22,28 @@ export function rewriteImports(text: string): ImportRewriteResult {
     let builder = "";
     let line = 0;
     let column = 0;
-    const sequence = [];
-    for (const token of jsTokens(text)) {
-        switch (token.type) {
-            case "LineTerminatorSequence":
-                line++;
-                column = 0;
-                sequence.length = 0;
-                continue;
-            case "WhiteSpace":
-                break;
-            case "IdentifierName":
-                switch (token.value) {
-                    case "import":
-                    case "from":
-                        sequence.push(token.value);
-                        break;
-                    default:
-                        if (sequence[0] !== "import")
-                            sequence.length = 0;
-                        else
-                            sequence.push(token.value);
-                        break;
-                }
-                break;
-            case "Punctuator":
-                switch (token.value) {
-                    case "{":
-                    case "}":
-                    case "'":
-                    case "\"":
-                        sequence.push(token.value);
-                        break;
-                    default:
-                        sequence.length = 0;
-                        break;
-                }
-                break;
-        }
-        column += token.value.length;
-        builder += token.value;
+    const allTokens = jsTokens(text)[Symbol.iterator]();
+    let token: Token = null as unknown as Token; // thanks vue-tsc for working :rolling_eyes:
+
+    while (next()) {
+        if (token.type !== "IdentifierName" || token.value !== "import")
+            continue;
+        // TODO: check next tokens
     }
+
     return { text: builder };
+
+    function next() {
+        const { value, done } = allTokens.next();
+        token = value;
+        if (token.type === "LineTerminatorSequence") {
+            line++;
+            column = 0;
+        } else
+            column += token.value.length;
+        builder += token.value.length;
+        return !done;
+    }
 }
 
 function validateFile(file: string) {
