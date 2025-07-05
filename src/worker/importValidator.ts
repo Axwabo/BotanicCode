@@ -24,21 +24,36 @@ export default function validateImports(text: string): ImportValidationResult {
             // side-effect import
             const file = token.value.match(extractString)[1];
             if (!validateFile(file))
-                return failFile(file);
+                return fail(file);
             continue;
         }
         if (token.type === "Punctuator" && token.value === "(")
             return { text: "", error: `Dynamic imports are not allowed. Line ${line} column ${column}` };
         if (token.type === "Punctuator" && token.value === "{") {
+            inner: while (true) {
+                if (!next())
+                    return end();
+                switch (token.type) {
+                    case "WhiteSpace":
+                    case "IdentifierName":
+                        break;
+                    case "Punctuator":
+                        if (token.value === ",")
+                            break;
+                        if (token.value !== "}")
+                            return end(); // syntax error
+                        if (!skipWhitespaces())
+                            return end();
+                        break inner;
+                    default:
+                        return end(); // syntax error
+                }
+            }
+        } else if (token.type === "IdentifierName") {
             if (!skipWhitespaces())
                 break;
-            if (token.type !== "Punctuator" && token.value !== "}")
-                return end();
-            // TODO: handle aliases, multiple members
-        } else if (token.type !== "IdentifierName")
+        } else
             return end(); // syntax error
-        if (!skipWhitespaces())
-            break;
         if (token.type !== "IdentifierName" && token.value !== "from")
             return end();
         if (!skipWhitespaces())
@@ -47,7 +62,7 @@ export default function validateImports(text: string): ImportValidationResult {
             return end();
         const file = token.value.match(extractString)[1];
         if (!validateFile(file))
-            return failFile(file);
+            return fail(file);
     }
 
     return { text: builder };
@@ -62,7 +77,7 @@ export default function validateImports(text: string): ImportValidationResult {
             column = 0;
         } else
             column += token.value.length;
-        builder += token.value.length;
+        builder += token.value;
         return !done;
     }
 
@@ -79,7 +94,7 @@ export default function validateImports(text: string): ImportValidationResult {
         return { text: builder };
     }
 
-    function failFile(file: string): ImportValidationResult {
+    function fail(file: string): ImportValidationResult {
         return { text: "", error: `Nefarious import at line ${line} column ${column - token.value.length}: ${file}` };
     }
 }
