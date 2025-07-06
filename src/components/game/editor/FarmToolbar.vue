@@ -5,10 +5,13 @@ import TilePlacer from "./tools/TilePlacer.vue";
 import FencePlacer from "./tools/FencePlacer.vue";
 import ClearTile from "./tools/ClearTile.vue";
 import BotInspector from "./tools/BotInspector.vue";
+import isTutorialSequence from "../../../tutorialStore.ts";
+
+const outline = isTutorialSequence("tools");
 </script>
 
 <template>
-    <div class="farm-toolbar">
+    <div class="farm-toolbar" :class="{ outline }">
         <div class="tool-selector">
             <ToolButton tool="Inspector"/>
             <ToolButton tool="Tile Placer"/>
