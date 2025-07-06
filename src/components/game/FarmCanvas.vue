@@ -3,8 +3,11 @@ import { onMounted, ref } from "vue";
 import loop from "../../game/main.ts";
 import { storeToRefs } from "pinia";
 import useGameStore from "../../gameStore.ts";
+import isTutorialSequence from "../../tutorialStore.ts";
 
 const { renderer, dragging } = storeToRefs(useGameStore());
+
+const outline = isTutorialSequence("board");
 
 const gameCanvas = ref<HTMLCanvasElement>();
 
@@ -24,7 +27,7 @@ onMounted(() => {
 </script>
 
 <template>
-    <canvas id="gameCanvas" ref="gameCanvas" :class="{ dragging }"></canvas>
+    <canvas id="gameCanvas" ref="gameCanvas" :class="{ dragging, outline }"></canvas>
 </template>
 
 <style scoped>

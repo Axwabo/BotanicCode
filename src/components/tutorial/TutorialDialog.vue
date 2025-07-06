@@ -9,6 +9,8 @@ import SDK from "./SDK.vue";
 import Editor from "./Editor.vue";
 import Tabs from "./Tabs.vue";
 import Run from "./Run.vue";
+import Board from "./Board.vue";
+import FarmActions from "./FarmActions.vue";
 
 const sequence = tutorialSequence();
 
@@ -39,6 +41,8 @@ watch(sequence, value => {
         <Editor v-if="sequence === 'editor'"/>
         <Tabs v-if="sequence === 'tabs'"/>
         <Run v-if="sequence === 'run'"/>
+        <Board v-if="sequence === 'board'"/>
+        <FarmActions v-if="sequence === 'actions'"/>
         <Example v-if="sequence === 'example'"/>
         <Navigation v-else/>
     </dialog>
