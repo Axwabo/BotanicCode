@@ -7,6 +7,7 @@ const { editors } = useFileStore();
 
 <template>
     <nav id="editorList">
+        <TabButton file="-" class="invisible"/>
         <TabButton v-for="file in editors.keys()" :key="file" :file="file"/>
     </nav>
 </template>
@@ -18,5 +19,10 @@ const { editors } = useFileStore();
     display: flex;
     justify-content: flex-start;
     gap: 0.5rem;
+}
+
+.invisible {
+    width: 0;
+    visibility: hidden;
 }
 </style>

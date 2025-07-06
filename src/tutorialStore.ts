@@ -1,4 +1,5 @@
 import { defineStore, storeToRefs } from "pinia";
+import { computed } from "vue";
 
 function defineParts<T extends string>(...args: T[]): T[] {
     return args;
@@ -6,7 +7,7 @@ function defineParts<T extends string>(...args: T[]): T[] {
 
 type TutorialPart = typeof parts extends ReadonlyArray<infer T> ? T : never;
 
-const parts = defineParts("welcome", "project", "sdk", "editor", "example", "skip");
+const parts = defineParts("welcome", "project", "sdk", "editor", "tabs", "run", "example", "skip");
 
 interface State {
     sequence: TutorialPart
@@ -24,7 +25,12 @@ export const useTutorialStore = defineStore("Tutorial", {
     }
 });
 
-export default function tutorialSequence() {
+export function tutorialSequence() {
     const { sequence } = storeToRefs(useTutorialStore());
     return sequence;
+}
+
+export default function isTutorialSequence(part: TutorialPart) {
+    const sequence = tutorialSequence();
+    return computed(() => sequence.value === part);
 }

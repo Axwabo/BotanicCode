@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import ConfirmDeleteDialog from "./ConfirmDeleteDialog.vue";
 import useFileStore from "../../fileStore.ts";
-import tutorialSequence from "../../tutorialStore.ts";
+import isTutorialSequence from "../../tutorialStore.ts";
 
 const { setSdkVisibility } = useFileStore();
 
-const sequence = tutorialSequence();
+const outline = isTutorialSequence("sdk");
 
 function toggleHidden(event: Event) {
     const checkbox = <HTMLInputElement>event.target;
@@ -15,7 +15,7 @@ function toggleHidden(event: Event) {
 
 <template>
     <span class="view-label">Project</span>
-    <div :class="{ outline: sequence === 'sdk' }">
+    <div :class="{ outline }">
         <label for="sdk">Show SDK</label>
         <input type="checkbox" id="sdk" v-on:change="toggleHidden">
     </div>

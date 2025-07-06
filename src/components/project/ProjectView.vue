@@ -4,11 +4,11 @@ import useFileStore from "../../fileStore.ts";
 import FileList from "./FileList.vue";
 import ProjectTitleBar from "./ProjectTitleBar.vue";
 import PrecacheProgress from "./PrecacheProgress.vue";
-import tutorialSequence from "../../tutorialStore.ts";
+import isTutorialSequence from "../../tutorialStore.ts";
 
 const { navigate } = useFileStore();
 
-const sequence = tutorialSequence();
+const outline = isTutorialSequence("project");
 
 const newFile = ref("");
 
@@ -28,7 +28,7 @@ function createFile() {
     <div class="view-title-bar">
         <ProjectTitleBar/>
     </div>
-    <div id="projectContainer" :class="{ 'create-container': true, outline: sequence === 'project' }">
+    <div id="projectContainer" :class="{ 'create-container': true, outline }">
         <div class="create-container">
             <input type="text" v-model="newFile" placeholder="Create file" :pattern="filenamePattern">
             <button v-on:click="createFile" :disabled="!newFile.match(filenameRegex)">+</button>
