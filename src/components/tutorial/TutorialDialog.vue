@@ -5,6 +5,7 @@ import tutorialSequence from "../../tutorialStore.ts";
 import Welcome from "./Welcome.vue";
 import Project from "./Project.vue";
 import Navigation from "./Navigation.vue";
+import SDK from "./SDK.vue";
 
 const sequence = tutorialSequence();
 
@@ -31,6 +32,7 @@ watch(sequence, value => {
     <dialog ref="dialogElement" closedby="none" v-on:close="complete">
         <Welcome v-if="sequence === 'welcome'"/>
         <Project v-if="sequence === 'project'"/>
+        <SDK v-if="sequence === 'sdk'"/>
         <Example v-if="sequence === 'example'"/>
         <Navigation v-else/>
     </dialog>
