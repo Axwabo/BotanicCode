@@ -12,7 +12,7 @@ function toggleHidden(event: Event) {
 
 <template>
     <span class="view-label">Project</span>
-    <div>
+    <div id="sdkToggleContainer">
         <label for="sdk">Show SDK</label>
         <input type="checkbox" id="sdk" v-on:change="toggleHidden">
     </div>
