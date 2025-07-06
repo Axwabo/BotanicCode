@@ -7,6 +7,8 @@ import Project from "./Project.vue";
 import Navigation from "./Navigation.vue";
 import SDK from "./SDK.vue";
 import Editor from "./Editor.vue";
+import Tabs from "./Tabs.vue";
+import Run from "./Run.vue";
 
 const sequence = tutorialSequence();
 
@@ -35,6 +37,8 @@ watch(sequence, value => {
         <Project v-if="sequence === 'project'"/>
         <SDK v-if="sequence === 'sdk'"/>
         <Editor v-if="sequence === 'editor'"/>
+        <Tabs v-if="sequence === 'tabs'"/>
+        <Run v-if="sequence === 'run'"/>
         <Example v-if="sequence === 'example'"/>
         <Navigation v-else/>
     </dialog>

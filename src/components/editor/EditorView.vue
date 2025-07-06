@@ -5,12 +5,12 @@ import { storeToRefs } from "pinia";
 import Loading from "./Loading.vue";
 import EditorList from "./EditorList.vue";
 import EditorTitleBar from "./EditorTitleBar.vue";
-import isTutorialSequence from "../../tutorialStore.ts";
+import { tutorialSequence } from "../../tutorialStore.ts";
 
 const { currentFile } = storeToRefs(useFileStore());
 const { navigate, editors, get } = useFileStore();
 
-const outline = isTutorialSequence("editor");
+const sequence = tutorialSequence();
 
 const monaco = defineAsyncComponent({
     delay: 0,
@@ -34,12 +34,12 @@ watch(currentFile, async value => {
 </script>
 
 <template>
-    <div class="view-title-bar">
+    <div :class="{ 'view-title-bar': true, outline: sequence === 'run' }">
         <EditorTitleBar/>
     </div>
     <div id="editorContainer">
         <EditorList/>
-        <div id="currentEditor" :class="{ outline }">
+        <div id="currentEditor" :class="{ outline: sequence === 'editor' }">
             <monaco v-if="editors.size" v-for="file in editors.keys()" v-show="file === currentFile" :key="file" :path="file"/>
             <p v-else>Click on a file to open it, or create a new one</p>
         </div>
