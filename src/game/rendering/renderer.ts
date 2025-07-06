@@ -6,7 +6,7 @@ import { fillCircle } from "./shapes.ts";
 import { drawEntities } from "./entities.ts";
 import { drawViewportChunks, viewportChunks } from "./chunks.ts";
 import type { Tool } from "../editor/editorTypes.ts";
-import { drawBots } from "./bots.ts";
+import { drawBots } from "./bo.ts";
 
 const gizmos: Gizmo[] = [];
 
