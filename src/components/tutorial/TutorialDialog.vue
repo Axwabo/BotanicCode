@@ -12,6 +12,7 @@ import Run from "./Run.vue";
 import Board from "./Board.vue";
 import FarmActions from "./FarmActions.vue";
 import Tools from "./Tools.vue";
+import Environment from "./Environment.vue";
 
 const sequence = tutorialSequence();
 
@@ -45,12 +46,17 @@ watch(sequence, value => {
         <Board v-if="sequence === 'board'"/>
         <FarmActions v-if="sequence === 'actions'"/>
         <Tools v-if="sequence === 'tools'"/>
+        <Environment v-if="sequence === 'environment'"/>
         <Example v-if="sequence === 'example'"/>
         <Navigation v-else/>
     </dialog>
 </template>
 
 <style scoped>
+:deep(h1) {
+    margin-top: 0;
+}
+
 :deep(code) {
     background-color: black;
     padding: 0.25em;

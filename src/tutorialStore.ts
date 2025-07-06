@@ -7,7 +7,7 @@ function defineParts<T extends string>(...args: T[]): T[] {
 
 type TutorialPart = typeof parts extends ReadonlyArray<infer T> ? T : never;
 
-const parts = defineParts("welcome", "project", "sdk", "editor", "tabs", "run", "board", "actions", "tools", "example", "skip");
+const parts = defineParts("welcome", "project", "sdk", "editor", "tabs", "run", "board", "actions", "tools", "environment", "example", "skip");
 
 interface State {
     sequence: TutorialPart
