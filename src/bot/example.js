@@ -10,6 +10,8 @@ const bot = createBot(board, "Worker");
 const moves = [ [ 1, 0 ], [ 0, -1 ], [ -1, 0 ], [ 0, 1 ] ];
 let moveIndex = 0;
 
+// place some fences to have the worker turn
+
 while (!bot.isTerminated) {
     await nextFrame();
     const [ moveX, moveY ] = moves[moveIndex % moves.length];
