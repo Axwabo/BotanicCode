@@ -8,5 +8,3 @@
     <p>For changes to be reflected in the running code, files must be saved.</p>
     <p>On desktop, you can also hit <code>Ctrl+S</code> to save.</p>
 </template>
-<script setup lang="ts">
-</script>
