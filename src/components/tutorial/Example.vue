@@ -20,8 +20,8 @@ async function importExample() {
 </script>
 
 <template>
-    <h1>Botanic Code</h1>
-    <p>Welcome!</p>
+    <h1>End of Tutorial</h1>
+    <p>That's all you need to know!</p>
     <p>Would you like to import an example script?</p><span v-if="loading">Importing...</span>
     <section v-else class="choices">
         <button v-on:click="importExample()">Yes</button>

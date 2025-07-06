@@ -13,7 +13,7 @@ interface State {
 }
 
 const useTutorialStore = defineStore("Tutorial", {
-    state: (): State => ({ sequence: "example" }),
+    state: (): State => ({ sequence: "welcome" }),
     actions: {
         next() {
             this.sequence = parts[parts.indexOf(this.sequence) + 1];

@@ -3,6 +3,7 @@ import { onMounted, ref, watch } from "vue";
 import Example from "./Example.vue";
 import { storeToRefs } from "pinia";
 import useTutorialStore from "../../tutorialStore.ts";
+import Welcome from "./Welcome.vue";
 
 const { sequence } = storeToRefs(useTutorialStore());
 
@@ -27,7 +28,7 @@ watch(sequence, value => {
 
 <template>
     <dialog ref="dialogElement" closedby="none" v-on:close="complete">
-        <button v-on:click="sequence = 'skip'">Skip Tutorial</button>
+        <Welcome v-if="sequence === 'welcome'"/>
         <Example v-if="sequence === 'example'"/>
     </dialog>
 </template>
