@@ -1,15 +1,12 @@
 import getContext, { canvasToWorld } from "../ctx.ts";
 import { tileSize, worldToChunk } from "../../util/tileConstants.js";
-import { isInRange } from "../../util/distance";
 import type { Gizmo } from "../../util/gizmos";
 import { editorHandler } from "../events/editorHandler.ts";
-import { type BotInstance } from "../botInstance.ts";
-import { botRadius } from "../../bot/sdk/bot.js";
-import { energyBar, fillCircle } from "./shapes.ts";
-import { drawEntity } from "./entities.ts";
+import { fillCircle } from "./shapes.ts";
+import { drawEntities } from "./entities.ts";
 import { drawViewportChunks, viewportChunks } from "./chunks.ts";
 import type { Tool } from "../editor/editorTypes.ts";
-import type { ManagedEntity } from "../entities/interfaces.ts";
+import { drawBots } from "./bots.ts";
 
 const gizmos: Gizmo[] = [];
 
@@ -36,50 +33,6 @@ export function render() {
     drawGizmos(ctx);
     highlightTile(ctx, tool, pointerWorldX, pointerWorldY);
     drawHud(ctx, x, y, game.zoom);
-}
-
-function drawEntities(ctx: CanvasRenderingContext2D, entities: Set<ManagedEntity>, startX: number, startY: number, endX: number, endY: number, pointerWorldX: number, pointerWorldY: number, tool: Tool) {
-    for (const entity of entities) {
-        const chunkX = worldToChunk(entity.position.x);
-        const chunkY = worldToChunk(entity.position.y);
-        if (chunkX >= startX - 0.5 && chunkX <= endX + 0.5 && chunkY >= startY - 0.5 && chunkY <= endY + 0.5)
-            drawEntity(ctx, entity, pointerWorldX, pointerWorldY, tool === "Inspector");
-    }
-}
-
-function drawBots(ctx: CanvasRenderingContext2D, bots: Map<string, BotInstance>, selectedBot: string, tool: Tool, pointerWorldX: number, pointerWorldY: number) {
-    ctx.font = "20px monospace";
-    ctx.textBaseline = "bottom";
-    ctx.textAlign = "center";
-    let highlightedBot: BotInstance | undefined = bots.get(selectedBot);
-    for (const bot of bots.values()) {
-        const { x, y } = bot.position;
-        ctx.fillStyle = "white";
-        fillCircle(ctx, x, y, botRadius);
-        if (tool === "Inspector" && isInRange(x, y, pointerWorldX, pointerWorldY, botRadius))
-            highlightedBot = bot;
-    }
-    if (highlightedBot)
-        drawHighlighted(ctx, highlightedBot);
-}
-
-function drawHighlighted(ctx: CanvasRenderingContext2D, highlightedBot: BotInstance) {
-    const { name, position: { x, y } } = highlightedBot;
-    ctx.strokeStyle = "black";
-    ctx.fillStyle = "white";
-    ctx.lineWidth = 3;
-    ctx.lineJoin = "round";
-    ctx.strokeText(name, x, y - botRadius);
-    ctx.fillText(name, x, y - botRadius);
-    ctx.font = "15px Arial";
-    let drawY = y - botRadius - 22;
-    for (const [ type, count ] of highlightedBot.inventory) {
-        const text = `${type} x${count}`;
-        ctx.strokeText(text, x, drawY);
-        ctx.fillText(text, x, drawY);
-        drawY -= 17;
-    }
-    energyBar(ctx, highlightedBot.energy, x, y, botRadius);
 }
 
 function drawGizmos(ctx: CanvasRenderingContext2D) {

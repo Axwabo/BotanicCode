@@ -1,6 +1,18 @@
 import type { Entity } from "../../bot/sdk/entities";
 import { isInRange } from "../../util/distance";
 import { energyBar, fillCircle } from "./shapes.ts";
+import type { ManagedEntity } from "../entities/interfaces.ts";
+import type { Tool } from "../editor/editorTypes.ts";
+import { worldToChunk } from "../../util/tileConstants";
+
+export function drawEntities(ctx: CanvasRenderingContext2D, entities: Set<ManagedEntity>, startX: number, startY: number, endX: number, endY: number, pointerWorldX: number, pointerWorldY: number, tool: Tool) {
+    for (const entity of entities) {
+        const chunkX = worldToChunk(entity.position.x);
+        const chunkY = worldToChunk(entity.position.y);
+        if (chunkX >= startX - 0.5 && chunkX <= endX + 0.5 && chunkY >= startY - 0.5 && chunkY <= endY + 0.5)
+            drawEntity(ctx, entity, pointerWorldX, pointerWorldY, tool === "Inspector");
+    }
+}
 
 function entityCircle(ctx: CanvasRenderingContext2D, entity: Entity, x: number, y: number) {
     switch (entity.type) {
@@ -56,7 +68,7 @@ function comb(ctx: CanvasRenderingContext2D, x: number, y: number, entity: Entit
     ctx.fill();
 }
 
-export function drawEntity(ctx: CanvasRenderingContext2D, entity: Entity, pointerWorldX: number, pointerWorldY: number, overlay: boolean) {
+function drawEntity(ctx: CanvasRenderingContext2D, entity: Entity, pointerWorldX: number, pointerWorldY: number, overlay: boolean) {
     const { x, y } = entity.position;
     entityCircle(ctx, entity, x, y);
     switch (entity.type) {
