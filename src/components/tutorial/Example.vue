@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref } from "vue";
 import useFileStore from "../../fileStore.ts";
-import useTutorialStore from "../../tutorialStore.ts";
+import { useTutorialStore } from "../../tutorialStore.ts";
 
 const { save } = useFileStore();
 

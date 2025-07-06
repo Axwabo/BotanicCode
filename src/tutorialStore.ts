@@ -1,4 +1,4 @@
-import { defineStore } from "pinia";
+import { defineStore, storeToRefs } from "pinia";
 
 function defineParts<T extends string>(...args: T[]): T[] {
     return args;
@@ -6,13 +6,13 @@ function defineParts<T extends string>(...args: T[]): T[] {
 
 type TutorialPart = typeof parts extends ReadonlyArray<infer T> ? T : never;
 
-const parts = defineParts("welcome", "example", "skip");
+const parts = defineParts("welcome", "project", "sdk", "editor", "example", "skip");
 
 interface State {
     sequence: TutorialPart
 }
 
-const useTutorialStore = defineStore("Tutorial", {
+export const useTutorialStore = defineStore("Tutorial", {
     state: (): State => ({ sequence: "welcome" }),
     actions: {
         next() {
@@ -24,4 +24,7 @@ const useTutorialStore = defineStore("Tutorial", {
     }
 });
 
-export default useTutorialStore;
+export default function tutorialSequence() {
+    const { sequence } = storeToRefs(useTutorialStore());
+    return sequence;
+}
