@@ -106,7 +106,7 @@ export default function validateImports(text: string): ImportValidationResult {
         return skipWhitespaces() ? from() : { text: builder };
     }
 
-    function endDefault(): ImportValidationResult | undefined {
+    function endDefault(): ImportValidationResult | false | undefined {
         if (!skipWhitespaces())
             return end();
         if (token.type === "Punctuator" && token.value === ",") {
@@ -114,10 +114,11 @@ export default function validateImports(text: string): ImportValidationResult {
             if (!skipWhitespaces())
                 return end();
             const asterisk = asteriskAlias();
-            if (asterisk === undefined)
-                return undefined;
-            if (asterisk)
-                return asterisk;
+            return asterisk === undefined
+                ? undefined
+                : asterisk
+                    ? asterisk
+                    : false;
         } else {
             // only default export
             const failure = from();
