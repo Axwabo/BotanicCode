@@ -23,7 +23,7 @@ onMounted(() => {
         readOnly: files.get(path) === "locked"
     });
     editor.onDidChangeModelContent(() => files.set(path, "modified"));
-    instance.contents = () => editor!.getValue();
+    instance.load(() => editor!.getValue());
 });
 
 onUnmounted(() => {
