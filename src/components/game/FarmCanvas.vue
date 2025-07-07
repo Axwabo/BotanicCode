@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onMounted, ref } from "vue";
+import { onMounted, onUnmounted, ref } from "vue";
 import loop from "../../game/main.ts";
 import { storeToRefs } from "pinia";
 import useGameStore from "../../gameStore.ts";
@@ -11,19 +11,29 @@ const outline = isTutorialSequence("board");
 
 const gameCanvas = ref<HTMLCanvasElement>();
 
-onMounted(() => {
+function layout() {
     const canvas = gameCanvas.value!;
+    canvas.style.removeProperty("width");
+    canvas.style.removeProperty("height");
     const rect = canvas.getBoundingClientRect();
     canvas.width = rect.width;
     canvas.height = rect.height;
     canvas.style.width = `${canvas.width}px`;
     canvas.style.height = `${canvas.height}px`;
+    return canvas;
+}
+
+onMounted(() => {
+    const canvas = layout();
     renderer.value = {
         canvas,
         context: canvas.getContext("2d")!
     };
     requestAnimationFrame(loop);
+    window.addEventListener("resize", layout);
 });
+
+onUnmounted(() => window.removeEventListener("resize", layout));
 </script>
 
 <template>
