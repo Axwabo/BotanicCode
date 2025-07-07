@@ -10,7 +10,7 @@ interface ImportValidationResult {
 const extractString = /^["']([\s\S]+?)["']$/;
 
 export default function validateImports(text: string): ImportValidationResult {
-    let builder = "";
+    const builder: string[] = [];
     let line = 1;
     let column = 0;
     const allTokens = jsTokens(text)[Symbol.iterator]();
@@ -26,6 +26,7 @@ export default function validateImports(text: string): ImportValidationResult {
             const file = token.value.match(extractString)[1];
             if (!validateFile(file))
                 return fail(file);
+            rewriteRoot(file);
             continue;
         }
         if (token.type === "Punctuator" && token.value === "(")
@@ -53,7 +54,7 @@ export default function validateImports(text: string): ImportValidationResult {
             return failure;
     }
 
-    return { text: builder };
+    return { text: builder.join("") };
 
     function next() {
         const { value, done } = allTokens.next();
@@ -65,7 +66,7 @@ export default function validateImports(text: string): ImportValidationResult {
             column = 0;
         } else
             column += token.value.length;
-        builder += token.value;
+        builder.push(token.value);
         return !done;
     }
 
@@ -79,7 +80,7 @@ export default function validateImports(text: string): ImportValidationResult {
     function end(): ImportValidationResult {
         // noinspection StatementWithEmptyBodyJS
         while (next()) ;
-        return { text: builder };
+        return { text: builder.join("") };
     }
 
     function fail(file: string): ImportValidationResult {
@@ -90,21 +91,24 @@ export default function validateImports(text: string): ImportValidationResult {
         if (token.type !== "IdentifierName" || token.value !== "from" || !skipWhitespaces() || token.type !== "StringLiteral")
             return end(); // syntax error, must be: from "./file.js"
         const file = token.value.match(extractString)[1];
-        return validateFile(file) ? undefined : fail(file);
+        if (!validateFile(file))
+            return fail(file);
+        rewriteRoot(file);
+        return undefined;
     }
 
     function asteriskAlias(): ImportValidationResult | false | undefined {
         if (token.type !== "Punctuator" || token.value !== "*")
             return false;
         if (!skipWhitespaces())
-            return { text: builder };
+            return end();
         if (token.type !== "IdentifierName" || token.value !== "as")
             return end(); // syntax error, must be: * as name
         if (!skipWhitespaces())
-            return { text: builder };
+            return end();
         if (token.type !== "IdentifierName")
             return end();
-        return skipWhitespaces() ? from() : { text: builder };
+        return skipWhitespaces() ? from() : end();
     }
 
     function endDefault(): ImportValidationResult | false | undefined {
@@ -158,6 +162,13 @@ export default function validateImports(text: string): ImportValidationResult {
                     return end();
             }
         }
+    }
+
+    function rewriteRoot(file: string) {
+        if (!file.startsWith("/"))
+            return;
+        const quote = builder.pop()[0];
+        builder.push(`${quote}${import.meta.env.BASE_URL}${file.substring(1)}${quote}`);
     }
 }
 
