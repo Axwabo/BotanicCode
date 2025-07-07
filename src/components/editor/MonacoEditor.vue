@@ -27,12 +27,18 @@ onMounted(() => {
     });
     editor.onDidChangeModelContent(() => files.set(path, "modified"));
     instance.contents = () => editor!.getValue();
+    window.addEventListener("resize", layout);
 });
 
 onUnmounted(() => {
     editor?.dispose();
     instance.contents = () => "";
+    window.removeEventListener("resize", layout);
 });
+
+function layout() {
+    editor?.layout({ width: 0, height: 0 });
+}
 </script>
 
 <template>
@@ -53,6 +59,6 @@ onUnmounted(() => {
     left: 0;
     width: 100%;
     height: 100%;
-    background-image: repeating-linear-gradient(135deg, transparent 1px, rgba(100, 100, 100, 0.1) 3px, transparent 4px, transparent 15px);
+    background-image: repeating-linear-gradient(135deg, transparent 1px, rgba(100, 100, 100, 0.1) 3px, transparent 5px, transparent 15px);
 }
 </style>
