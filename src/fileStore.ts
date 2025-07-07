@@ -52,7 +52,7 @@ const useFileStore = defineStore("projectFiles", {
             const cache = await this.cacheAsync;
             const keys = await cache.keys();
             const statuses: [ string, FileStatus ][] = keys.map(e => [ new URL(e.url, location.origin).pathname, "saved" ]);
-            const response = await fetch(`${import.meta.env.BASE_URL}file-list/static`);
+            const response = await fetch(`${import.meta.env.BASE_URL}file-list`);
             if (response.ok && response.headers.get("Content-Type") === "text/plain") {
                 const text = await response.text();
                 statuses.push(...(<[ string, FileStatus ][]>text.split("\n").filter(e => e).map(e => [ e, "hidden" ])));

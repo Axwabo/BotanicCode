@@ -5,6 +5,7 @@ import { precacheChannel, requestErrorChannel } from "./worker/channels";
 import { addJsHeader, generateEntryPoint } from "./worker/transforms.ts";
 import { badRequest, illegalFetch, illegalImport, illegalImportsContained, jsSuccess, notFound, plainInit } from "./worker/ini.ts";
 import validateImports from "./worker/importValidator.ts";
+import type { RouteMatchCallback } from "workbox-core";
 
 declare let self: ServiceWorkerGlobalScope;
 
@@ -41,14 +42,22 @@ self.addEventListener("fetch", event => {
     event.respondWith(new Response(illegalFetch, illegalImport));
 });
 
-registerRoute(/\/file-list\/static/, async () => {
+function capture(regex: RegExp): RouteMatchCallback {
+    return ({ url }) => {
+        return url.origin !== self.location.origin
+            && url.pathname.startsWith(import.meta.env.BASE_URL)
+            && regex.test(url.pathname.substring(import.meta.env.BASE_URL.length));
+    };
+}
+
+registerRoute(capture(/^file-list$/i), async () => {
     return new Response(manifest.map(e => typeof e === "string" ? e : e.url)
     .filter(e => e.startsWith("util/") || e.startsWith("bot/"))
     .map(e => `/${e}`)
     .join("\n"), plainInit);
 });
 
-registerRoute(/\/bot\/sdk\/run*/, async options => {
+registerRoute(capture(/^bot\/sdk\/run*/i), async options => {
     const entry = options.url.searchParams.get("entryPoint");
     if (!entry)
         return new Response(null, badRequest);
@@ -56,7 +65,7 @@ registerRoute(/\/bot\/sdk\/run*/, async options => {
     return new Response(generateEntryPoint(entry, Date.now()), jsSuccess);
 });
 
-registerRoute(/\/bot\/(?!sdk\/)/i, async ({ url }) => {
+registerRoute(capture(/^bot\/(?!sdk)/i), async ({ url }) => {
     fileCache ??= await caches.open("Files");
     const file = url.pathname.replace(import.meta.env.BASE_URL, "/");
     const cached = await fileCache.match(file);

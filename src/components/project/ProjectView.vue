@@ -12,14 +12,14 @@ const outline = isTutorialSequence("project");
 
 const newFile = ref("");
 
-const filenamePattern = "(?:\\/?[A-z0-9_\\-])+";
+const filenamePattern = "(?!sdk\\/)(?:\\/?[A-z0-9_\\-])+";
 
 const filenameRegex = new RegExp(`^${filenamePattern}$`);
 
 function createFile() {
     if (!newFile.value.match(filenameRegex))
         return;
-    navigate(`/bot/${newFile.value.replace("//", "/")}.js`);
+    navigate(`/bot/${newFile.value}.js`);
     newFile.value = "";
 }
 </script>
