@@ -1,5 +1,6 @@
 // @ts-nocheck
 import jsTokens, { type Token } from "js-tokens";
+import { getAbsolutePath } from "./transforms.ts";
 
 interface ImportValidationResult {
     text: string;
@@ -161,18 +162,7 @@ export default function validateImports(text: string): ImportValidationResult {
 }
 
 function validateFile(file: string) {
-    if (!file.startsWith("/") && !file.startsWith("./") && !file.startsWith("../"))
-        return true; // invalid reference
-    const fullPath = [ "bot" ];
-    for (const segment of file.split("/")) {
-        if (!segment || segment === ".")
-            continue;
-        if (segment !== "..") {
-            fullPath.push(segment.toLowerCase());
-            continue;
-        }
-        if (!fullPath.pop())
-            return false;
-    }
-    return fullPath[0] === "util" || fullPath[0] === "bot";
+    const fullPath = getAbsolutePath(file);
+    return fullPath && (fullPath[0] === "util" || fullPath[0] === "bot");
 }
+

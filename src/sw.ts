@@ -2,7 +2,7 @@
 import { addPlugins, cleanupOutdatedCaches, createHandlerBoundToURL, precacheAndRoute } from "workbox-precaching"
 import { NavigationRoute, registerRoute } from "workbox-routing";
 import { precacheChannel, requestErrorChannel } from "./worker/channels";
-import { addJsHeader, generateEntryPoint } from "./worker/transforms.ts";
+import { addJsHeader, generateEntryPoint, validateEntryFile } from "./worker/transforms.ts";
 import { badRequest, illegalFetch, illegalImport, illegalImportsContained, jsSuccess, notFound, plainInit } from "./worker/ini.ts";
 import validateImports from "./worker/importValidator.ts";
 import type { RouteMatchCallback } from "workbox-core";
@@ -25,29 +25,25 @@ self.addEventListener("message", event => {
         void self.skipWaiting();
 });
 
-const botDirectory = new RegExp(`^${import.meta.env.BASE_URL.replace("/", "\\/")}bot\\/(?!sdk\\/)`);
-
 self.addEventListener("fetch", event => {
-    const path = new URL(event.request.url).pathname;
     if (!event.request.referrer)
         return;
-    const referrerUrl = new URL(event.request.referrer);
-    if (referrerUrl?.origin !== self.location.origin
-        || !referrerUrl.pathname.match(botDirectory)
-        || path.startsWith(import.meta.env.BASE_URL + "bot/")
-        || path.startsWith(import.meta.env.BASE_URL + "util/"))
+    const referrer = new URL(event.request.referrer);
+    const requested = new URL(event.request.url);
+    if (!isPath(referrer, /^bot\//i) || isPath(requested, /^(?:bot|util)\//i))
         return;
     requestErrorChannel.postMessage(`${illegalFetch}\nRequested resource: ${event.request.url}`);
-
     event.respondWith(new Response(illegalFetch, illegalImport));
 });
 
+function isPath(url: URL, regex: RegExp) {
+    return url.origin === self.location.origin
+        && url.pathname.startsWith(import.meta.env.BASE_URL)
+        && regex.test(url.pathname.substring(import.meta.env.BASE_URL.length));
+}
+
 function capture(regex: RegExp): RouteMatchCallback {
-    return ({ url }) => {
-        return url.origin === self.location.origin
-            && url.pathname.startsWith(import.meta.env.BASE_URL)
-            && regex.test(url.pathname.substring(import.meta.env.BASE_URL.length));
-    };
+    return ({ url }) => isPath(url, regex);
 }
 
 registerRoute(capture(/^file-list$/i), async () => {
@@ -59,10 +55,9 @@ registerRoute(capture(/^file-list$/i), async () => {
 
 registerRoute(capture(/^bot\/sdk\/run*/i), async options => {
     const entry = options.url.searchParams.get("entryPoint");
-    if (!entry)
-        return new Response(null, badRequest);
-    // TODO: sanitize input
-    return new Response(generateEntryPoint(entry, Date.now()), jsSuccess);
+    return validateEntryFile(entry)
+        ? new Response(generateEntryPoint(entry!, Date.now()), jsSuccess)
+        : new Response(null, badRequest);
 });
 
 registerRoute(capture(/^bot\/(?!sdk)/i), async ({ url }) => {

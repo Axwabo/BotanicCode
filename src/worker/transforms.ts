@@ -7,6 +7,30 @@ export function addJsHeader(response: Response) {
     return response;
 }
 
+export function getAbsolutePath(file: string) {
+    if (!file.startsWith("/") && !file.startsWith("./") && !file.startsWith("../"))
+        return false; // invalid reference
+    const fullPath = [ "bot" ];
+    for (const segment of file.split("/")) {
+        if (!segment || segment === ".")
+            continue;
+        if (segment !== "..") {
+            fullPath.push(segment.toLowerCase());
+            continue;
+        }
+        if (!fullPath.pop())
+            return false;
+    }
+    return fullPath;
+}
+
+export function validateEntryFile(entry: string | null) {
+    if (!entry)
+        return false;
+    const path = getAbsolutePath(entry);
+    return path && path.length > 1 && path[0] === "bot" && path[1] !== "sdk";
+}
+
 export function generateEntryPoint(entry: string, run: number) {
-    return `import { signalReady, signalError } from "./ready.js";import "./events.js";import("${import.meta.env.BASE_URL}${entry}?t=${run}").then(signalReady).catch(signalError);`;
+    return `import { signalReady, signalError } from "./ready.js";import "./events.js";import("${import.meta.env.BASE_URL}${entry.substring(1)}?t=${run}").then(signalReady).catch(signalError);`;
 }

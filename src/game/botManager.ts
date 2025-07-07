@@ -44,7 +44,7 @@ export default class BotManager implements Updatable {
         this.bots = previous?.bots ?? new Map<string, BotInstance>();
         if (!entryPoint)
             return;
-        this.worker = new Worker(`${import.meta.env.BASE_URL}bot/sdk/run.js?t=${Date.now()}&entryPoint=${encodeURI(entryPoint.replace(/^\//, ""))}`, { type: "module" });
+        this.worker = new Worker(`${import.meta.env.BASE_URL}bot/sdk/run.js?t=${Date.now()}&entryPoint=${encodeURI(entryPoint)}`, { type: "module" });
         // noinspection JSUnusedGlobalSymbols
         const callbacks: EventHandlers = {
             render: ev => this.send({ type: "render", delta: ev.deltaTime }),
