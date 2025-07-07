@@ -30,17 +30,26 @@ function complete() {
 }
 
 watch(sequence, value => {
+    const dialog = dialogElement.value!;
     if (value === "skip")
-        dialogElement.value?.close();
-    const outlined = document.querySelector(".outline");
+        dialog.close();
+    const outlined = document.querySelector<HTMLElement>(".outline");
     if (!outlined)
         return;
+    dialog.style.removeProperty("margin-top");
+    dialog.style.removeProperty("margin-bottom");
     outlined.scrollIntoView();
-});
+    const dialogRect = dialog.getBoundingClientRect();
+    const outlinedRect = outlined.getBoundingClientRect();
+    if (outlinedRect.bottom > dialogRect.top && outlinedRect.bottom < dialogRect.bottom)
+        dialog.style.marginTop = `${outlinedRect.bottom + 10}px`;
+    else if (outlinedRect.top < dialogRect.bottom && outlinedRect.top > dialogRect.top)
+        dialog.style.marginBottom = `${outlinedRect.top + 10}px`;
+}, { flush: "post" });
 </script>
 
 <template>
-    <dialog ref="dialogElement" closedby="none" v-on:close="complete">
+    <dialog ref="dialogElement" v-on:close="complete">
         <Welcome v-if="sequence === 'welcome'"/>
         <Project v-else-if="sequence === 'project'"/>
         <SDK v-else-if="sequence === 'sdk'"/>
