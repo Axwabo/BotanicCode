@@ -10,17 +10,17 @@ const { files, editors } = useFileStore();
 
 const instance = editors.get(path)!;
 
-const editorRef = ref<monaco.editor.IStandaloneCodeEditor>();
+let editor: monaco.editor.IStandaloneCodeEditor | undefined;
 
 const element = ref<HTMLDivElement>();
 
 const locked = computed(() => files.get(path) === "locked");
 
-watchSettings(editorRef);
+watchSettings(() => editor);
 
 onMounted(() => {
     ensureMonacoEnvironment();
-    const editor = monaco.editor.create(element.value!, {
+    editor = monaco.editor.create(element.value!, {
         language: path.endsWith(".ts") ? "typescript" : "javascript",
         theme: "vs-dark",
         value: instance.text,
@@ -28,19 +28,18 @@ onMounted(() => {
         automaticLayout: true
     });
     editor.onDidChangeModelContent(() => files.set(path, "modified"));
-    editorRef.value = editor;
     instance.contents = () => editor!.getValue();
     window.addEventListener("resize", layout);
 });
 
 onUnmounted(() => {
-    editorRef.value?.dispose();
+    editor?.dispose();
     instance.contents = () => "";
     window.removeEventListener("resize", layout);
 });
 
 function layout() {
-    editorRef.value?.layout({ width: 0, height: 0 });
+    editor?.layout({ width: 0, height: 0 });
 }
 </script>
 

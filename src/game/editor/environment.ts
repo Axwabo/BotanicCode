@@ -34,12 +34,13 @@ async function registerLibrary(path: string) {
 function loadSettings() {
 }
 
-type EditorRef = Ref<monaco.editor.IStandaloneCodeEditor | undefined>;
+// simple Ref causes the page to hang
+type EditorRef = () => monaco.editor.IStandaloneCodeEditor | undefined;
 
 export function watchSettings(editor: EditorRef) {
     watchSetting(editor, stickyScroll, enabled => ({ stickyScroll: { enabled } }));
 }
 
 function watchSetting<T>(editor: EditorRef, setting: Ref<T>, transform: (value: T) => monaco.editor.IEditorOptions) {
-    watch(setting, value => editor.value?.updateOptions(transform(value)));
+    watch(setting, value => editor()?.updateOptions(transform(value)));
 }
