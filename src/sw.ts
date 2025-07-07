@@ -44,7 +44,7 @@ self.addEventListener("fetch", event => {
 
 function capture(regex: RegExp): RouteMatchCallback {
     return ({ url }) => {
-        return url.origin !== self.location.origin
+        return url.origin === self.location.origin
             && url.pathname.startsWith(import.meta.env.BASE_URL)
             && regex.test(url.pathname.substring(import.meta.env.BASE_URL.length));
     };
