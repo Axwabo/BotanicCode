@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, defineAsyncComponent, watch } from "vue";
+import { defineAsyncComponent, watch } from "vue";
 import useFileStore from "../../fileStore.ts";
 import { storeToRefs } from "pinia";
 import Loading from "./Loading.vue";
@@ -15,10 +15,7 @@ const sequence = tutorialSequence();
 const monaco = defineAsyncComponent({
     delay: 0,
     loadingComponent: Loading,
-    loader: async () => {
-
-        return await import("./MonacoEditor.vue");
-    }
+    loader: () => import("./MonacoEditor.vue")
 });
 
 watch(currentFile, async value => {
@@ -31,23 +28,6 @@ watch(currentFile, async value => {
     const contents = await get(value);
     navigate(value, contents);
 }, { immediate: true });
-
-const editorComponents = computed(() => {
-    const components = [];
-    for (const instance of editors.values()) {
-        const component = defineAsyncComponent({
-            delay: 0,
-            loadingComponent: Loading,
-            loader: async () => {
-                instance.loadTriggered = true;
-                await Promise.all(Array.from(editors.values()).filter(e => !e.loadTriggered).map(e => e.loading));
-                return await import("./MonacoEditor.vue");
-            }
-        });
-        components.push([ instance.file, component ]);
-    }
-    return components;
-});
 </script>
 
 <template>
@@ -57,8 +37,7 @@ const editorComponents = computed(() => {
     <div id="editorContainer">
         <EditorList/>
         <div id="currentEditor" :class="{ outline: sequence === 'editor' }">
-            <component v-if="editorComponents.length" v-for="[file, editorComponent] in editorComponents" v-show="file === currentFile"
-                       :is="editorComponent" :key="file" :path="file"/>
+            <monaco v-if="editors.size" v-for="file in editors.keys()" v-show="file === currentFile" :key="file" :path="file"/>
             <p v-else>Click on a file to open it, or create a new one</p>
         </div>
     </div>

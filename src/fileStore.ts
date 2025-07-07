@@ -16,10 +16,6 @@ export interface EditorInstance {
     file: string;
     text: string;
     contents: () => string;
-    loading: Promise<any>;
-    loadTriggered: boolean;
-
-    load(contentGetter: () => string): void;
 }
 
 function reactiveMap<T>() {
@@ -38,22 +34,6 @@ function findIndex(editorPaths: Map<string, EditorInstance>, current: string) {
             break;
     }
     return -1;
-}
-
-function createEditor(path: string, content: string): EditorInstance {
-    let resolve: (value: any) => void;
-    const promise = new Promise(res => resolve = res);
-    return {
-        file: path,
-        text: content ?? "",
-        contents: () => "",
-        load(contentGetter: () => string) {
-            this.contents = contentGetter;
-            resolve(undefined);
-        },
-        loading: promise,
-        loadTriggered: false
-    };
 }
 
 const useFileStore = defineStore("projectFiles", {
@@ -107,7 +87,7 @@ const useFileStore = defineStore("projectFiles", {
                 this.files.set(path, "created");
             const editor = this.editors.get(path);
             if (!editor && content !== undefined)
-                this.editors.set(path, createEditor(path, content));
+                this.editors.set(path, { file: path, text: content ?? "", contents: () => "" });
             this.currentFile = path;
         },
         setSdkVisibility(visible: boolean) {
