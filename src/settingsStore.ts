@@ -6,7 +6,7 @@ interface Settings {
 
 const useSettingsStore = defineStore("Settings", {
     state: (): Settings => ({
-        stickyScroll: false
+        stickyScroll: true
     })
 });
 

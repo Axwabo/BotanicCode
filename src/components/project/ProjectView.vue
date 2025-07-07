@@ -5,6 +5,7 @@ import FileList from "./FileList.vue";
 import ProjectTitleBar from "./ProjectTitleBar.vue";
 import PrecacheProgress from "./PrecacheProgress.vue";
 import isTutorialSequence from "../../tutorialStore.ts";
+import SettingsButton from "../settings/SettingsButton.vue";
 
 const { navigate } = useFileStore();
 
@@ -40,6 +41,7 @@ function createFile() {
             </template>
         </Suspense>
         <PrecacheProgress/>
+        <SettingsButton/>
     </div>
 </template>
 

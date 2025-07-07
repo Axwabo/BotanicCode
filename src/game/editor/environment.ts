@@ -32,9 +32,6 @@ async function registerLibrary(path: string) {
 }
 
 function loadSettings() {
-    const settings = localStorage.getItem("BotanicCodeSettings");
-    if (!settings)
-        stickyScroll.value = monaco.editor.EditorOptions.stickyScroll.defaultValue.enabled;
 }
 
 type EditorRef = Ref<monaco.editor.IStandaloneCodeEditor | undefined>;
