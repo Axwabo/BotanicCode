@@ -20,7 +20,8 @@ onMounted(() => {
         language: path.endsWith(".ts") ? "typescript" : "javascript",
         theme: "vs-dark",
         value: instance.text,
-        readOnly: files.get(path) === "locked"
+        readOnly: files.get(path) === "locked",
+        automaticLayout: true
     });
     editor.onDidChangeModelContent(() => files.set(path, "modified"));
     instance.contents = () => editor!.getValue();
