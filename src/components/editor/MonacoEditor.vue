@@ -17,7 +17,7 @@ const element = ref<HTMLDivElement>();
 onMounted(() => {
     ensureMonacoEnvironment();
     editor = monaco.editor.create(element.value!, {
-        language: "javascript",
+        language: path.endsWith(".ts") ? "typescript" : "javascript",
         theme: "vs-dark",
         value: instance.text,
         readOnly: files.get(path) === "locked"
