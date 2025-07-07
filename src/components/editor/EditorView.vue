@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, defineAsyncComponent, watch } from "vue";
+import { computed, defineAsyncComponent, ref, watch } from "vue";
 import useFileStore from "../../fileStore.ts";
 import { storeToRefs } from "pinia";
 import Loading from "./Loading.vue";
@@ -12,12 +12,14 @@ const { navigate, editors, get } = useFileStore();
 
 const sequence = tutorialSequence();
 
+const currentlyLoading = ref("");
+
 const monaco = defineAsyncComponent({
     delay: 0,
     loadingComponent: Loading,
-    loader: async () => {
-
-        return await import("./MonacoEditor.vue");
+    loader: () => {
+        console.log(currentlyLoading.value)
+        return import("./MonacoEditor.vue");
     }
 });
 
@@ -32,21 +34,16 @@ watch(currentFile, async value => {
     navigate(value, contents);
 }, { immediate: true });
 
-const editorComponents = computed(() => {
-    const components = [];
-    for (const instance of editors.values()) {
-        const component = defineAsyncComponent({
-            delay: 0,
-            loadingComponent: Loading,
-            loader: async () => {
-                instance.loadTriggered = true;
-                await Promise.all(Array.from(editors.values()).filter(e => !e.loadTriggered).map(e => e.loading));
-                return await import("./MonacoEditor.vue");
+const editorPaths = computed(() => {
+    const paths = Array.from(editors.keys());
+    return {
+        * [Symbol.iterator]() {
+            for (const path of paths) {
+                currentlyLoading.value = path;
+                yield path;
             }
-        });
-        components.push([ instance.file, component ]);
-    }
-    return components;
+        }
+    };
 });
 </script>
 
@@ -57,8 +54,7 @@ const editorComponents = computed(() => {
     <div id="editorContainer">
         <EditorList/>
         <div id="currentEditor" :class="{ outline: sequence === 'editor' }">
-            <component v-if="editorComponents.length" v-for="[file, editorComponent] in editorComponents" v-show="file === currentFile"
-                       :is="editorComponent" :key="file" :path="file"/>
+            <monaco v-if="editors.size" v-for="file in editorPaths" v-show="file === currentFile" :key="file" :path="file"/>
             <p v-else>Click on a file to open it, or create a new one</p>
         </div>
     </div>
