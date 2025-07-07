@@ -41,6 +41,7 @@ body {
 .outline {
     outline: 2px solid red;
     outline-offset: 3px;
+    scroll-margin: 5px;
 }
 
 @media (min-width: 1000px) {
@@ -48,5 +49,9 @@ body {
         grid-template-columns: auto minmax(0, 1fr) 1fr;
         grid-template-rows: auto 1fr;
         grid-auto-flow: column;
+    }
+
+    .farm-toolbar {
+        margin-bottom: 0;
     }
 }

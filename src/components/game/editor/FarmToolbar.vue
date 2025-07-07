@@ -39,6 +39,7 @@ const outline = isTutorialSequence("tools");
     display: grid;
     grid-template-columns: max-content auto;
     gap: 0.5rem;
+    margin-bottom: 0.5rem;
 }
 
 .tool-selector {

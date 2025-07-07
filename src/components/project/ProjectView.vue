@@ -48,6 +48,7 @@ function createFile() {
     display: flex;
     flex-direction: column;
     overflow: hidden;
+    min-height: 10rem;
 }
 
 .create-container {

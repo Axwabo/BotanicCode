@@ -32,21 +32,25 @@ function complete() {
 watch(sequence, value => {
     if (value === "skip")
         dialogElement.value?.close();
+    const outlined = document.querySelector(".outline");
+    if (!outlined)
+        return;
+    outlined.scrollIntoView();
 });
 </script>
 
 <template>
     <dialog ref="dialogElement" closedby="none" v-on:close="complete">
         <Welcome v-if="sequence === 'welcome'"/>
-        <Project v-if="sequence === 'project'"/>
-        <SDK v-if="sequence === 'sdk'"/>
-        <Editor v-if="sequence === 'editor'"/>
-        <Tabs v-if="sequence === 'tabs'"/>
-        <Run v-if="sequence === 'run'"/>
-        <Board v-if="sequence === 'board'"/>
-        <FarmActions v-if="sequence === 'actions'"/>
-        <Tools v-if="sequence === 'tools'"/>
-        <Environment v-if="sequence === 'environment'"/>
+        <Project v-else-if="sequence === 'project'"/>
+        <SDK v-else-if="sequence === 'sdk'"/>
+        <Editor v-else-if="sequence === 'editor'"/>
+        <Tabs v-else-if="sequence === 'tabs'"/>
+        <Run v-else-if="sequence === 'run'"/>
+        <Board v-else-if="sequence === 'board'"/>
+        <FarmActions v-else-if="sequence === 'actions'"/>
+        <Tools v-else-if="sequence === 'tools'"/>
+        <Environment v-else-if="sequence === 'environment'"/>
         <Example v-if="sequence === 'example'"/>
         <Navigation v-else/>
     </dialog>
