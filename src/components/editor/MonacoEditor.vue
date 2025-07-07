@@ -2,7 +2,7 @@
 import { computed, onMounted, onUnmounted, ref } from "vue";
 import * as monaco from "monaco-editor";
 import useFileStore from "../../fileStore.ts"
-import ensureMonacoEnvironment from "../../game/editor/environment.ts";
+import { ensureMonacoEnvironment, watchSettings } from "../../game/editor/environment.ts";
 
 const { path } = defineProps<{ path: string; }>();
 
@@ -10,15 +10,17 @@ const { files, editors } = useFileStore();
 
 const instance = editors.get(path)!;
 
-let editor: monaco.editor.IStandaloneCodeEditor | undefined;
+const editorRef = ref<monaco.editor.IStandaloneCodeEditor>();
 
 const element = ref<HTMLDivElement>();
 
 const locked = computed(() => files.get(path) === "locked");
 
+watchSettings(editorRef);
+
 onMounted(() => {
     ensureMonacoEnvironment();
-    editor = monaco.editor.create(element.value!, {
+    const editor = monaco.editor.create(element.value!, {
         language: path.endsWith(".ts") ? "typescript" : "javascript",
         theme: "vs-dark",
         value: instance.text,
@@ -26,18 +28,19 @@ onMounted(() => {
         automaticLayout: true
     });
     editor.onDidChangeModelContent(() => files.set(path, "modified"));
+    editorRef.value = editor;
     instance.contents = () => editor!.getValue();
     window.addEventListener("resize", layout);
 });
 
 onUnmounted(() => {
-    editor?.dispose();
+    editorRef.value?.dispose();
     instance.contents = () => "";
     window.removeEventListener("resize", layout);
 });
 
 function layout() {
-    editor?.layout({ width: 0, height: 0 });
+    editorRef.value?.layout({ width: 0, height: 0 });
 }
 </script>
 
