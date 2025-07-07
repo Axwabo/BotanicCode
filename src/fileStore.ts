@@ -10,18 +10,13 @@ interface State {
     deleteConfirmation: string;
     swActivated: boolean;
     cache?: Cache;
-    pending: Map<string, string>;
 }
 
 export interface EditorInstance {
     file: string;
     text: string;
     contents: () => string;
-
-    load(contentGetter: () => string): void;
 }
-
-const emptyContent: () => string = () => "";
 
 function reactiveMap<T>() {
     return reactive(new Map<string, T>());
@@ -42,7 +37,7 @@ function findIndex(editorPaths: Map<string, EditorInstance>, current: string) {
 }
 
 const useFileStore = defineStore("projectFiles", {
-    state: (): State => ({ files: reactiveMap(), currentFile: "", editors: reactiveMap(), deleteConfirmation: "", swActivated: false, pending: new Map() }),
+    state: (): State => ({ files: reactiveMap(), currentFile: "", editors: reactiveMap(), deleteConfirmation: "", swActivated: false }),
     getters: {
         canRun(state: State) {
             const status = state.files.get(state.currentFile);
@@ -92,35 +87,8 @@ const useFileStore = defineStore("projectFiles", {
                 this.files.set(path, "created");
             const editor = this.editors.get(path);
             if (!editor && content !== undefined)
-                this.createEditor(path, content);
+                this.editors.set(path, { file: path, text: content ?? "", contents: () => "" });
             this.currentFile = path;
-        },
-        createEditor(path: string, content?: string) {
-            const loading = Array.from(this.editors.values()).some(e => e.contents === emptyContent);
-            const pending = this.pending;
-            if (loading) {
-                pending.set(path, content ?? "");
-                return;
-            }
-            const editors = this.editors;
-            editors.set(path, {
-                file: path,
-                text: content ?? "",
-                contents: emptyContent,
-                load(contentGetter: () => string) {
-                    this.contents = contentGetter;
-                    for (const [ path, content ] of pending) {
-                        editors.set(path, {
-                            file: path,
-                            text: content,
-                            contents: emptyContent,
-                            load(contentGetter: () => string) {
-                                this.contents = contentGetter;
-                            }
-                        });
-                    }
-                }
-            });
         },
         setSdkVisibility(visible: boolean) {
             const change: string[] = [];
