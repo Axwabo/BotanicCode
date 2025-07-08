@@ -109,11 +109,21 @@ const useFileStore = defineStore("projectFiles", {
             const paths = localStorage.getItem(openEditorsKey);
             if (!paths)
                 return;
-            for (const path of paths.split("\n"))
-                if (this.files.get(path)) {
-                    this.currentFile = path;
-                    await new Promise(resolve => setTimeout(resolve, 20)); // TODO: fix race condition
-                }
+            const promises: Promise<[ string, string ]>[] = [];
+            const split = paths.split("\n");
+            for (let i = 0; i < split.length - 1; i++) {
+                const path = split[i];
+                if (this.files.has(path))
+                    promises.push((async () => [ path, await this.get(path) ])());
+            }
+            const completed = await Promise.all(promises);
+            for (const [ path, content ] of completed) {
+                if (!this.editors.get(path) && this.files.has(path))
+                    this.editors.set(path, { file: path, text: content, contents: () => "" });
+            }
+            const current = split[split.length - 1];
+            if (this.files.has(current))
+                this.currentFile = current;
         },
         setSdkVisibility(visible: boolean) {
             const change: string[] = [];
@@ -135,6 +145,7 @@ const useFileStore = defineStore("projectFiles", {
                 return;
             if (!this.editors.size) {
                 this.currentFile = "";
+                localStorage.removeItem(openEditorsKey);
                 return;
             }
             const targetIndex = Math.max(0, Math.min(this.editors.size - 1, openIndex));
