@@ -1,6 +1,6 @@
 <template>
     <h1>The Board</h1>
-    <p>The canvas shows you how the farm looks like.</p>
+    <p>The canvas shows you what the farm looks like.</p>
     <p>Move around by:</p>
     <ul>
         <li>holding the middle mouse button and dragging</li>
