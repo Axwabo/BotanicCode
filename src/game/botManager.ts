@@ -140,6 +140,17 @@ export default class BotManager implements Updatable {
                 this.send({ type: "bot", name, response: { type: "pickUp", item: request.kind, count: -1 } });
                 break;
             }
+            case "drop":
+                const amount = Math.min(Math.max(0, request.amount), bot.inventory.get(request.item) ?? 0);
+                if (amount)
+                    this.board.handleItemUpdate({
+                        id: crypto.randomUUID(),
+                        type: request.item,
+                        amount: request.amount,
+                        position: { ...bot.position }
+                    });
+                // TODO: inventory delta
+                break;
         }
     }
 

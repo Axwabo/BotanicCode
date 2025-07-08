@@ -19,6 +19,7 @@ function createChunkRow(o) {
 function createChunk(o) {
     const chunk = new Chunk(o.x, o.y);
     chunk.rows = o.rows.map((e, i) => createRow(e, i, chunk));
+    chunk.items = o.items;
     return chunk;
 }
 
