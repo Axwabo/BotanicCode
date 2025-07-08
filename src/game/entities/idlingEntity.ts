@@ -25,5 +25,8 @@ export default class IdlingEntity extends MovableEntity {
     }
 
     protected* behavior(): Behavior {
+        while (true)
+            yield* this.movement.moveIldlyOnce();
     }
+
 }
