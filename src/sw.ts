@@ -69,7 +69,7 @@ registerRoute(capture(/^bot\/(?!sdk)/i), async ({ url }) => {
         return new Response(null, notFound);
     }
     const raw = await cached.text();
-    const { text, error } = validateImports(raw);
+    const { text, error } = validateImports(raw, file);
     if (!error)
         return new Response(text, jsSuccess);
     requestErrorChannel.postMessage(`An illegal import was detected in the requested file: ${file}\n${error}`);

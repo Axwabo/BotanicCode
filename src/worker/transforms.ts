@@ -7,10 +7,15 @@ export function addJsHeader(response: Response) {
     return response;
 }
 
-export function getAbsolutePath(file: string) {
+export function getAbsolutePath(file: string, relativeTo?: string) {
     if (!file.startsWith("/") && !file.startsWith("./") && !file.startsWith("../"))
         return false; // invalid reference
     const fullPath = [ "bot" ];
+    if (relativeTo) {
+        fullPath.shift();
+        fullPath.push(...relativeTo.split("/"));
+        fullPath.shift();
+    }
     for (const segment of file.split("/")) {
         if (!segment || segment === ".")
             continue;
@@ -22,6 +27,12 @@ export function getAbsolutePath(file: string) {
             return false;
     }
     return fullPath;
+}
+
+export function getParent(path: string) {
+    const slash = path.lastIndexOf("/");
+    const directory = path.substring(0, slash);
+    return { slash, directory };
 }
 
 export function validateEntryFile(entry: string | null) {

@@ -1,6 +1,6 @@
 // @ts-nocheck
 import jsTokens, { type Token } from "js-tokens";
-import { getAbsolutePath } from "./transforms.ts";
+import { getAbsolutePath, getParent } from "./transforms.ts";
 
 interface ImportValidationResult {
     text: string;
@@ -9,7 +9,7 @@ interface ImportValidationResult {
 
 const extractString = /^["']([\s\S]+?)["']$/;
 
-export default function validateImports(text: string): ImportValidationResult {
+export default function validateImports(text: string, path: string): ImportValidationResult {
     const builder: string[] = [];
     let line = 1;
     let column = 0;
@@ -170,10 +170,11 @@ export default function validateImports(text: string): ImportValidationResult {
         const quote = builder.pop()[0];
         builder.push(`${quote}${import.meta.env.BASE_URL}${file.substring(1)}${quote}`);
     }
+
+    function validateFile(file: string) {
+        const fullPath = getAbsolutePath(file, getParent(path).directory);
+        return fullPath && (fullPath[0] === "util" || fullPath[0] === "bot");
+    }
 }
 
-function validateFile(file: string) {
-    const fullPath = getAbsolutePath(file);
-    return fullPath && (fullPath[0] === "util" || fullPath[0] === "bot");
-}
 

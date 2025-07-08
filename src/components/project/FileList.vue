@@ -2,6 +2,7 @@
 import useFileStore, { type FileStatus } from "../../fileStore.ts";
 import { computed } from "vue";
 import File from "./File.vue";
+import { getParent } from "../../worker/transforms.ts";
 
 const { files, init } = useFileStore();
 
@@ -38,8 +39,7 @@ function process(statuses: { path: string, status: FileStatus }[], list: ListIte
         const { path, status } = statuses[i];
         if (status === "hidden")
             continue;
-        const slash = path.lastIndexOf("/");
-        const directory = path.substring(0, slash);
+        const { slash, directory } = getParent(path);
         if (directory !== previousDirectory) {
             if (!directory.startsWith(previousDirectory))
                 upperDirectory = getUpperDirectory(directory, previousDirectory);
