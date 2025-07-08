@@ -7,6 +7,8 @@ import { type Behavior, BehaviorRunner } from "./behavior.ts";
 import type { DroppedItem, ItemType } from "../../bot/sdk/items";
 import { isInRange } from "../../util/distance";
 import { tileSize } from "../../util/tileConstants";
+import { nearbyChunkOffsets } from "../tick.ts";
+import type { Chunk } from "../../util/world/tile";
 
 export default abstract class IdlingEntity extends MovableEntity {
     radius: number;
@@ -60,12 +62,18 @@ export default abstract class IdlingEntity extends MovableEntity {
     }
 
     private findEdibleItem(): DroppedItem | undefined {
-        for (const value of Object.values(this.board.getChunkAtPosition(this.position).items)) {
-            const item = <DroppedItem>value;
-            if (this.edibleItems.includes(item.type)
-                && isInRange(item.position.x, item.position.y, this.position.x, this.position.y, 10 * tileSize))
-                return item;
-        }
+        const currentChunk = this.board.getChunkAtPosition(this.position);
+        const chunks: Chunk[] = [
+            currentChunk,
+            ...nearbyChunkOffsets.map(([ x, y ]) => this.board.getChunk(currentChunk.x + x, currentChunk.y + y))
+        ];
+        for (const chunk of chunks)
+            for (const value of Object.values(chunk.items)) {
+                const item = <DroppedItem>value;
+                if (this.edibleItems.includes(item.type)
+                    && isInRange(item.position.x, item.position.y, this.position.x, this.position.y, 10 * tileSize))
+                    return item;
+            }
     }
 
 }

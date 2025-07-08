@@ -10,7 +10,7 @@ function getChunk(game: GameState, position: WorldPosition) {
 
 const chunkLoadTime = 10;
 
-const offsets = [
+export const nearbyChunkOffsets = [
     [ 1, 0 ],
     [ -1, 0 ],
     [ 0, 1 ],
@@ -34,7 +34,7 @@ function refreshLoadedChunks(game: GameState, deltaSeconds: number) {
         }
         bot.chunkSeconds.set(currentChunk, chunkLoadTime);
         loadedChunks.add(currentChunk);
-        for (const [ x, y ] of offsets) {
+        for (const [ x, y ] of nearbyChunkOffsets) {
             const chunk = game.board.getChunk(currentChunk.x + x, currentChunk.y + y);
             bot.chunkSeconds.set(chunk, chunkLoadTime);
             loadedChunks.add(chunk);
