@@ -14,7 +14,7 @@ export default abstract class ScavengerAnimal extends IdlingEntity {
             }
             const tile = this.findEdibleTile();
             if (tile)
-                this.eatTile(tile);
+                yield* this.eatTile(tile);
             else
                 yield* this.movement.moveIldlyOnce();
         }
