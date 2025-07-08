@@ -3,14 +3,10 @@ import ManagedBoard from "../managedBoard.ts";
 import type { GrowingPlant, Tile, TileData, WorldPosition } from "../../util/tile";
 import type { Behavior } from "./behavior.ts";
 import { findTileCircle } from "../../util/world/locator";
-import { tileSize } from "../../util/tileConstants";
+import { tileSize, worldCenter } from "../../util/tileConstants";
 import { isPlant } from "../plants/harvesting.ts";
 import { editorHandler } from "../events/editorHandler.ts";
 import TileUpdatedEvent from "../../util/world/events/tileUpdated";
-
-function worldCenter(tile: Tile) {
-    return { x: tile.x * tileSize + tileSize * 0.5, y: tile.y * tileSize + tileSize * 0.5 };
-}
 
 export default class Pig extends IdlingEntity {
 
@@ -25,8 +21,10 @@ export default class Pig extends IdlingEntity {
                 continue;
             }
             const tile = findTileCircle(this.board, Math.floor(this.position.x / tileSize), Math.floor(this.position.y / tileSize), 5, isEdibleTile);
-            if (!tile)
+            if (!tile) {
+                yield* this.movement.moveIldlyOnce();
                 continue;
+            }
             this.movement.target = worldCenter(tile);
             yield* this.movement.goToTarget();
             yield Math.random() * 2 + 1;

@@ -15,3 +15,8 @@ export function worldToChunk(coord) {
 export function getChunkRemainder(tile) {
     return tile >= 0 ? tile % tilesPerChunk : tilesPerChunk - Math.abs(tile) % tilesPerChunk;
 }
+
+/** @param tile {Tile} */
+export function worldCenter(tile) {
+    return { x: tile.x * tileSize + tileSize * 0.5, y: tile.y * tileSize + tileSize * 0.5 };
+}
