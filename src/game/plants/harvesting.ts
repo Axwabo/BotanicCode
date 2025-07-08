@@ -1,5 +1,5 @@
 import type { ItemType } from "../../bot/sdk/items";
-import type { PlantType, Tile } from "../../util/tile";
+import type { GrowingPlant, PlantType, Tile, TileData } from "../../util/tile";
 
 interface HarvestResult {
     item: ItemType;
@@ -7,8 +7,12 @@ interface HarvestResult {
     minimum?: number;
 }
 
+export function isPlant(data: TileData): data is GrowingPlant {
+    return "growthPercentage" in data;
+}
+
 export function getDrops(tile: Tile): Record<ItemType, number> | undefined {
-    if (!tile.data || !("growthPercentage" in tile.data))
+    if (!tile.data || !isPlant(tile.data))
         return;
     const result = dropsPerPlant[tile.data.type];
     if (!result)

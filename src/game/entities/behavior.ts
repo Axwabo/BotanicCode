@@ -33,8 +33,7 @@ export class BehaviorRunner implements Updatable {
             if (this.wait === nextFrame) {
                 this.wait = undefined;
                 break;
-            }
-            else if (typeof this.wait === "number") {
+            } else if (typeof this.wait === "number") {
                 if ((this.waitTime -= deltaSeconds) <= 0)
                     this.wait = undefined;
                 else
@@ -42,6 +41,8 @@ export class BehaviorRunner implements Updatable {
             } else if (typeof this.wait === "function") {
                 if (!this.wait())
                     this.wait = undefined;
+                else
+                    break;
             } else
                 break;
         }
