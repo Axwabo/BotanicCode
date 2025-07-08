@@ -1,9 +1,11 @@
 import { tileSize, tilesPerChunk, worldToChunk } from "../../util/tileConstants";
 import type { Tile } from "../../util/tile";
 import { getBoundingBoxes } from "../../util/world/boundingBoxes";
-import { fillCircle, lightning, outlineText } from "./shapes.ts";
+import { fillCircle, lightning } from "./shapes.ts";
 import type { GameState } from "../gameState.ts";
 import type { DroppedItem } from "../../bot/sdk/items";
+import drawItem from "./items.ts";
+import { carrot, chargingStation, potato, strawberry, tomato, unloadedOverlay } from "./colors.ts";
 
 export function viewportChunks(x: number, y: number, width: number, height: number, zoom: number) {
     // TODO: fix zoom
@@ -29,7 +31,7 @@ export function drawViewportChunks(ctx: CanvasRenderingContext2D, game: GameStat
                 drawItem(ctx, <DroppedItem>item);
             if (game.loadedChunks.has(chunk))
                 continue;
-            ctx.fillStyle = "rgba(120, 120, 120, 0.3)";
+            ctx.fillStyle = unloadedOverlay;
             ctx.fillRect(chunk.x * tilesPerChunk * tileSize, chunk.y * tilesPerChunk * tileSize, tilesPerChunk * tileSize, tilesPerChunk * tileSize);
         }
 }
@@ -55,7 +57,7 @@ function drawTile(ctx: CanvasRenderingContext2D, tile: Tile) {
                 ctx.fillRect(box.x + x, box.y + y, box.width, box.height);
             break;
         case "chargingStation":
-            ctx.fillStyle = "#89d6ff";
+            ctx.fillStyle = chargingStation;
             fillCircle(ctx, x + tileSize * 0.5, y + tileSize * 0.5, tileSize * 0.3);
             lightning(ctx, x + tileSize * 0.5, y + tileSize * 0.5);
             break;
@@ -65,7 +67,7 @@ function drawTile(ctx: CanvasRenderingContext2D, tile: Tile) {
                 ctx.fillRect(x + i, y + tileSize - 2, 3, -tileSize * 0.5);
             break;
         case "carrot":
-            ctx.fillStyle = "#f50";
+            ctx.fillStyle = carrot;
             ctx.beginPath();
             ctx.moveTo(x + tileSize * 0.5, y + tileSize * 0.9);
             ctx.lineTo(x + tileSize * (0.5 - (data.growthPercentage + 0.1) * 0.2), y + tileSize * (0.9 - (data.growthPercentage + 0.1) * 0.5));
@@ -73,7 +75,7 @@ function drawTile(ctx: CanvasRenderingContext2D, tile: Tile) {
             ctx.fill();
             break;
         case "potato":
-            ctx.fillStyle = "#a17d42";
+            ctx.fillStyle = potato;
             ctx.beginPath();
             ctx.ellipse(
                 x + tileSize * 0.5,
@@ -87,11 +89,11 @@ function drawTile(ctx: CanvasRenderingContext2D, tile: Tile) {
             ctx.fill();
             break;
         case "tomato":
-            ctx.fillStyle = "#ff2f00";
+            ctx.fillStyle = tomato;
             fillCircle(ctx, x + tileSize * 0.5, y + tileSize * 0.7, (data.growthPercentage * 0.1 + 0.1) * tileSize);
             break;
         case "strawberry":
-            ctx.fillStyle = "#bd0a39";
+            ctx.fillStyle = strawberry;
             ctx.beginPath();
             ctx.moveTo(x + tileSize * 0.5, y + tileSize * 0.8);
             ctx.lineTo(x + tileSize * (0.5 - (data.growthPercentage + 0.1) * 0.2), y + tileSize * (0.8 - (data.growthPercentage + 0.1) * 0.15));
@@ -99,12 +101,4 @@ function drawTile(ctx: CanvasRenderingContext2D, tile: Tile) {
             ctx.fill();
             break;
     }
-}
-
-function drawItem(ctx: CanvasRenderingContext2D, item: DroppedItem) {
-    ctx.font = "10px Arial";
-    ctx.textAlign = "center";
-    ctx.textBaseline = "middle";
-    ctx.lineWidth = 2;
-    outlineText(ctx, `${item.type} x${item.amount}`, item.position.x, item.position.y);
 }
