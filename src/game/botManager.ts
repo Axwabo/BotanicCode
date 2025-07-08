@@ -21,6 +21,7 @@ import type { Updatable } from "../bot/sdk/entities";
 import type RenderEvent from "../util/world/events/render";
 import type EntityEnergyUpdatedEvent from "../util/world/events/energyUpdated";
 import WorkerLogEvent from "./events/workerLogEvent.ts";
+import { getDrops } from "./plants/harvesting.ts";
 
 type EventHandler<T> = (event: T) => void;
 
@@ -115,16 +116,16 @@ export default class BotManager implements Updatable {
                 break;
             case "harvest": {
                 const tile = this.board.getTileAt(position.x, position.y);
-                const data = tile.data;
-                if (!data || !("growthPercentage" in data))
+                const drops = getDrops(tile);
+                if (!drops || !this.depleteEnergy(bot, 0.01))
                     break;
-                const count = Math.floor(5 * data.growthPercentage);
-                if (count === 0 || !this.depleteEnergy(bot, 0.01))
-                    break;
-                modifyInventory(bot.inventory, data.type, count);
-                this.send({ type: "bot", name, response: { type: "pickUp", item: data.type, count } });
                 tile.data = undefined;
                 editorHandler.dispatchEvent(new TileUpdatedEvent(tile));
+                for (const item of Object.keys(drops)) {
+                    const count = drops[item];
+                    modifyInventory(bot.inventory, item, count);
+                    this.send({ type: "bot", name, response: { type: "pickUp", item, count } });
+                }
                 break;
             }
             case "plant": {
