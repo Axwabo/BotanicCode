@@ -1,11 +1,10 @@
 import IdlingEntity from "./idlingEntity.ts";
-import type { GrowingPlant, Tile, TileData } from "../../util/tile";
+import type { Tile } from "../../util/tile";
 import type { Behavior } from "./behavior.ts";
 import { findTileCircle } from "../../util/world/locator";
 import { tileSize, worldCenter } from "../../util/tileConstants";
-import { isPlant } from "../plants/harvesting.ts";
 
-export default class ScavengerAnimal extends IdlingEntity {
+export default abstract class ScavengerAnimal extends IdlingEntity {
 
     protected* behavior(): Behavior {
         while (true) {
@@ -27,7 +26,7 @@ export default class ScavengerAnimal extends IdlingEntity {
             Math.floor(this.position.x / tileSize),
             Math.floor(this.position.y / tileSize),
             5,
-            t => this.isEdible(t.data)
+            t => this.canEat(t)
         );
     }
 
@@ -35,24 +34,12 @@ export default class ScavengerAnimal extends IdlingEntity {
         this.movement.target = worldCenter(tile);
         yield* this.movement.goToTarget();
         yield Math.random() * 2 + 1;
-        if (!this.isEdible(tile.data))
-            return;
-        const energy = this.getEnergy(tile.data);
-        tile.data = undefined;
-        this.notifyTileUpdate(tile);
-        this.depleteEnergy(-energy);
+        if (this.canEat(tile))
+            this.consume(tile);
     }
 
-    private isEdible(data?: TileData): data is GrowingPlant {
-        return !!data && isPlant(data) && this.canEat(data);
-    }
+    protected abstract canEat(tile: Tile): boolean;
 
-    protected canEat(data: GrowingPlant): boolean {
-        return data.growthPercentage > 0.5;
-    }
-
-    protected getEnergy(data: GrowingPlant) {
-        return 0.05 * data.growthPercentage;
-    }
+    protected abstract consume(tile: Tile): void;
 
 }

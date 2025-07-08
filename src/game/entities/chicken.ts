@@ -1,15 +1,14 @@
-import type { GrowingPlant } from "../../util/tile";
+import type { Tile } from "../../util/tile";
 import ScavengerAnimal from "./scavengerAnimal.ts";
 
 export default class Chicken extends ScavengerAnimal {
 
-    protected canEat(data: GrowingPlant): boolean {
-        return data.type === "wheat" && data.growthPercentage < 0.3;
+    protected canEat(tile: Tile): boolean {
+        return tile.type === "grass" && !tile.data && Math.random() < 0.05;
     }
 
     // @ts-ignore
-    protected getEnergy(data: GrowingPlant): number {
-        return 0.05;
+    protected consume(tile: Tile): void {
     }
 
 }
