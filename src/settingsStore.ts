@@ -7,23 +7,26 @@ interface Settings {
 const settingsKey = "BotanicCodeSettings";
 
 const useSettingsStore = defineStore("Settings", {
-    state: (): Settings => ({
-        stickyScroll: true
-    }),
+    state: load,
     actions: {
-        load() {
-            const value = localStorage.getItem(settingsKey);
-            if (!value)
-                return;
-            const settings: Settings = JSON.parse(value);
-            this.$patch(state => {
-                state.stickyScroll = settings.stickyScroll;
-            });
-        },
         save() {
             localStorage.setItem(settingsKey, JSON.stringify(this.$state));
         }
     }
 });
+
+const defaultSettings: Settings = {
+    stickyScroll: true
+};
+
+function load(): Settings {
+    const value = localStorage.getItem(settingsKey);
+    if (!value)
+        return defaultSettings;
+    const settings: Partial<Settings> = JSON.parse(value);
+    return {
+        stickyScroll: !!settings.stickyScroll
+    };
+}
 
 export default useSettingsStore;

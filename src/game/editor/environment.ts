@@ -22,7 +22,6 @@ export function ensureMonacoEnvironment() {
         if (status === "locked" || status === "hidden")
             void registerLibrary(path);
     }
-    useSettingsStore().load();
 }
 
 async function registerLibrary(path: string) {
