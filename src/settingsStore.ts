@@ -12,6 +12,12 @@ const useSettingsStore = defineStore("Settings", {
     actions: {
         save() {
             localStorage.setItem(settingsKey, JSON.stringify(this.$state));
+        },
+        reset() {
+            this.$patch(state => {
+                state.stickyScroll = defaultSettings.stickyScroll;
+                state.minimap = defaultSettings.minimap;
+            });
         }
     }
 });

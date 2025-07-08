@@ -17,6 +17,10 @@ function restartTutorial() {
     emit("close");
     restart();
 }
+
+function resetSettings() {
+    store.reset();
+}
 </script>
 
 <template>
@@ -30,5 +34,6 @@ function restartTutorial() {
         <label for="minimap">Editor Minimap</label>
     </div>
     <button v-on:click="restartTutorial">Restart Tutorial</button>
+    <button v-on:click="resetSettings">Reset Settings</button>
     <button v-on:click="emit('close')" autofocus>Close</button>
 </template>
