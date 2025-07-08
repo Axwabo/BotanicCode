@@ -152,14 +152,14 @@ export default class BotManager implements Updatable {
                     amount,
                     position: { ...bot.position }
                 });
-                this.modifyInventory(bot, request.item, amount);
+                this.modifyInventory(bot, request.item, -amount);
                 break;
         }
     }
 
     modifyInventory(bot: BotInstance, item: ItemType, delta: number) {
         modifyInventory(bot.inventory, item, delta);
-        this.send({ type: "bot", name: bot.name, response: { type: "pickUp", item, count: -1 } });
+        this.send({ type: "bot", name: bot.name, response: { type: "pickUp", item, count: delta } });
     }
 
     deleteBot(name: string) {

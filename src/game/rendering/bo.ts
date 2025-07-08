@@ -1,6 +1,6 @@
 import type { BotInstance } from "../botInstance.ts";
 import type { Tool } from "../editor/editorTypes.ts";
-import { energyBar, fillCircle } from "./shapes.ts";
+import { energyBar, fillCircle, outlineText } from "./shapes.ts";
 import { botRadius } from "../../bot/sdk/bot";
 import { isInRange } from "../../util/distance";
 
@@ -37,18 +37,12 @@ function drawBot(ctx: CanvasRenderingContext2D, x: number, y: number) {
 
 function drawInfo(ctx: CanvasRenderingContext2D, highlightedBot: BotInstance) {
     const { name, position: { x, y } } = highlightedBot;
-    ctx.strokeStyle = "black";
-    ctx.fillStyle = "white";
-    ctx.lineWidth = 3;
-    ctx.lineJoin = "round";
-    ctx.strokeText(name, x, y - botRadius);
-    ctx.fillText(name, x, y - botRadius);
+    outlineText(ctx, name, x, y - botRadius);
     ctx.font = "15px Arial";
     let drawY = y - botRadius - 22;
     for (const [ type, count ] of highlightedBot.inventory) {
-        const text = `${type} x${count}`;
-        ctx.strokeText(text, x, drawY);
-        ctx.fillText(text, x, drawY);
+        ctx.lineWidth = 3;
+        outlineText(ctx, `${type} x${count}`, x, drawY);
         drawY -= 17;
     }
     energyBar(ctx, highlightedBot.energy, x, y, botRadius);

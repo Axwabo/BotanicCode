@@ -1,13 +1,15 @@
 import { signalReady } from "./ready.js";
 
+const loadWorldPromise = new Promise(resolve => addEventListener(
+    "worldloaded",
+    /** @param e {WorldLoadedEvent} */e => resolve(e.board),
+    true
+));
+
 /** @returns {Promise<Board>} */
 export function loadWorld() {
     signalReady();
-    return new Promise(resolve => addEventListener(
-        "worldloaded",
-        /** @param e {WorldLoadedEvent} */e => resolve(e.board),
-        true
-    ));
+    return loadWorldPromise;
 }
 
 /** @returns {Promise<number>} */

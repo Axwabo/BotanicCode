@@ -24,3 +24,11 @@ export function fillCircle(ctx: CanvasRenderingContext2D, x: number, y: number, 
     ctx.arc(x, y, radius, 0, Math.PI * 2);
     ctx.fill();
 }
+
+export function outlineText(ctx: CanvasRenderingContext2D, text: string, x: number, y: number) {
+    ctx.lineJoin = "round";
+    ctx.strokeStyle = "black";
+    ctx.fillStyle = "white";
+    ctx.strokeText(text, x, y);
+    ctx.fillText(text, x, y);
+}

@@ -1,7 +1,7 @@
 import { tileSize, tilesPerChunk, worldToChunk } from "../../util/tileConstants";
 import type { Tile } from "../../util/tile";
 import { getBoundingBoxes } from "../../util/world/boundingBoxes";
-import { fillCircle, lightning } from "./shapes.ts";
+import { fillCircle, lightning, outlineText } from "./shapes.ts";
 import type { GameState } from "../gameState.ts";
 import type { DroppedItem } from "../../bot/sdk/items";
 
@@ -105,9 +105,6 @@ function drawItem(ctx: CanvasRenderingContext2D, item: DroppedItem) {
     ctx.font = "10px Arial";
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
-    ctx.fillStyle = "white";
-    ctx.strokeStyle = "black";
     ctx.lineWidth = 2;
-    ctx.strokeText(`${item.type} x${item.amount}`, item.position.x, item.position.y);
-    ctx.fillText(`${item.type} x${item.amount}`, item.position.x, item.position.y);
+    outlineText(ctx, `${item.type} x${item.amount}`, item.position.x, item.position.y);
 }
