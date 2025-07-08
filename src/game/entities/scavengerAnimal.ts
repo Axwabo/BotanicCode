@@ -26,7 +26,7 @@ export default abstract class ScavengerAnimal extends IdlingEntity {
             Math.floor(this.position.x / tileSize),
             Math.floor(this.position.y / tileSize),
             5,
-            t => this.canEat(t)
+            t => this.canEat(t, true)
         );
     }
 
@@ -34,11 +34,11 @@ export default abstract class ScavengerAnimal extends IdlingEntity {
         this.movement.target = worldCenter(tile);
         yield* this.movement.goToTarget();
         yield Math.random() * 2 + 1;
-        if (this.canEat(tile))
+        if (this.canEat(tile, false))
             this.consume(tile);
     }
 
-    protected abstract canEat(tile: Tile): boolean;
+    protected abstract canEat(tile: Tile, locating: boolean): boolean;
 
     protected abstract consume(tile: Tile): void;
 

@@ -4,7 +4,8 @@ import { isPlant } from "../plants/harvesting.ts";
 
 export default class Pig extends ScavengerAnimal {
 
-    protected canEat(tile: Tile) {
+    // @ts-ignore
+    protected canEat(tile: Tile, locating: boolean): boolean {
         return !!tile.data && isPlant(tile.data) && isEdibleType(tile.data.type) && tile.data.growthPercentage > 0.5;
     }
 
