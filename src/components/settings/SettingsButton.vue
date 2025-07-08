@@ -7,8 +7,19 @@ const dialogElement = ref<HTMLDialogElement>();
 
 <template>
     <button v-on:click="dialogElement?.showModal()">Settings</button>
-    <dialog ref="dialogElement">
-        <SettingsDialog/>
-        <button v-on:click="dialogElement?.close()" autofocus>Close</button>
+    <dialog ref="dialogElement" class="settings-dialog">
+        <SettingsDialog v-on:close="dialogElement?.close()"/>
     </dialog>
 </template>
+
+
+<style scoped>
+.settings-dialog {
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.settings-dialog[open] {
+    display: flex;
+}
+</style>

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { onMounted, ref, watch } from "vue";
 import Example from "./Example.vue";
-import { tutorialSequence } from "../../tutorialStore.ts";
+import { tutorialKey, tutorialSequence } from "../../tutorialStore.ts";
 import Welcome from "./Welcome.vue";
 import Project from "./Project.vue";
 import Navigation from "./Navigation.vue";
@@ -18,21 +18,21 @@ const sequence = tutorialSequence();
 
 const dialogElement = ref<HTMLDialogElement>();
 
-const key = "BotanicCodeTutorialCompleted";
-
 onMounted(() => {
-    if (localStorage.getItem(key) !== "true")
+    if (sequence.value !== "skip")
         dialogElement.value!.showModal();
 });
 
 function complete() {
-    localStorage.setItem(key, "true");
+    localStorage.setItem(tutorialKey, "true");
 }
 
 watch(sequence, value => {
     const dialog = dialogElement.value!;
     if (value === "skip")
         dialog.close();
+    else if (dialogElement.value?.open === false)
+        dialogElement.value.showModal();
     const outlined = document.querySelector<HTMLElement>(".outline");
     if (!outlined)
         return;
@@ -66,10 +66,6 @@ watch(sequence, value => {
 </template>
 
 <style scoped>
-:deep(h1) {
-    margin-top: 0;
-}
-
 :deep(code) {
     background-color: black;
     padding: 0.25em;

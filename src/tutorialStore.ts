@@ -14,13 +14,16 @@ interface State {
 }
 
 export const useTutorialStore = defineStore("Tutorial", {
-    state: (): State => ({ sequence: "welcome" }),
+    state: (): State => ({ sequence: localStorage.getItem(tutorialKey) === "true" ? "skip" : parts[0] }),
     actions: {
         next() {
             this.sequence = parts[parts.indexOf(this.sequence) + 1];
         },
         skip() {
             this.sequence = "skip";
+        },
+        restart() {
+            this.sequence = parts[0];
         }
     }
 });
@@ -34,3 +37,5 @@ export default function isTutorialSequence(part: TutorialPart) {
     const sequence = tutorialSequence();
     return computed(() => sequence.value === part);
 }
+
+export const tutorialKey = "BotanicCodeTutorialCompleted";
