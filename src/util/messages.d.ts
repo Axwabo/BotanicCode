@@ -2,10 +2,10 @@ import type { BotRequest, BotResponse } from "../bot/sdk/requests";
 import type { Tile, WorldPosition } from "./tile";
 import type { Gizmo } from "./gizmos";
 import type { Entity } from "../bot/sdk/entities";
-import type { ItemType } from "../bot/sdk/items";
+import type { DroppedItem, ItemType } from "../bot/sdk/items";
 
 export type WorkerMessage = Ready | BotRequestMessage | DrawGizmos | ClearGizmos | Log;
-export type GameMessage = Render | BotResponseMessage | World | TileUpdate | EntityAdd | EntityPositionUpdate | EntityEnergyUpdate | EntityRemove;
+export type GameMessage = Render | BotResponseMessage | World | TileUpdate | EntityAdd | EntityPositionUpdate | EntityEnergyUpdate | EntityRemove | ItemUpdate;
 
 export type LogType = "debug" | "info" | "warn" | "error" | "fatal";
 
@@ -83,4 +83,9 @@ interface EntityEnergyUpdate {
 interface EntityRemove {
     type: "entityRemove";
     id: string;
+}
+
+interface ItemUpdate {
+    type: "itemUpdate";
+    item: DroppedItem;
 }

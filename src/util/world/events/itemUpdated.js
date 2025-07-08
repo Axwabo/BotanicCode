@@ -4,7 +4,7 @@ export default class ItemUpdatedEvent extends Event {
 
     /** @param item {DroppedItem} */
     constructor(item) {
-        super("itemUpdated");
+        super("itemupdated");
         this.item = item;
     }
 }

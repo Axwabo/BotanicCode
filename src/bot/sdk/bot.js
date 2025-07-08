@@ -77,6 +77,19 @@ class Bot {
         this.#request({ type: "plant", kind: plantType });
     }
 
+    /**
+     * @param itemType {ItemType}
+     * @param amount {number}
+     */
+    drop(itemType, amount) {
+        if (amount <= 0)
+            return;
+        const available = this.inventory?.get(itemType) ?? 0;
+        amount = Math.min(available, Math.max(0, amount));
+        if (amount)
+            this.#request({ type: "drop", item: itemType, amount });
+    }
+
     terminate() {
         this.#terminated = true;
         this.#request({ type: "terminate" });

@@ -22,6 +22,8 @@ import type RenderEvent from "../util/world/events/render";
 import type EntityEnergyUpdatedEvent from "../util/world/events/energyUpdated";
 import WorkerLogEvent from "./events/workerLogEvent.ts";
 import { getDrops } from "./plants/harvesting.ts";
+import type { ItemType } from "../bot/sdk/items";
+import type ItemUpdatedEvent from "../util/world/events/itemUpdated";
 
 type EventHandler<T> = (event: T) => void;
 
@@ -31,6 +33,7 @@ interface EventHandlers {
     entityPositionUpdated: EventHandler<EntityPositionUpdatedEvent>;
     entityEnergyUpdated: EventHandler<EntityEnergyUpdatedEvent>;
     entityRemoved: EventHandler<EntityRemovedEvent>;
+    itemUpdated: EventHandler<ItemUpdatedEvent>;
 }
 
 export default class BotManager implements Updatable {
@@ -52,7 +55,8 @@ export default class BotManager implements Updatable {
             entityAdded: ev => this.sendAdd(ev),
             entityPositionUpdated: ev => this.sendMove(ev),
             entityEnergyUpdated: ev => this.sendEnergy(ev),
-            entityRemoved: ev => this.sendRemove(ev)
+            entityRemoved: ev => this.sendRemove(ev),
+            itemUpdated: ev => this.sendItemUpdate(ev)
         };
         this.handlers = callbacks;
         this.worker.addEventListener("message", event => this.handleMessage(event));
@@ -61,6 +65,7 @@ export default class BotManager implements Updatable {
         board.addEventListener("entitypositionupdated", callbacks.entityPositionUpdated);
         board.addEventListener("entityenergyupdated", callbacks.entityEnergyUpdated);
         board.addEventListener("entityremoved", callbacks.entityRemoved);
+        board.addEventListener("itemupdated", callbacks.itemUpdated);
     }
 
     private handleMessage(event: MessageEvent<WorkerMessage>) {
@@ -131,27 +136,30 @@ export default class BotManager implements Updatable {
             case "plant": {
                 const amount = bot.inventory.get(request.kind) ?? 0;
                 const type = plantableToPlantType(request.kind);
-                if (!type
-                    || amount <= 0
-                    || !this.depleteEnergy(bot, 0.005)
-                    || !plant(this.board, Math.floor(worldToTile(position.x)), Math.floor(worldToTile(position.y)), type))
-                    break;
-                modifyInventory(bot.inventory, request.kind, -1);
-                this.send({ type: "bot", name, response: { type: "pickUp", item: request.kind, count: -1 } });
+                if (type && amount > 0
+                    && this.depleteEnergy(bot, 0.005)
+                    && plant(this.board, Math.floor(worldToTile(position.x)), Math.floor(worldToTile(position.y)), type))
+                    this.modifyInventory(bot, request.kind, -1);
                 break;
             }
             case "drop":
                 const amount = Math.min(Math.max(0, request.amount), bot.inventory.get(request.item) ?? 0);
-                if (amount)
-                    this.board.handleItemUpdate({
-                        id: crypto.randomUUID(),
-                        type: request.item,
-                        amount: request.amount,
-                        position: { ...bot.position }
-                    });
-                // TODO: inventory delta
+                if (!amount)
+                    break;
+                this.board.handleItemUpdate({
+                    id: crypto.randomUUID(),
+                    type: request.item,
+                    amount,
+                    position: { ...bot.position }
+                });
+                this.modifyInventory(bot, request.item, amount);
                 break;
         }
+    }
+
+    modifyInventory(bot: BotInstance, item: ItemType, delta: number) {
+        modifyInventory(bot.inventory, item, delta);
+        this.send({ type: "bot", name: bot.name, response: { type: "pickUp", item, count: -1 } });
     }
 
     deleteBot(name: string) {
@@ -165,6 +173,7 @@ export default class BotManager implements Updatable {
             this.board.removeEventListener("entitypositionupdated", this.handlers.entityPositionUpdated);
             this.board.removeEventListener("entityremoved", this.handlers.entityRemoved);
             this.board.removeEventListener("entityenergyupdated", this.handlers.entityEnergyUpdated);
+            this.board.removeEventListener("itemupdated", this.handlers.itemUpdated);
         }
         this.worker?.terminate();
     }
@@ -204,6 +213,10 @@ export default class BotManager implements Updatable {
 
     private sendRemove(ev: EntityRemovedEvent) {
         this.send({ type: "entityRemove", id: ev.id });
+    }
+
+    private sendItemUpdate(ev: ItemUpdatedEvent) {
+        this.send({ type: "itemUpdate", item: ev.item });
     }
 
     tick(deltaSeconds: number): void {
