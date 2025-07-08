@@ -51,7 +51,7 @@ export default abstract class IdlingEntity extends MovableEntity {
         yield* this.movement.goToTarget();
         yield Math.random() + 1;
         let any = false;
-        while (item.amount && this.wantsToEat) {
+        while (item.amount && this.wantsToEat && this.isNearby(item)) {
             any = true;
             item.amount--;
             this.board.handleItemUpdate(item);
@@ -71,9 +71,12 @@ export default abstract class IdlingEntity extends MovableEntity {
             for (const value of Object.values(chunk.items)) {
                 const item = <DroppedItem>value;
                 if (this.edibleItems.includes(item.type)
-                    && isInRange(item.position.x, item.position.y, this.position.x, this.position.y, 10 * tileSize))
+                    && this.isNearby(item))
                     return item;
             }
     }
 
+    private isNearby(item: DroppedItem) {
+        return isInRange(item.position.x, item.position.y, this.position.x, this.position.y, 10 * tileSize);
+    }
 }

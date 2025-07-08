@@ -23,6 +23,10 @@ export default class IdleMovement {
     * goToTarget(): Behavior {
         while (this.target) {
             const { x, y } = normalize(this.target.x - this.position.x, this.target.y - this.position.y);
+            if (isNaN(x) || isNaN(y)) {
+                this.target = undefined;
+                break;
+            }
             const deltaSeconds = yield nextFrame;
             if (!this.entity.move(x * this.movementSpeed * deltaSeconds, y * this.movementSpeed * deltaSeconds)) {
                 this.target = undefined;
