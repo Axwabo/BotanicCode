@@ -11,7 +11,6 @@ import RenderEvent from "../../util/world/events/render.js";
 import EntityEnergyUpdatedEvent from "../../util/world/events/energyUpdated.js";
 import { signalError } from "./ready.js";
 import ItemUpdatedEvent from "../../util/world/events/itemUpdated.js";
-import { worldToTile } from "../../util/tileConstants.js";
 
 addEventListener("message", handleMessage);
 
@@ -33,10 +32,8 @@ function handleMessage(ev) {
                 tile.type = type;
                 tile.data = data;
             });
-            addEventListener("itemupdated", /** @param event {ItemUpdatedEvent} */event => {
-                const { x, y } = event.item.position;
-                board.getChunkAt(worldToTile(x), worldToTile(y)).handleItemUpdate(event.item);
-            });
+            addEventListener("itemupdated", /** @param event {ItemUpdatedEvent} */event =>
+                board.getChunkAtPosition(event.item.position).handleItemUpdate(event.item));
             dispatchEvent(new WorldLoadedEvent(board, ev.data.bots));
             break;
         case "tile":

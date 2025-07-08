@@ -6,7 +6,6 @@ import type EntityRemovedEvent from "../util/world/events/entityRemoved";
 import type EntityEnergyUpdatedEvent from "../util/world/events/energyUpdated";
 import ItemUpdatedEvent from "../util/world/events/itemUpdated";
 import type { DroppedItem } from "../bot/sdk/items";
-import { worldToTile } from "../util/tileConstants";
 
 interface EventMap {
     entityadded: EntityAddedEvent;
@@ -33,7 +32,7 @@ export default class ManagedBoard extends Board {
     }
 
     handleItemUpdate(item: DroppedItem) {
-        this.getChunkAt(worldToTile(item.position.x), worldToTile(item.position.y)).handleItemUpdate(item);
+        this.getChunkAtPosition(item.position).handleItemUpdate(item);
         this.dispatchEvent(new ItemUpdatedEvent(item));
     }
 }

@@ -7,7 +7,7 @@ import RuminantAnimal from "./ruminantAnimal.ts";
 import Pig from "./pig.ts";
 import Chicken from "./chicken.ts";
 
-function createRuminant(board: ManagedBoard, position: WorldPosition, type: EntityType, radiusScalar: number, speedScalar: number = radiusScalar): ManagedEntity {
+function createRuminant(board: ManagedBoard, position: WorldPosition, type: EntityType, radiusScalar: number, speedScalar: number): ManagedEntity {
     return new RuminantAnimal(board, position, type, tileSize * radiusScalar, tileSize * speedScalar);
 }
 

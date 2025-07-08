@@ -23,6 +23,14 @@ export class Board {
     }
 
     /**
+     * @param position {WorldPosition}
+     * @return {Chunk}
+     */
+    getChunkAtPosition(position) {
+        return this.getChunkAt(worldToTile(position.x), worldToTile(position.y));
+    }
+
+    /**
      * @param x {number}
      * @param y {number}
      * @return {Tile}
