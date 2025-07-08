@@ -9,6 +9,7 @@ export default class Chicken extends ScavengerAnimal {
 
     // @ts-ignore
     protected consume(tile: Tile): void {
+        this.depleteEnergy(-0.05);
     }
 
 }
