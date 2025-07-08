@@ -8,10 +8,12 @@ export default abstract class ScavengerAnimal extends IdlingEntity {
 
     protected* behavior(): Behavior {
         while (true) {
-            if (this.energy > 0.8) {
+            if (!this.wantsToEat) {
                 yield* this.movement.moveIldlyOnce();
                 continue;
             }
+            if (yield* this.eatNearbyItem())
+                continue;
             const tile = this.findEdibleTile();
             if (tile)
                 yield* this.eatTile(tile);

@@ -30,21 +30,26 @@ export default abstract class IdlingEntity extends MovableEntity {
 
     protected* behavior(): Behavior {
         while (true) {
-            if (this.energy <= 0.8)
-                yield* this.eatNearbyItem();
+            yield* this.eatNearbyItem();
             yield* this.movement.moveIldlyOnce();
         }
     }
 
+    get wantsToEat() {
+        return this.energy <= 0.8;
+    }
+
     protected* eatNearbyItem() {
+        if (!this.wantsToEat)
+            return false;
         const item = this.findEdibleItem();
-        if (!item || this.energy > 0.8)
+        if (!item)
             return false;
         this.movement.target = item.position;
         yield* this.movement.goToTarget();
         yield Math.random() + 1;
         let any = false;
-        while (item.amount && this.energy <= 0.8) {
+        while (item.amount && this.wantsToEat) {
             any = true;
             item.amount--;
             this.board.handleItemUpdate(item);

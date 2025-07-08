@@ -14,7 +14,7 @@ export default class RuminantAnimal extends IdlingEntity {
     protected* behavior(): Behavior {
         while (true) {
             yield* this.movement.moveIldlyOnce();
-            if (this.eatingCooldown > 0 || this.energy > 0.8)
+            if (this.eatingCooldown > 0 || !this.wantsToEat)
                 continue;
             if (!(yield* this.eatNearbyItem()))
                 yield* this.eatGrass();
