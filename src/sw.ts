@@ -36,10 +36,12 @@ self.addEventListener("fetch", event => {
     event.respondWith(new Response(illegalFetch, illegalImport));
 });
 
+const leadingSlashes = /^\/*/;
+
 function isPath(url: URL, regex: RegExp) {
     return url.origin === self.location.origin
         && url.pathname.startsWith(import.meta.env.BASE_URL)
-        && regex.test(url.pathname.substring(import.meta.env.BASE_URL.length));
+        && regex.test(url.pathname.substring(import.meta.env.BASE_URL.length).replace(leadingSlashes, ""));
 }
 
 function capture(regex: RegExp): RouteMatchCallback {
@@ -62,7 +64,7 @@ registerRoute(capture(/^bot\/sdk\/run*/i), async options => {
 
 registerRoute(capture(/^bot\/(?!sdk)/i), async ({ url }) => {
     fileCache ??= await caches.open("Files");
-    const file = url.pathname.replace(import.meta.env.BASE_URL, "/");
+    const file = url.pathname.substring(import.meta.env.BASE_URL.length).replace(leadingSlashes, "/");
     const cached = await fileCache.match(file);
     if (!cached) {
         requestErrorChannel.postMessage(`File not found: ${file}`);
