@@ -14,7 +14,7 @@ import EntityAddedEvent from "../util/world/events/entityAdded";
 import EntityPositionUpdatedEvent from "../util/world/events/entityPosition";
 import EntityRemovedEvent from "../util/world/events/entityRemoved";
 import { botRadius } from "../bot/sdk/bot.js";
-import { plant } from "./plants/create.ts";
+import { plant, plantableToPlantType } from "./plants/create.ts";
 import { worldToTile } from "../util/tileConstants";
 import { modifyInventory } from "../util/inventoryHelper";
 import type { Updatable } from "../bot/sdk/entities";
@@ -130,9 +130,11 @@ export default class BotManager implements Updatable {
             }
             case "plant": {
                 const amount = bot.inventory.get(request.kind) ?? 0;
-                if (amount <= 0
+                const type = plantableToPlantType(request.kind);
+                if (!type
+                    || amount <= 0
                     || !this.depleteEnergy(bot, 0.005)
-                    || !plant(this.board, Math.floor(worldToTile(position.x)), Math.floor(worldToTile(position.y)), request.kind))
+                    || !plant(this.board, Math.floor(worldToTile(position.x)), Math.floor(worldToTile(position.y)), type))
                     break;
                 modifyInventory(bot.inventory, request.kind, -1);
                 this.send({ type: "bot", name, response: { type: "pickUp", item: request.kind, count: -1 } });

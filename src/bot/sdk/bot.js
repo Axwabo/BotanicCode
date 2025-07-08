@@ -72,7 +72,7 @@ class Bot {
         this.#request({ type: "harvest" });
     }
 
-    /** @param plantType {PlantType} */
+    /** @param plantType {Plantable} */
     plant(plantType) {
         this.#request({ type: "plant", kind: plantType });
     }

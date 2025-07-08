@@ -1,5 +1,4 @@
-import type { ItemType } from "./items";
-import type { PlantType } from "../../util/tile";
+import type { ItemType, Plantable } from "./items";
 
 export type BotRequest = Create | Move | Terminate | Harvest | Plant;
 export type BotResponse = Terminate | PositionUpdate | PickUp | EnergyDepletion;
@@ -24,7 +23,7 @@ export interface Harvest {
 
 interface Plant {
     type: "plant";
-    kind: PlantType;
+    kind: Plantable;
 }
 
 interface PositionUpdate {
