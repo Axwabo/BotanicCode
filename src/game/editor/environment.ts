@@ -22,16 +22,13 @@ export function ensureMonacoEnvironment() {
         if (status === "locked" || status === "hidden")
             void registerLibrary(path);
     }
-    loadSettings();
+    useSettingsStore().load();
 }
 
 async function registerLibrary(path: string) {
     const response = await get(path);
     if (response)
         monaco.languages.typescript.javascriptDefaults.addExtraLib(response, path); // TODO: doesn't work
-}
-
-function loadSettings() {
 }
 
 // simple Ref causes the page to hang

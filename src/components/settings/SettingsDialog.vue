@@ -2,7 +2,11 @@
 import { storeToRefs } from "pinia";
 import useSettingsStore from "../../settingsStore.ts";
 
-const { stickyScroll } = storeToRefs(useSettingsStore());
+const store = useSettingsStore();
+
+const { stickyScroll } = storeToRefs(store);
+
+store.$subscribe(() => store.save());
 </script>
 
 <template>
