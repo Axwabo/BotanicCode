@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { defineAsyncComponent, watch } from "vue";
+import { defineAsyncComponent, onMounted, watch } from "vue";
 import useFileStore from "../../fileStore.ts";
 import { storeToRefs } from "pinia";
 import Loading from "./Loading.vue";
@@ -8,7 +8,7 @@ import EditorTitleBar from "./EditorTitleBar.vue";
 import { tutorialSequence } from "../../tutorialStore.ts";
 
 const { currentFile } = storeToRefs(useFileStore());
-const { navigate, editors, get } = useFileStore();
+const { navigate, editors, get, restoreEditors } = useFileStore();
 
 const sequence = tutorialSequence();
 
@@ -28,6 +28,8 @@ watch(currentFile, async value => {
     const contents = await get(value);
     navigate(value, contents);
 }, { immediate: true });
+
+onMounted(() => restoreEditors());
 </script>
 
 <template>

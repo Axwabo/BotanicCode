@@ -18,6 +18,8 @@ export interface EditorInstance {
     contents: () => string;
 }
 
+const openEditorsKey = "BotanicCodeOpenEditors";
+
 function reactiveMap<T>() {
     return reactive(new Map<string, T>());
 }
@@ -36,6 +38,12 @@ function findIndex(editorPaths: Map<string, EditorInstance>, current: string) {
     return -1;
 }
 
+function commitEditors(editors: Map<string, EditorInstance>, current: string) {
+    localStorage.setItem(openEditorsKey, Array.from(editors.keys()).concat(current).join("\n"));
+}
+
+let initPromise: Promise<void> | undefined;
+
 const useFileStore = defineStore("projectFiles", {
     state: (): State => ({ files: reactiveMap(), currentFile: "", editors: reactiveMap(), deleteConfirmation: "", swActivated: false }),
     getters: {
@@ -48,20 +56,25 @@ const useFileStore = defineStore("projectFiles", {
         }
     },
     actions: {
-        async init() {
-            const cache = await this.cacheAsync;
-            const keys = await cache.keys();
-            const statuses: [ string, FileStatus ][] = keys.map(e => [ new URL(e.url, location.origin).pathname, "saved" ]);
-            const response = await fetch(`${import.meta.env.BASE_URL}file-list`);
-            if (response.ok && response.headers.get("Content-Type") === "text/plain") {
-                const text = await response.text();
-                statuses.push(...(<[ string, FileStatus ][]>text.split("\n").filter(e => e).map(e => [ e, "hidden" ])));
-            }
-            this.$patch(state => {
-                this.files.clear();
-                for (const [ path, status ] of statuses)
-                    state.files.set(path, status);
-            });
+        init() {
+            if (initPromise)
+                return initPromise;
+            const init = async () => {
+                const cache = await this.cacheAsync;
+                const keys = await cache.keys();
+                const statuses: [ string, FileStatus ][] = keys.map(e => [ new URL(e.url, location.origin).pathname, "saved" ]);
+                const response = await fetch(`${import.meta.env.BASE_URL}file-list`);
+                if (response.ok && response.headers.get("Content-Type") === "text/plain") {
+                    const text = await response.text();
+                    statuses.push(...(<[ string, FileStatus ][]>text.split("\n").filter(e => e).map(e => [ e, "hidden" ])));
+                }
+                this.$patch(state => {
+                    this.files.clear();
+                    for (const [ path, status ] of statuses)
+                        state.files.set(path, status);
+                });
+            };
+            return initPromise = init();
         },
         async get(path: string) {
             const cache = await this.cacheAsync;
@@ -89,6 +102,18 @@ const useFileStore = defineStore("projectFiles", {
             if (!editor && content !== undefined)
                 this.editors.set(path, { file: path, text: content ?? "", contents: () => "" });
             this.currentFile = path;
+            commitEditors(this.editors, path);
+        },
+        async restoreEditors() {
+            await this.init();
+            const paths = localStorage.getItem(openEditorsKey);
+            if (!paths)
+                return;
+            for (const path of paths.split("\n"))
+                if (this.files.get(path)) {
+                    this.currentFile = path;
+                    await new Promise(resolve => setTimeout(resolve, 20)); // TODO: fix race condition
+                }
         },
         setSdkVisibility(visible: boolean) {
             const change: string[] = [];
@@ -104,7 +129,8 @@ const useFileStore = defineStore("projectFiles", {
         close(path: string) {
             const current = this.currentFile;
             const openIndex = findIndex(this.editors, current);
-            this.editors.delete(path);
+            if (this.editors.delete(path))
+                commitEditors(this.editors, current);
             if (current !== path)
                 return;
             if (!this.editors.size) {
