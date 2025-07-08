@@ -2,7 +2,7 @@
 import { computed, onMounted, onUnmounted, ref } from "vue";
 import * as monaco from "monaco-editor";
 import useFileStore from "../../fileStore.ts"
-import { ensureMonacoEnvironment, watchSettings } from "../../game/editor/environment.ts";
+import { editorConstruction, ensureMonacoEnvironment, watchSettings } from "../../game/editor/environment.ts";
 
 const { path } = defineProps<{ path: string; }>();
 
@@ -21,6 +21,7 @@ watchSettings(() => editor);
 onMounted(() => {
     ensureMonacoEnvironment();
     editor = monaco.editor.create(element.value!, {
+        ...editorConstruction(),
         language: path.endsWith(".ts") ? "typescript" : "javascript",
         theme: "vs-dark",
         value: instance.text,

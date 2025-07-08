@@ -9,7 +9,7 @@ const { restart } = useTutorialStore();
 
 const store = useSettingsStore();
 
-const { stickyScroll } = storeToRefs(store);
+const { stickyScroll, minimap } = storeToRefs(store);
 
 store.$subscribe(() => store.save());
 
@@ -24,6 +24,10 @@ function restartTutorial() {
     <div>
         <input type="checkbox" id="stickyScroll" v-model="stickyScroll">
         <label for="stickyScroll">Sticky Scroll</label>
+    </div>
+    <div>
+        <input type="checkbox" id="minimap" v-model="minimap">
+        <label for="minimap">Editor Minimap</label>
     </div>
     <button v-on:click="restartTutorial">Restart Tutorial</button>
     <button v-on:click="emit('close')" autofocus>Close</button>

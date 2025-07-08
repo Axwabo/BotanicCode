@@ -1,7 +1,8 @@
 import { defineStore } from "pinia";
 
 interface Settings {
-    stickyScroll: boolean
+    stickyScroll: boolean;
+    minimap: boolean;
 }
 
 const settingsKey = "BotanicCodeSettings";
@@ -16,7 +17,8 @@ const useSettingsStore = defineStore("Settings", {
 });
 
 const defaultSettings: Settings = {
-    stickyScroll: true
+    stickyScroll: true,
+    minimap: true
 };
 
 function load(): Settings {
@@ -25,7 +27,8 @@ function load(): Settings {
         return defaultSettings;
     const settings: Partial<Settings> = JSON.parse(value);
     return {
-        stickyScroll: !!settings.stickyScroll
+        stickyScroll: settings.stickyScroll !== false,
+        minimap: settings.minimap !== false
     };
 }
 

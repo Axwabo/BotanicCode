@@ -21,5 +21,6 @@ const dialogElement = ref<HTMLDialogElement>();
 
 .settings-dialog[open] {
     display: flex;
+    min-width: 12rem;
 }
 </style>

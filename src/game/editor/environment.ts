@@ -8,7 +8,7 @@ import { type Ref, watch } from "vue";
 
 const { files, get } = useFileStore();
 
-const { stickyScroll } = storeToRefs(useSettingsStore());
+const { stickyScroll, minimap } = storeToRefs(useSettingsStore());
 
 export function ensureMonacoEnvironment() {
     if (self.MonacoEnvironment)
@@ -35,8 +35,16 @@ type EditorRef = () => monaco.editor.IStandaloneCodeEditor | undefined;
 
 export function watchSettings(editor: EditorRef) {
     watchSetting(editor, stickyScroll, enabled => ({ stickyScroll: { enabled } }));
+    watchSetting(editor, minimap, enabled => ({ minimap: { enabled } }));
 }
 
 function watchSetting<T>(editor: EditorRef, setting: Ref<T>, transform: (value: T) => monaco.editor.IEditorOptions) {
     watch(setting, value => editor()?.updateOptions(transform(value)));
+}
+
+export function editorConstruction(): monaco.editor.IStandaloneEditorConstructionOptions {
+    return {
+        stickyScroll: { enabled: stickyScroll.value },
+        minimap: { enabled: minimap.value }
+    };
 }
