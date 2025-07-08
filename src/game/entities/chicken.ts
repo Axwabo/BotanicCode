@@ -4,7 +4,7 @@ import ScavengerAnimal from "./scavengerAnimal.ts";
 export default class Chicken extends ScavengerAnimal {
 
     protected canEat(tile: Tile, locating: boolean): boolean {
-        return tile.type === "grass" && !tile.data && (!locating || Math.random() < 0.05);
+        return tile.type === "grass" && !tile.data && (!locating || Math.random() < 0.1);
     }
 
     // @ts-ignore
