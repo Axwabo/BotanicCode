@@ -1,4 +1,4 @@
-import type { WorldPosition } from "../../util/tile";
+import type { Tile, WorldPosition } from "../../util/tile";
 import { validateMove } from "../../util/movement";
 import type { EntityType } from "../../bot/sdk/entities";
 import ManagedBoard from "../managedBoard.ts";
@@ -7,6 +7,8 @@ import EntityAddedEvent from "../../util/world/events/entityAdded";
 import EntityPositionUpdatedEvent from "../../util/world/events/entityPosition";
 import EntityRemovedEvent from "../../util/world/events/entityRemoved";
 import EntityEnergyUpdatedEvent from "../../util/world/events/energyUpdated";
+import { editorHandler } from "../events/editorHandler.ts";
+import TileUpdatedEvent from "../../util/world/events/tileUpdated";
 
 export default abstract class MovableEntity implements ManagedEntity {
     readonly id: string = crypto.randomUUID();
@@ -51,5 +53,9 @@ export default abstract class MovableEntity implements ManagedEntity {
     depleteEnergy(delta: number) {
         this.energy = Math.max(0, Math.min(1, this.energy - delta));
         this.board.dispatchEvent(new EntityEnergyUpdatedEvent(this.id, this.energy));
+    }
+
+    protected notifyTileUpdate(tile: Tile) {
+        editorHandler.dispatchEvent(new TileUpdatedEvent(tile));
     }
 }

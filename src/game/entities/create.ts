@@ -1,15 +1,11 @@
 import type ManagedBoard from "../managedBoard.ts";
 import type { WorldPosition } from "../../util/tile";
 import type { EntityType } from "../../bot/sdk/entities";
-import IdlingEntity from "./idlingEntity.ts";
 import type { ManagedEntity } from "./interfaces.ts";
 import { tileSize } from "../../util/tileConstants";
 import RuminantAnimal from "./ruminantAnimal.ts";
 import Pig from "./pig.ts";
-
-function createIdling(board: ManagedBoard, position: WorldPosition, type: EntityType, radiusScalar: number, speedScalar: number = radiusScalar): ManagedEntity {
-    return new IdlingEntity(board, position, type, tileSize * radiusScalar, tileSize * speedScalar);
-}
+import Chicken from "./chicken.ts";
 
 function createRuminant(board: ManagedBoard, position: WorldPosition, type: EntityType, radiusScalar: number, speedScalar: number = radiusScalar): ManagedEntity {
     return new RuminantAnimal(board, position, type, tileSize * radiusScalar, tileSize * speedScalar);
@@ -20,7 +16,7 @@ export function createCow(board: ManagedBoard, position: WorldPosition) {
 }
 
 export function createPig(board: ManagedBoard, position: WorldPosition) {
-    return new Pig(board, position, tileSize * 0.6, tileSize * 0.6);
+    return new Pig(board, position, "pig", tileSize * 0.6, tileSize * 0.6);
 }
 
 export function createSheep(board: ManagedBoard, position: WorldPosition) {
@@ -28,5 +24,5 @@ export function createSheep(board: ManagedBoard, position: WorldPosition) {
 }
 
 export function createChicken(board: ManagedBoard, position: WorldPosition) {
-    return createIdling(board, position, "chicken", 0.3, 0.6);
+    return new Chicken(board, position, "chicken", tileSize * 0.3, tileSize * 0.6);
 }
