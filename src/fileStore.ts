@@ -81,6 +81,8 @@ const useFileStore = defineStore("projectFiles", {
             const response = await cache.match(path);
             if (response)
                 return await response.text();
+            if (path.startsWith("/bot/"))
+                return "";
             const network = await fetch(import.meta.env.BASE_URL + path);
             return network.ok ? await network.text() : "";
         },
