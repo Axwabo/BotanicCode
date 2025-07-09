@@ -30,6 +30,7 @@ onMounted(() => {
     });
     editor.onDidChangeModelContent(() => files.set(path, "modified"));
     instance.contents = () => editor!.getValue();
+    element.value?.querySelector<HTMLTextAreaElement>("textarea")?.focus();
     window.addEventListener("resize", layout);
 });
 
