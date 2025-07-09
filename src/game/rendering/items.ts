@@ -1,9 +1,7 @@
 import type { DroppedItem } from "../../bot/sdk/items";
 import { fillCircle, outlineText } from "./shapes.ts";
 import { tileSize } from "../../util/tileConstants";
-import { carrot, potato, strawberry, tomato } from "./colors.ts";
-
-const wheat = "#ddbb49";
+import { carrot, potato, strawberry, tomato, wheat } from "./colors.ts";
 
 export default function drawItem(ctx: CanvasRenderingContext2D, item: DroppedItem) {
     ctx.font = "12px Arial";
@@ -14,7 +12,7 @@ export default function drawItem(ctx: CanvasRenderingContext2D, item: DroppedIte
     outlineText(ctx, `x${item.amount}`, x + tileSize * 0.5, y);
     switch (item.type) {
         case "wheat":
-            ctx.strokeStyle = wheat;
+            ctx.strokeStyle = wheat(1);
             ctx.beginPath();
             ctx.moveTo(x + tileSize * 0.2, y + tileSize * 0.25);
             ctx.lineTo(x - tileSize * 0.2, y - tileSize * 0.25);
@@ -51,7 +49,7 @@ export default function drawItem(ctx: CanvasRenderingContext2D, item: DroppedIte
             ctx.fill();
             break;
         case "wheatSeed":
-            ctx.fillStyle = wheat;
+            ctx.fillStyle = wheat(0);
             seeds(ctx, x, y);
             break;
         case "tomatoSeed":

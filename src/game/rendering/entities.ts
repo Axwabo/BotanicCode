@@ -4,6 +4,7 @@ import { energyBar, fillCircle } from "./shapes.ts";
 import type { ManagedEntity } from "../entities/interfaces.ts";
 import type { Tool } from "../editor/editorTypes.ts";
 import { worldToChunk } from "../../util/tileConstants";
+import { beak as beakColor, chicken, comb as combColor, cow, horns as hornsColor, pig, sheep, snout as snoutColor } from "./colors.ts";
 
 export function drawEntities(ctx: CanvasRenderingContext2D, entities: Set<ManagedEntity>, startX: number, startY: number, endX: number, endY: number, pointerWorldX: number, pointerWorldY: number, tool: Tool) {
     for (const entity of entities) {
@@ -17,29 +18,29 @@ export function drawEntities(ctx: CanvasRenderingContext2D, entities: Set<Manage
 function entityCircle(ctx: CanvasRenderingContext2D, entity: Entity, x: number, y: number) {
     switch (entity.type) {
         case "cow":
-            ctx.fillStyle = "#933d00";
+            ctx.fillStyle = cow;
             break;
         case "pig":
-            ctx.fillStyle = "#f99";
+            ctx.fillStyle = pig;
             break;
         case "sheep":
-            ctx.fillStyle = "#ddd";
+            ctx.fillStyle = sheep;
             break;
         case "chicken":
-            ctx.fillStyle = "#dc862a";
+            ctx.fillStyle = chicken;
             break;
     }
     fillCircle(ctx, x, y, entity.radius);
 }
 
 function horns(ctx: CanvasRenderingContext2D, x: number, y: number, radius: number) {
-    ctx.fillStyle = "#aaa";
+    ctx.fillStyle = hornsColor;
     ctx.fillRect(x - 12, y - radius * 0.5, 4, -15);
     ctx.fillRect(x + 8, y - radius * 0.5, 4, -15);
 }
 
 function snout(ctx: CanvasRenderingContext2D, x: number, y: number) {
-    ctx.fillStyle = "#a55";
+    ctx.fillStyle = snoutColor;
     ctx.beginPath();
     ctx.arc(x - 7, y, 4, 0, Math.PI * 2);
     ctx.arc(x + 7, y, 4, 0, Math.PI * 2);
@@ -47,7 +48,7 @@ function snout(ctx: CanvasRenderingContext2D, x: number, y: number) {
 }
 
 function beak(ctx: CanvasRenderingContext2D, x: number, y: number) {
-    ctx.fillStyle = "#e8d29d";
+    ctx.fillStyle = beakColor;
     ctx.beginPath();
     ctx.moveTo(x - 3, y);
     ctx.lineTo(x + 3, y);
@@ -57,7 +58,7 @@ function beak(ctx: CanvasRenderingContext2D, x: number, y: number) {
 }
 
 function comb(ctx: CanvasRenderingContext2D, x: number, y: number, entity: Entity) {
-    ctx.fillStyle = "#f00";
+    ctx.fillStyle = combColor;
     ctx.beginPath();
     ctx.moveTo(x, y - entity.radius);
     ctx.lineTo(x, y - entity.radius - 4);

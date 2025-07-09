@@ -7,6 +7,7 @@ import { drawEntities } from "./entities.ts";
 import { drawViewportChunks, viewportChunks } from "./chunks.ts";
 import type { Tool } from "../editor/editorTypes.ts";
 import { drawBots } from "./bo.ts";
+import { highlightOverlay } from "./colors.ts";
 
 const gizmos: Gizmo[] = [];
 
@@ -16,8 +17,8 @@ editorHandler.addEventListener("addgizmos", ev => gizmos.push(...ev.gizmos));
 function clearAndTransform(ctx: CanvasRenderingContext2D, width: number, height: number, x: number, y: number, zoom: number) {
     ctx.resetTransform();
     ctx.clearRect(0, 0, width, height);
-    ctx.translate(Math.floor(width * 0.5), Math.floor(height * 0.5));
-    ctx.translate(-x, -y);
+    ctx.translate(Math.round(-x * zoom), Math.round(-y * zoom));
+    ctx.translate(Math.round(width * 0.5), Math.round(height * 0.5));
     ctx.scale(zoom, zoom);
 }
 
@@ -62,7 +63,7 @@ function drawGizmos(ctx: CanvasRenderingContext2D) {
 function highlightTile(ctx: CanvasRenderingContext2D, tool: Tool, pointerWorldX: number, pointerWorldY: number) {
     if (tool === "Inspector" || isNaN(pointerWorldX) || isNaN(pointerWorldY))
         return;
-    ctx.fillStyle = "rgba(255, 255, 0, 0.3)";
+    ctx.fillStyle = highlightOverlay;
     ctx.fillRect(Math.floor(pointerWorldX / tileSize) * tileSize, Math.floor(pointerWorldY / tileSize) * tileSize, tileSize, tileSize);
 }
 

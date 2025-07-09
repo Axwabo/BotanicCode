@@ -5,18 +5,15 @@ import { fillCircle, lightning } from "./shapes.ts";
 import type { GameState } from "../gameState.ts";
 import type { DroppedItem } from "../../bot/sdk/items";
 import drawItem from "./items.ts";
-import { carrot, chargingStation, potato, strawberry, tomato, unloadedOverlay } from "./colors.ts";
+import { carrot, chargingStation, potato, strawberry, tomato, unloadedOverlay, wheat } from "./colors.ts";
 
 export function viewportChunks(x: number, y: number, width: number, height: number, zoom: number) {
-    // TODO: fix zoom
-    const chunkX = Math.floor(worldToChunk(x));
-    const chunkY = Math.floor(worldToChunk(y));
-    const halfWidth = width / zoom * 0.5;
-    const halfHeight = height / zoom * 0.5;
-    const startX = chunkX - Math.ceil(worldToChunk(halfWidth));
-    const startY = chunkY - Math.ceil(worldToChunk(halfHeight));
-    const endX = chunkX + Math.ceil(worldToChunk(halfWidth));
-    const endY = chunkY + Math.ceil(worldToChunk(halfHeight));
+    const halfWidth = width * 0.5 / zoom;
+    const halfHeight = height * 0.5 / zoom;
+    const startX = Math.floor(worldToChunk(x - halfWidth));
+    const startY = Math.floor(worldToChunk(y - halfHeight));
+    const endX = Math.ceil(worldToChunk(x + halfWidth));
+    const endY = Math.ceil(worldToChunk(y + halfHeight));
     return { startX, startY, endX, endY };
 }
 
@@ -62,7 +59,7 @@ function drawTile(ctx: CanvasRenderingContext2D, tile: Tile) {
             lightning(ctx, x + tileSize * 0.5, y + tileSize * 0.5);
             break;
         case "wheat":
-            ctx.fillStyle = `hsl(${120 - 60 * data.growthPercentage}, 50%, 50%)`;
+            ctx.fillStyle = wheat(data.growthPercentage);
             for (let i = 2; i < tileSize; i += 4)
                 ctx.fillRect(x + i, y + tileSize - 2, 3, -tileSize * 0.5);
             break;
