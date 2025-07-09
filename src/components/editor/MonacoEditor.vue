@@ -45,16 +45,16 @@ function layout() {
 </script>
 
 <template>
-    <div id="monacoEditor" ref="element" :class="{ locked }"></div>
+    <div class="monaco-container" :data-path="path" ref="element" :class="{ locked }"></div>
 </template>
 
 <style scoped>
-#monacoEditor {
+.monaco-container {
     position: relative;
     height: 100%;
 }
 
-#monacoEditor.locked::after {
+.monaco-container.locked::after {
     content: "";
     position: absolute;
     pointer-events: none;

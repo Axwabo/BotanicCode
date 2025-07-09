@@ -23,10 +23,16 @@ watch(currentFile, async value => {
         return;
     if (editors.get(value)) {
         navigate(value);
+        setTimeout(focus, 1);
         return;
     }
     const contents = await get(value);
     navigate(value, contents);
+    setTimeout(focus, 1);
+
+    function focus() {
+        document.querySelector<HTMLTextAreaElement>(`.monaco-container[data-path='${value}'] textarea`)?.focus();
+    }
 }, { immediate: true });
 
 onMounted(() => {
