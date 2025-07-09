@@ -32,8 +32,13 @@ function handleMessage(ev) {
                 tile.type = type;
                 tile.data = data;
             });
-            addEventListener("itemupdated", /** @param event {ItemUpdatedEvent} */event =>
-                board.getChunkAtPosition(event.item.position).handleItemUpdate(event.item));
+            addEventListener("itemupdated", /** @param event {ItemUpdatedEvent} */event => {
+                const items = board.getChunkAtPosition(event.item.position).items;
+                if (!event.item.amount)
+                    delete items[event.item.id];
+                else
+                    items[event.item.id] = event.item;
+            });
             dispatchEvent(new WorldLoadedEvent(board, ev.data.bots));
             break;
         case "tile":

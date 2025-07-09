@@ -54,12 +54,4 @@ export class Chunk {
     getTile(x, y) {
         return this.rows[y].getTile(x);
     }
-
-    /** @param item {DroppedItem} */
-    handleItemUpdate(item) {
-        if (!item.amount)
-            delete this.items[item.id];
-        else
-            this.items[item.id] = item;
-    }
 }

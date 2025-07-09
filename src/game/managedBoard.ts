@@ -32,7 +32,11 @@ export default class ManagedBoard extends Board {
     }
 
     handleItemUpdate(item: DroppedItem) {
-        this.getChunkAtPosition(item.position).handleItemUpdate(item);
+        const items = this.getChunkAtPosition(item.position).items;
+        if (!item.amount)
+            delete items[item.id];
+        else
+            items[item.id] = item;
         this.dispatchEvent(new ItemUpdatedEvent(item));
     }
 }
