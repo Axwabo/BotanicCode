@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { defineAsyncComponent, onMounted, watch } from "vue";
+import { defineAsyncComponent, onMounted, onUnmounted, watch } from "vue";
 import useFileStore from "../../fileStore.ts";
 import { storeToRefs } from "pinia";
 import Loading from "./Loading.vue";
@@ -8,7 +8,7 @@ import EditorTitleBar from "./EditorTitleBar.vue";
 import { tutorialSequence } from "../../tutorialStore.ts";
 
 const { currentFile } = storeToRefs(useFileStore());
-const { navigate, editors, get, restoreEditors } = useFileStore();
+const { navigate, editors, files, get, restoreEditors } = useFileStore();
 
 const sequence = tutorialSequence();
 
@@ -29,7 +29,20 @@ watch(currentFile, async value => {
     navigate(value, contents);
 }, { immediate: true });
 
-onMounted(() => restoreEditors());
+onMounted(() => {
+    restoreEditors();
+    window.addEventListener("beforeunload", handleUnload);
+});
+
+onUnmounted(() => window.removeEventListener("beforeunload", handleUnload));
+
+function handleUnload(event: BeforeUnloadEvent) {
+    if (!currentFile.value)
+        return;
+    const state = files.get(currentFile.value);
+    if (state === "created" || state === "modified")
+        event.preventDefault();
+}
 </script>
 
 <template>

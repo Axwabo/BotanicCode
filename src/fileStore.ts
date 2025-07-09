@@ -141,8 +141,18 @@ const useFileStore = defineStore("projectFiles", {
         close(path: string) {
             const current = this.currentFile;
             const openIndex = findIndex(this.editors, current);
-            if (this.editors.delete(path))
+            if (this.editors.delete(path)) {
                 commitEditors(this.editors, current);
+                const state = this.files.get(path);
+                switch (state) {
+                    case "created":
+                        this.files.delete(path);
+                        break;
+                    case "modified":
+                        this.files.set(path, "saved");
+                        break;
+                }
+            }
             if (current !== path)
                 return;
             if (!this.editors.size) {
