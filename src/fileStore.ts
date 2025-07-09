@@ -38,6 +38,14 @@ function findIndex(editorPaths: Map<string, EditorInstance>, current: string) {
     return -1;
 }
 
+function pathAtIndex(editors: Map<string, EditorInstance>, targetIndex: number) {
+    const editorPaths = editors.keys();
+    let path = "";
+    for (let i = 0; i <= targetIndex; i++)
+        path = editorPaths.next().value!;
+    return path;
+}
+
 function commitEditors(editors: Map<string, EditorInstance>, current: string) {
     localStorage.setItem(openEditorsKey, Array.from(editors.keys()).concat(current).join("\n"));
 }
@@ -106,6 +114,16 @@ const useFileStore = defineStore("projectFiles", {
             this.currentFile = path;
             commitEditors(this.editors, path);
         },
+        cycleTabs(delta: number) {
+            if (!this.currentFile)
+                return;
+            let index = findIndex(this.editors, this.currentFile) + delta;
+            if (index >= this.editors.size)
+                index = 0;
+            else if (index < 0)
+                index = this.editors.size - 1;
+            this.navigate(pathAtIndex(this.editors, index));
+        },
         async restoreEditors() {
             await this.init();
             const paths = localStorage.getItem(openEditorsKey);
@@ -161,11 +179,7 @@ const useFileStore = defineStore("projectFiles", {
                 return;
             }
             const targetIndex = Math.max(0, Math.min(this.editors.size - 1, openIndex));
-            const editorPaths = this.editors.keys();
-            let targetPath = "";
-            for (let i = 0; i <= targetIndex; i++)
-                targetPath = editorPaths.next().value!;
-            this.navigate(targetPath);
+            this.navigate(pathAtIndex(this.editors, targetIndex));
         }
     }
 });

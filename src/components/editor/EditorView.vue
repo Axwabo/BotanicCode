@@ -8,7 +8,7 @@ import EditorTitleBar from "./EditorTitleBar.vue";
 import { tutorialSequence } from "../../tutorialStore.ts";
 
 const { currentFile } = storeToRefs(useFileStore());
-const { navigate, editors, files, get, restoreEditors } = useFileStore();
+const { cycleTabs, navigate, editors, files, get, restoreEditors } = useFileStore();
 
 const sequence = tutorialSequence();
 
@@ -32,9 +32,13 @@ watch(currentFile, async value => {
 onMounted(() => {
     restoreEditors();
     window.addEventListener("beforeunload", handleUnload);
+    window.addEventListener("keydown", handleKeyDown);
 });
 
-onUnmounted(() => window.removeEventListener("beforeunload", handleUnload));
+onUnmounted(() => {
+    window.removeEventListener("beforeunload", handleUnload);
+    window.addEventListener("keydown", handleKeyDown);
+});
 
 function handleUnload(event: BeforeUnloadEvent) {
     if (!currentFile.value)
@@ -42,6 +46,15 @@ function handleUnload(event: BeforeUnloadEvent) {
     const state = files.get(currentFile.value);
     if (state === "created" || state === "modified")
         event.preventDefault();
+}
+
+function handleKeyDown(event: KeyboardEvent) {
+    if (!event.ctrlKey || !event.altKey)
+        return;
+    if (event.key === "ArrowRight")
+        cycleTabs(1);
+    else if (event.key === "ArrowLeft")
+        cycleTabs(-1);
 }
 </script>
 

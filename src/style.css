@@ -48,6 +48,10 @@ dialog h1 {
     margin-top: 0;
 }
 
+.monaco-editor {
+    --vscode-focusBorder: transparent !important;
+}
+
 @media (min-width: 1000px) {
     #app {
         grid-template-columns: auto minmax(0, 1fr) 1fr;
