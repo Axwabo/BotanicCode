@@ -120,8 +120,8 @@ function handleMouseMove(event: MoveEvent) {
     }
     if (!dragging.value)
         return;
-    game.value.position.x -= isNaN(x) ? 0 : event.offsetX - x;
-    game.value.position.y -= isNaN(y) ? 0 : event.offsetY - y;
+    game.value.position.x -= isNaN(x) ? 0 : Math.round((event.offsetX - x) / game.value.zoom);
+    game.value.position.y -= isNaN(y) ? 0 : Math.round((event.offsetY - y) / game.value.zoom);
 }
 
 function zoom(delta: number) {

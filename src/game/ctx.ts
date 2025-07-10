@@ -40,9 +40,10 @@ export function canvasToWorld(pointerX: number, pointerY: number) {
     const currentRenderer = renderer.value;
     if (!currentRenderer)
         throw new Error("Renderer is not initialized");
+    const { width, height } = currentRenderer.canvas;
     const { zoom, position: { x, y } } = game.value;
     return {
-        x: (pointerX + x - currentRenderer.canvas.width * 0.5) / zoom,
-        y: (pointerY + y - currentRenderer.canvas.height * 0.5) / zoom
+        x: x - (width * 0.5 - pointerX) / zoom,
+        y: y - (height * 0.5 - pointerY) / zoom
     };
 }
