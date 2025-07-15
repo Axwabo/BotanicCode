@@ -36,10 +36,10 @@ function createBoard() {
     plant(board, 2, 2, "potato");
     plant(board, 3, 2, "tomato");
     plant(board, 4, 2, "strawberry");
-    createCow(board, { x: 20, y: 40 });
-    createPig(board, { x: -20, y: -40 });
-    createSheep(board, { x: 20, y: -40 });
-    createChicken(board, { x: -20, y: 40 });
+    createCow(board, { x: -80, y: 40 });
+    createPig(board, { x: -120, y: -40 });
+    createSheep(board, { x: -80, y: -40 });
+    createChicken(board, { x: -120, y: 40 });
     return board;
 }
 

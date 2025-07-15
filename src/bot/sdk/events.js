@@ -11,6 +11,7 @@ import RenderEvent from "../../util/world/events/render.js";
 import EntityEnergyUpdatedEvent from "../../util/world/events/energyUpdated.js";
 import { signalError } from "./ready.js";
 import ItemUpdatedEvent from "../../util/world/events/itemUpdated.js";
+import MagicReadyEvent from "../../util/world/events/magicReady.js";
 
 addEventListener("message", handleMessage);
 
@@ -85,6 +86,9 @@ function handleResponse(bot, response) {
             break;
         case "energy":
             dispatchEvent(new EnergyDepletionEvent(bot.name, response.amount));
+            break;
+        case "magicReady":
+            dispatchEvent(new MagicReadyEvent(bot.name));
             break;
     }
 }

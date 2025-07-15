@@ -26,3 +26,16 @@ export function createSheep(board: ManagedBoard, position: WorldPosition) {
 export function createChicken(board: ManagedBoard, position: WorldPosition) {
     return new Chicken(board, position, "chicken", tileSize * 0.3, tileSize * 0.6);
 }
+
+export function createEntity(board: ManagedBoard, position: WorldPosition, type: EntityType): ManagedEntity {
+    switch (type) {
+        case "cow":
+            return createCow(board, position);
+        case "pig":
+            return createPig(board, position);
+        case "sheep":
+            return createSheep(board, position);
+        case "chicken":
+            return createChicken(board, position);
+    }
+}

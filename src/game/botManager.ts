@@ -15,15 +15,18 @@ import EntityPositionUpdatedEvent from "../util/world/events/entityPosition";
 import EntityRemovedEvent from "../util/world/events/entityRemoved";
 import { botRadius } from "../bot/sdk/bot.js";
 import { plant, plantableToPlantType } from "./plants/create.ts";
-import { worldToTile } from "../util/tileConstants";
+import { tileSize, worldToTile } from "../util/tileConstants";
 import { modifyInventory } from "../util/inventoryHelper";
 import type { Updatable } from "../bot/sdk/entities";
 import type RenderEvent from "../util/world/events/render";
 import type EntityEnergyUpdatedEvent from "../util/world/events/energyUpdated";
 import WorkerLogEvent from "./events/workerLogEvent.ts";
-import { getDrops } from "./plants/harvesting.ts";
+import { getDrops, isPlant } from "./plants/harvesting.ts";
 import type { ItemType } from "../bot/sdk/items";
 import type ItemUpdatedEvent from "../util/world/events/itemUpdated";
+import { isInRange } from "../util/distance";
+import { createEntity } from "./entities/create.ts";
+import MovableEntity from "./entities/movableEntity.ts";
 
 type EventHandler<T> = (event: T) => void;
 
@@ -154,6 +157,30 @@ export default class BotManager implements Updatable {
                     position: { ...bot.position }
                 });
                 this.modifyInventory(bot, request.item, -amount);
+                break;
+            case "magic":
+                if (bot.magicCooldown > 0)
+                    break;
+                if ("id" in request.target) {
+                    for (const entity of this.board.entities.values()) {
+                        if (entity.id !== request.target.id || !(entity instanceof MovableEntity))
+                            continue;
+                        if (!isInRange(entity.position.x, entity.position.y, bot.position.x, bot.position.y, tileSize))
+                            break;
+                        entity.depleteEnergy(-1);
+                        const clone = createEntity(this.board, bot.position, entity.type);
+                        if (clone instanceof MovableEntity)
+                            clone.depleteEnergy(Math.random() * 0.2 + 0.6);
+                        return;
+                    }
+                    this.sendMagicReady(bot);
+                    break;
+                }
+                const tile = this.board.getTile(request.target.x, request.target.y);
+                if (!isPlant(tile.data))
+                    break;
+                tile.data.ageSeconds = 1000;
+                editorHandler.dispatchEvent(new TileUpdatedEvent(tile));
                 break;
         }
     }
