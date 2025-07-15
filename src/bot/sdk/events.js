@@ -27,6 +27,8 @@ function handleMessage(ev) {
             break;
         case "world":
             const board = createBoardFromJson(ev.data.board);
+            for (const entity of ev.data.entities)
+                board.entities.add(entity);
             addEventListener("tileupdated", /** @param event {TileUpdatedEvent} */event => {
                 const { x, y, type, data } = event.tile;
                 const tile = board.getTile(x, y);
@@ -39,6 +41,24 @@ function handleMessage(ev) {
                     delete items[event.item.id];
                 else
                     items[event.item.id] = event.item;
+            });
+            addEventListener("entityadded", /** @param event {EntityAddedEvent} */event => board.entities.add(event.entity));
+            addEventListener("entitypositionupdated", /** @param event {EntityPositionUpdatedEvent} */event => {
+                for (const entity of board.entities) {
+                    if (entity.id === event.id) {
+                        entity.position.x = event.position.x;
+                        entity.position.y = event.position.y;
+                        break;
+                    }
+                }
+            });
+            addEventListener("entityremoved", /** @param event {EntityRemovedEvent} */event => {
+                for (const entity of board.entities) {
+                    if (entity.id === event.id) {
+                        board.entities.delete(entity);
+                        break;
+                    }
+                }
             });
             dispatchEvent(new WorldLoadedEvent(board, ev.data.bots));
             break;

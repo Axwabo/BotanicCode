@@ -3,6 +3,7 @@ import { Chunk, Row } from "./tile.js";
 
 // TODO: would it be more ideal to store plain objects and create functions to manipulate world data instead?
 
+/** @returns {Board} */
 export default function createBoardFromJson(chunkStoreContent) {
     const deserialized = JSON.parse(chunkStoreContent);
     const board = new Board();

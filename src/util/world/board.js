@@ -3,6 +3,8 @@ import { getChunkRemainder, tilesPerChunk, worldToTile } from "../tileConstants.
 
 export class Board {
     chunkStore = new ChunkStore();
+    /** @type {Set<Entity>} */
+    entities = new Set();
 
     /**
      * @param x {number}

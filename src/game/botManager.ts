@@ -5,7 +5,7 @@ import { editorHandler } from "./events/editorHandler.ts";
 import WorkerErrorEvent from "./events/workerErrorEvent.ts";
 import { validateMove } from "../util/movement";
 import TileUpdatedEvent from "../util/world/events/tileUpdated";
-import cloneData from "./cloneData.ts";
+import { cloneData, cloneEntity } from "./cloneData.ts";
 import { reactive } from "vue";
 import AddGizmosEvent from "./events/addGizmosEvent.ts";
 import { type BotInstance } from "./botInstance.ts";
@@ -169,7 +169,7 @@ export default class BotManager implements Updatable {
                         if (!isInRange(entity.position.x, entity.position.y, bot.position.x, bot.position.y, tileSize))
                             break;
                         entity.depleteEnergy(-1);
-                        const clone = createEntity(this.board, bot.position, entity.type);
+                        const clone = createEntity(this.board, { ...bot.position }, entity.type);
                         if (clone instanceof MovableEntity)
                             clone.depleteEnergy(Math.random() * 0.2 + 0.6);
                         bot.magicCooldown = 60;
@@ -212,7 +212,12 @@ export default class BotManager implements Updatable {
     }
 
     sendBoard(board: Board) {
-        this.send({ type: "world", board: JSON.stringify(board.chunkStore), bots: Array.from(this.bots.values()).map(toInitialData) });
+        this.send({
+            type: "world",
+            board: JSON.stringify(board.chunkStore),
+            bots: Array.from(this.bots.values()).map(toInitialData),
+            entities: Array.from(this.board.entities.values()).map(cloneEntity)
+        });
     }
 
     sendTileUpdate(event: TileUpdatedEvent) {

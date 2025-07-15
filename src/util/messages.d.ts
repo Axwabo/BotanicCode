@@ -51,6 +51,7 @@ interface World {
     type: "world";
     board: string;
     bots: InitialBotData[];
+    entities: Entity[];
 }
 
 interface TileUpdate {

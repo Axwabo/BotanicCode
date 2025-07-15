@@ -1,6 +1,7 @@
 import type { GrowingPlant, TileData } from "../util/tile";
+import type { Entity } from "../bot/sdk/entities";
 
-export default function cloneData(data?: TileData): TileData | Omit<GrowingPlant, "tick" | "growthPercentage"> | undefined {
+export function cloneData(data?: TileData): TileData | Omit<GrowingPlant, "tick" | "growthPercentage"> | undefined {
     if (!data)
         return undefined;
     switch (data.type) {
@@ -19,4 +20,14 @@ export default function cloneData(data?: TileData): TileData | Omit<GrowingPlant
         case "fence":
             return { type: "fence", posts: Array.from(data.posts) };
     }
+}
+
+export function cloneEntity(entity: Entity): Entity {
+    return {
+        id: entity.id,
+        type: entity.type,
+        position: { ...entity.position },
+        radius: entity.radius,
+        energy: entity.energy
+    };
 }
