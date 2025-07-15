@@ -1,7 +1,9 @@
 import type { ItemType, Plantable } from "./items";
+import type { Entity } from "./entities";
+import type { Tile } from "../../util/tile";
 
-export type BotRequest = Create | Move | Terminate | Harvest | Plant | Drop;
-export type BotResponse = Terminate | PositionUpdate | PickUp | EnergyDepletion;
+export type BotRequest = Create | Move | Terminate | Harvest | Plant | Drop | Magic;
+export type BotResponse = Terminate | PositionUpdate | PickUp | EnergyDepletion | MagicReady;
 
 interface Create {
     type: "create";
@@ -32,6 +34,11 @@ interface Drop {
     amount: number;
 }
 
+interface Magic {
+    type: "magic";
+    target: Entity | Tile;
+}
+
 interface PositionUpdate {
     type: "position";
     x: number;
@@ -47,4 +54,8 @@ interface PickUp {
 interface EnergyDepletion {
     type: "energy";
     amount: number;
+}
+
+interface MagicReady {
+    type: "magicReady";
 }

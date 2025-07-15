@@ -11,6 +11,8 @@ const bots = new Map();
 const inventories = new Map();
 /** @type {Map<string, number>} */
 const energy = new Map();
+/** @type {Set<string>} */
+const magicReady = new Set();
 
 let initial = false;
 
@@ -110,6 +112,18 @@ class Bot {
     get energy() {
         return energy.get(this.name) ?? 0;
     }
+
+    get canUseMagic() {
+        return magicReady.has(this.name);
+    }
+
+    /** @param entityOrTile {Entity | Tile} */
+    magic(entityOrTile) {
+        if (!this.canUseMagic)
+            return;
+        magicReady.delete(this.name);
+        this.#request({ type: "magic", target: entityOrTile });
+    }
 }
 
 /**
@@ -136,12 +150,12 @@ addEventListener("pickup", /** @param ev {PickUpEvent} */ev => {
         modifyInventory(inventory, ev.itemType, ev.count);
 });
 
-addEventListener("energydepletion", /** @param ev {EnergyDepletionEvent}*/ev => {
+addEventListener("energydepletion", /** @param ev {EnergyDepletionEvent} */ev => {
     const current = energy.get(ev.botName) ?? 0;
     energy.set(ev.botName, Math.max(0, Math.min(1, current - ev.amount)));
 });
 
-addEventListener("worldloaded", /** @param ev {WorldLoadedEvent}*/ev => {
+addEventListener("worldloaded", /** @param ev {WorldLoadedEvent} */ev => {
     for (const bot of ev.bots) {
         initial = true;
         const instance = new Bot(bot.name, ev.board);
@@ -151,3 +165,5 @@ addEventListener("worldloaded", /** @param ev {WorldLoadedEvent}*/ev => {
         energy.set(bot.name, bot.energy);
     }
 });
+
+addEventListener("magicready", /** @param ev {MagicReadyEvent} */ev => magicReady.add(ev.bot));

@@ -8,4 +8,5 @@ export interface BotInstance {
     inventory: Inventory;
     chunkSeconds: Map<Chunk, number>;
     energy: number;
+    magicCooldown: number;
 }

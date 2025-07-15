@@ -99,7 +99,8 @@ export default class BotManager implements Updatable {
                 position: reactive({ x: 0, y: 0 }),
                 inventory: new Map(),
                 chunkSeconds: new Map(),
-                energy: 1
+                energy: 1,
+                magicCooldown: 60
             });
             return;
         }
@@ -219,10 +220,18 @@ export default class BotManager implements Updatable {
         this.send({ type: "itemUpdate", item: ev.item });
     }
 
+    private sendMagicReady(bot: BotInstance) {
+        this.send({ type: "bot", name: bot.name, response: { type: "magicReady" } });
+    }
+
     tick(deltaSeconds: number): void {
         for (const bot of this.bots.values()) {
             const tile = this.board.getTileAt(bot.position.x, bot.position.y);
             this.depleteEnergy(bot, deltaSeconds * (tile.data?.type === "chargingStation" ? -0.01 : 0.001));
+            const couldUseMagic = bot.magicCooldown <= 0;
+            bot.magicCooldown -= deltaSeconds;
+            if (bot.magicCooldown <= 0 && !couldUseMagic)
+                this.sendMagicReady(bot);
         }
     }
 
