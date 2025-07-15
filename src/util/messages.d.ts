@@ -44,6 +44,7 @@ export interface InitialBotData {
     position: WorldPosition;
     inventory: [ ItemType, number ][];
     energy: number;
+    magicReady: boolean;
 }
 
 interface World {

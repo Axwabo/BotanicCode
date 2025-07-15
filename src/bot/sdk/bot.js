@@ -163,6 +163,8 @@ addEventListener("worldloaded", /** @param ev {WorldLoadedEvent} */ev => {
         bots.set(bot.name, instance);
         inventories.set(bot.name, new Map(bot.inventory));
         energy.set(bot.name, bot.energy);
+        if (bot.magicReady)
+            magicReady.add(bot.name);
     }
 });
 

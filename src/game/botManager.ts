@@ -276,6 +276,7 @@ function toInitialData(bot: BotInstance): InitialBotData {
         name: bot.name,
         position: { ...bot.position },
         inventory: Array.from(bot.inventory.entries()),
-        energy: bot.energy
+        energy: bot.energy,
+        magicReady: bot.magicCooldown <= 0
     };
 }
