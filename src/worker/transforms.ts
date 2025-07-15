@@ -11,7 +11,7 @@ export function getAbsolutePath(file: string, relativeTo?: string) {
     if (!file.startsWith("/") && !file.startsWith("./") && !file.startsWith("../"))
         return false; // invalid reference
     const fullPath = [ "bot" ];
-    if (relativeTo) {
+    if (relativeTo !== undefined) {
         fullPath.shift();
         fullPath.push(...relativeTo.split("/"));
         fullPath.shift();
@@ -38,7 +38,7 @@ export function getParent(path: string) {
 export function validateEntryFile(entry: string | null) {
     if (!entry)
         return false;
-    const path = getAbsolutePath(entry);
+    const path = getAbsolutePath(entry, "");
     return path && path.length > 1 && path[0] === "bot" && path[1] !== "sdk";
 }
 
