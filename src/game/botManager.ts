@@ -177,7 +177,7 @@ export default class BotManager implements Updatable {
                     break;
                 }
                 const tile = this.board.getTile(request.target.x, request.target.y);
-                if (!isPlant(tile.data))
+                if (!tile.data || !isPlant(tile.data))
                     break;
                 tile.data.ageSeconds = 1000;
                 editorHandler.dispatchEvent(new TileUpdatedEvent(tile));
