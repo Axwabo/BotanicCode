@@ -161,6 +161,7 @@ export default class BotManager implements Updatable {
             case "magic":
                 if (bot.magicCooldown > 0)
                     break;
+                console.log(request.target)
                 if ("id" in request.target) {
                     for (const entity of this.board.entities.values()) {
                         if (entity.id !== request.target.id || !(entity instanceof MovableEntity))
@@ -171,16 +172,20 @@ export default class BotManager implements Updatable {
                         const clone = createEntity(this.board, bot.position, entity.type);
                         if (clone instanceof MovableEntity)
                             clone.depleteEnergy(Math.random() * 0.2 + 0.6);
+                        bot.magicCooldown = 60;
                         return;
                     }
                     this.sendMagicReady(bot);
                     break;
                 }
                 const tile = this.board.getTile(request.target.x, request.target.y);
-                if (!tile.data || !isPlant(tile.data))
+                if (!tile.data || !isPlant(tile.data)) {
+                    this.sendMagicReady(bot);
                     break;
+                }
                 tile.data.ageSeconds = 1000;
                 editorHandler.dispatchEvent(new TileUpdatedEvent(tile));
+                bot.magicCooldown = 60;
                 break;
         }
     }
